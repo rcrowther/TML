@@ -1,0 +1,91 @@
+= HTML Quick Reference
+Common or notable HTML, using the HTML parser,
+
+main, div, aside etc.,
+
+#pre
+?code
+#main content#
+?
+#
+
+headline,
+
+#pre
+?code
+=== Some charms\nNot this for sure. But that?
+?
+#
+
+#pre
+?code
+=== Some charms\n[a{coffee.fr} Not this] for sure. But that?
+?
+#
+
+
+image (inline),
+
+#pre
+?code
+the dolphin,\n\n*.small[image of dolphin]{dolphin.mars.ok}\ndolphins are...
+?
+#
+
+horizontal rule,
+
+#pre
+?code
+_.dashed
+?
+#
+
+span,
+
+#pre
+?code
+Some special [ £2.99] text
+?
+#
+
+italic,
+
+#pre
+?code
+Some special £[i 2.99] text
+?
+#
+
+links block-level,
+
+#pre
+?code
+through to\n\n#a.external[go now!]{otherwhere.com} the other side\n\n#
+?
+#
+
+links (standard, inline),
+
+
+#pre
+?code
+through to [a.external[go now!]{otherwhere.com} the other side]
+?
+#
+
+pre,
+
+#pre
+?code
+?? To be,\n   Or not to be\nWhat now?\n?
+?
+#
+
+code,
+
+#pre
+?code
+#pre\n?code       var prevChar = currentChar\n       var closing = false\n     forward(until)\n?\n#
+?
+#
+

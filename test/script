@@ -1,0 +1,235 @@
+== Parser
+val p = Parser()
+val p = Parser2()
+
+== whitespace
+p("")
+p(" ")
+p("  ")
+p("\n")
+p("\n\n")
+
+== whitespace text
+p("x")
+p("duff ")
+p("duff")
+p(" duff")
+
+
+== block control full
+ p("## oops\n a daisy\n#\n")
+ p("## oops\n a daisy\n#")
+ p("## oops\n a daisy\n#")
+ p("##.klass oops\n a daisy\n\n#")
+ p("#tag.klass oops\n a daisy\n#")
+  p("##.klass       oops\n a daisy\n#")
+ 
+ 
+ p(" #tag.klass oops\n a daisy\n#")
+ p(" #tag.klass oops\n a daisy\n#\n")
+
+== block control alternate
+ p("#neato.hots oops\n a daisy\n\n#")
+ p("\n\n++ oops\n a daisy\n\n+")
+ p("\n\n+ol.success oops\n a daisy\n\n+")
+ p("\n\n++.success \n\n-- oops\n\n-\n\n-- a daisy\n\n-\n\n+")
+p("#bq truth, covered in security \n#")
+
+== Block control open
+p("#thing oops")
+p("\n#thing oops")
+p("#thing oops")
+ p("## oops")
+
+== block control close
+p("#\n oops")
+p("\n#\n oops")
+p("\n#  \n oops")
+
+== Attribute warning
+p("#thing{dot.com\n oops")
+p("#thing[frankly... \n oops")
+
+
+== Block literal
+p("??.lost loner\n?\nsee him")
+p("??   \nloner\n?")
+p("?? loner\n")
+
+== paragraph control
+p("~ loner\nsee him")
+p("== well\n~ well\n: well")
+
+== paragraph control alternate
+p("~ loner\nsee him")
+p("~ loner\n")
+p("~ loner")
+
+p("@ loner\nsee him")
+p("* loner\nsee him")
+
+
+
+== paragraph control count
+p("=h3.tracks loner\nsee him")
+p("= loner\nsee him")
+p("== loner\nsee him")
+p("==yp.tracks loner\nsee him")
+p("===.tracks loner\nsee him")
+
+p("===== loner\n\nsee him")
+
+== Selfclosing paragraph
+p("\n_.dashed ")
+p("_ ")
+
+
+== Parser
+val p = Parser()
+
+
+
+
+== inline full
+p("bell [stress ] cup")
+p("bell [stress not] cup")
+p("bell [stress.klass not] cup")
+p("bell [ not] cup")
+p("bell [italic not] cup")
+
+p("bell[stress not]cup")
+p("bell [stress       not] cup")
+p("bell [stress not      ] cup")
+
+== inlineOpen
+p("")
+p("sock[")
+p("[sock et")
+
+== inline close
+p("sock]")
+p("sock]it toem")
+
+
+== Inline closure warning
+p("bell [stress not\n cup")
+p("bell [? not\n cup")
+
+== inline mark
+p("bell*img.small[a bell]{church.com} cup")
+p("bell  *img.small    cup")
+
+p("bell\n*img.small cup")
+
+
+
+== Inline literal
+p("bell [?   not\\*#|[clusp   ] cup")
+
+p("?? play\n?")
+p("??\nplay\n?")
+
+p("""
+??
+To be
+  ...or not to be?
+That
+    [That!]
+  is the question.
+?
+""")
+p("\n?? \nTo be\n  ...or not to be?\nThat\n    [That!]\n  is the question.?\n")
+
+== Parser
+val p = Parser()
+val p = Parser2()
+p.whitespaceEnd(2, "    k")
+p.whitespaceEnd("    k")
+
+== HTML
+// main.section etc.
+p("#main content\n\n#")
+// headline
+p("=== Some charms\nNot this for sure. But that?")
+p("=== Some charms\n[a{coffee.fr} Not this] for now. So what?")
+// image (inline)
+p("the dolphin,\n\n*.small[image of dolphin]{dolphin.mars.ok}\ndolphins are...")
+// horizontal rule? Block level?...
+p("_.dashed")
+// Span block
+p("Some special [ £2.99] text")
+p("Some special £[i 2.99] text")
+
+// links block
+p("through to\n\n#a.external[go now!]{otherwhere.com} the other side\n\n#")
+// links (inline)
+p("through to [a.external[go now!]{otherwhere.com} the other side]")
+// pre
+p("?? To be,\n   Or not to be\nWhat now?\n?")
+
+// code
+p("#pre\n?code       var prevChar = currentChar\n       var closing = false\n     forward(until)\n?\n#")
+
+====
+p("")
+p("bell")
+p("bell cup")
+p("bell    cup")
+p("bell cup   ")
+p("   bell cup")
+p("   bell\n \n cup")
+
+p("bell\\cup")
+p("bell\\")
+p("bell\\]cup")
+
+
+== processLine
+p("")
+p("bell")
+p("bell cup")
+p("bell    cup")
+p("bell cup   ")
+p("   bell cup")
+p("bell[cup")
+p("bell]cup")
+
+== Newlines
+p("  \n")
+p("  s\n")
+p("  s\nq")
+p("s\nq")
+     
+   
+  
+== Parser
+val p = Parser()
+  val p = Parser2()
+  
+ == Lines
+p("\n1\n2\n3\n4")
+ 
+
+
+p("""
+== TML in short
+++
+-- TML does not try to be comprehensive for any particular output. 
+It provides basic text structuring and a few ways to insert stand-alone markup tags.
+-
+-- TML makes no attempt to be discrete or hidden.
+-
+-- TML is inflexible
+It can not be customised except by re-writing the parser.
+-
+-- TML does not try to copy other lightweight markups. 
+Some markups do this, to help a user remember how to use them. After all, markup is
+is a job most users will only do now and then.
+
+However, TML does sometimes inherit a few marks that look similar to other notations.
+-
+
+-- TML has a consistent and low-weight syntax.
+-
++
+""")

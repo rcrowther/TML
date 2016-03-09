@@ -1,0 +1,48 @@
+
+== What is a lightweight markup language
+A markup language is a set of marks and constructs added to text. These marks tell 
+any code or reader reading the text information about the text. The information may be used to
+adapt the display of the text (for example, defining some text to be a headline). In
+advanced usage, a markup language allows text to be used as a way to carry data, for example,
+that the number here, "&lt;long&gt;78&lt;long/&gt;", is a float.
+
+Markup languages can be found in most text files saved on a computer. Savedd Word processor files
+files use markup languages. Email often nowadays stores using HTML.
+
+Good markup languages use elaborate combinations of characters to avoid confusing
+markup with text. They also build in flexibility for usage in other contexts. For example,
+ XML allows the user to define their own markup tags.
+ 
+Markup languages which are unambiguous and flexible can be difficult for a human to read and edit.
+XML, for example, is bulky, and a very difficult language to both read and edit, even with the help of a dedicated editor.
+JSON uses nested brackets, which are easy for computers to scan, but hard for humans to read.
+
+=== lightweight markup languages
+Sometimes people like to write in markup languages. Writing them directly can be easier
+ than using some fancy graphical editor, and is often more reliable.
+
+These people use lightweight markup languages. Lightweight markup languages
+do not try to do all the actions of a full markup language. The language
+can sometimes be ambiguous, leading to errors or very complex work for
+the code that reads the language. However, lightweight languages
+are, above all, easy for a user to type or write. The resulting texts
+are run through code, producing the full markup language.
+
+=== Markup language world
+There are many lightweight markup languages. The Wikipedia entry lists several.
+The reason many Lightweight markups exist is because they are good at different things.
+
+You should probably try and read about a few. For example, if you
+wish to write about computer code and publish the result as a webpage,
+you should at least try Markdown. And if you would like a
+language with more heavyweight text-structuring abilities, try Restructured Text.
+
+If the final documents need to be in many different formats, then then, for example,
+Mallard or the markup language associated with the program Pandoc
+may be more suitable (they have different abilities, Mallard can generates help files organised by topic.
+and manuals, Pandoc can generate webpages, PDFs, and slides).
+
+https://en.wikipedia.org/wiki/Lightweight_markup_language
+http://projectmallard.org/about/learn/code
+https://en.wikipedia.org/wiki/ReStructuredText
+http://daringfireball.net/projects/markdown/

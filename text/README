@@ -1,0 +1,29 @@
+== Java TML parser
+The Java parser is a non-regex character-stepping parser. 
+When given a string (potentially containing line ends) the parser splits by line.
+
+The parser has these characteristics,
+
+++
+-- It is slow
+Stepping along arrays (String = array of codepoints) in Java is slow.
+ Also, the string split creates new strings for each line 
+ (in mitigation, the parser creates no other strings, for example, by trimming). 
+-  
+-- The code is plain and open
+As a result of the above (Regex and/or non-linebased algorithms are more complex)
+-
+-- It handles any (Java-style) Unicode
+Java Regex can handle Unicode, but I kept this parser plain.
+-
+-- It handles any form of linebreak
+Using line splitting, this is easy.
+-
+-- It should show even performance to length/complexity
+In some peoples terminology, is 'scalable'.
++
+
+== State of project
+The original was written on a Windows 10 laptop computer using Eclipse. This setup was horribly slow, sometimes stalled, and the intermittent power supply caused unrequested shutdowns. The Eclipse Scala pluging remains, for my purposes, an unhappy experience. After I lost 2 hours work on yet another shutdown, I finished off on a proper computer. As a result, no automated tests have been written.   
+
+

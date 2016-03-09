@@ -1,0 +1,33 @@
+UML("""
+Well...
+
+Onwards
+short-circuit
+between text--typography
+and implying---something
+and a dictionary-.definition
+
+All proper with ligatures
+o|euf
+
+Getting mathematical
+Fractions:
+1/2
+1/3
+
+table = 5' :mx 5'
+room - table = 20 :m- 5
+hot = 100:mo
+
+Accents
+Known
+gar:ccon
+Unknown
+Karel :vCapek
+M::otorhead
+
+As the French say, <<ca va>>.
+...or English ``Whatever''
+
+(c)2013 Robert Crowther
+""")
