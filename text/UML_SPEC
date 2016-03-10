@@ -1,0 +1,112 @@
+= Spec
+UML is markup used to translate keyboard-available characters into Unicode. In no way is it intended as comprehensive. But it may help to make simple typograaphy more available.
+
+== Generalities
+If any match fails, the input symbols should be printed to output as they lie in the input.
+
+UML depends on typographical input. Some of the character sequences are bound to create unexpected conversions if the text is in some way complex.
+
+
+== Input format
+Input is text. The form of input, stream, file, etc. is not defined.
+
+=== Unicode
+UML must always be Unicode (not, for example, some subsection handling Latin).
+
+== Parsing generalities
+Each group in the character references should be available as a seperate call. 
+Some more combined groups may be implemented also.
+Subgroups are detailed for purpose of information.
+
+
+== Character sequences
+A pseudo-PEG grammar shows the required match and format (for complex matches, sometimes detailed below). The format is designed to be readable, efficent code will be optomised.
+
+
+=== basic
+Legal marks, hyphens, dashes and elipses.
+
+==== Legal marks
+"(c)" = copyright
+"(t)" = trademark
+"(r)" = registered
+
+The copyright, trademark, and registered legal marks.
+
+==== Ellipsis
+"..." = ellipsis
+
+==== Hyphen
+(A-Z|a-z) ~ "-"
+
+Must be preceeded directly by a letter (which prints to output).
+
+==== Dashes
+
+"---" = em
+"--" = en
+"-." = dictionary hyphen
+
+
+=== Typography
+Should include basic, and the following,
+
+==== Combining marks
+":" ~ oneOf(
+| "c" CEDILLA
+| ":" DIAERESIS
+| "u" BREVE
+| "^" CIRCUMFLEX
+| "v" CARRON
+| "o" RING
+| "\" GRAVE ACCENT
+| "/" ACUTE ACCENT
+) ~ LETTER
+
+The tables may match a character first. If character matching is attempted, they should first implement ''Latin-1 Supplement' Letters, meaning vowels (vowels includes ''y') for accents, not including BREVE and CARRON.
+
+If character tables fail, they should fall back to using combining characters.
+
+Java advice: "never build your own tables".
+
+==== Quotes
+"''"  single quotes open
+"'" single quote close and apostrophe
+"\"\""  double quote open 
+"\"" double quote close
+"<<" guillemet open
+">>" guillemet close
+
+~ Rationale
+: An unusual quote system. However, TML convention suggests an open should be distinguished from a close, and that characters should be, where possible, repeated.
+
+This system also, as do some other systems, allows single quote close to be an apostrophe (Unicode approved usage).
+
+
+=== Math
+Fractions, math symbols (inc. mathematical multiply/minus, and degree).
+
+==== Fractions
+anyOf(1235678) ~ "/" ~ anyOf(234568)
+
+All non-reducable fractions with factorial 2,3,4,5,7,8. Non-reducable means 3/4 exists, but not 2/4 (reduces to 1/2).
+
+==== Maths symbols
+":mx" multiply
+":m-" minus
+":mo" degree
+
+
+~ Rationale
+: Degree also has use as the unit of temperature. However, use for temperature can still be regarded as ''math', and spares symbols for other uses.
+
+~ Rationale
+: Multiply also has use for volume dimensions. It can still be regarded as ''math'.
+
+
+== Notes
+=== ligatures
+Unicode regards ligatures as a feature of presentation. They have an effect on semantic parsing, so Unicode discourage their use. Consequently, they are not enabled.
+
+=== Math before typography
+If used tohether, ''math' should be parsed before ''typography'. The math definition of ''minus' is unlikley to be ambiguous, but the typographical hyphen wil replace it if typography is used first.   

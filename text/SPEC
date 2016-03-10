@@ -4,7 +4,7 @@ TML is a lightweight markup tool, designed to turn relaively human-readable mark
 
 == Generalities
 
-=== TML as typorgaphical
+=== TML as typographical
 TML syntax is mainly aimed at generating typographical markup.
 
 TML is based round bracketting, not indenting.
