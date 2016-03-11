@@ -43,7 +43,6 @@ import java.util.regex.Pattern
   * [[http://daringfireball.net/projects/smartypants/]]
   */
 //TODO: soft hyphen (&#173;
-//TODO: Hyphen with intro letter, or ok as single -?
 //TODO: Make into one pass?
 object UML {
 
@@ -67,18 +66,16 @@ object UML {
 
 
   private val elipsisSP = nc("""\.\.\.""")
-  private val dashSP = nc("""-(?:(?:-{1,2})|(?:\.))""")
-  private val hyphenSP = nc("""[A-Za-z]-""")
+  private val hyphenDashSP = nc("""-(?:-{1,2}|\.)?""")
   private val legalMarkSP = nc("""\([ctr]\)""")
 
   private val basicP = Pattern.compile('(' + (
-    dashSP
+    hyphenDashSP
       | elipsisSP
-      | hyphenSP
       | legalMarkSP
   ) + ')')
 
-  println(s"basicP $basicP")
+  //println(s"basicP $basicP")
 
   private def basics(m: String)
       : String =
@@ -89,13 +86,17 @@ object UML {
       // dashes
       case '-' => {
         //println(s"dash match $m")
-        // em/dict else en
-        if (m.size == 2) {
-          // 'dictionary hyphen' else 'en'
-          if (m(1) == '.')"&#8231;"
-          else "&#8211;"
+        // hyphen else dash
+        if (m.size == 1) "&#8208;"
+        else {
+          // em/dict else en
+          if (m.size == 2) {
+            // 'dictionary hyphen' else 'en'
+            if (m(1) == '.')"&#8231;"
+            else "&#8211;"
+          }
+          else "&#8212;"
         }
-        else "&#8212;"
       }
 
       // ellipsis
@@ -112,12 +113,8 @@ object UML {
 
       // source match, but no recognition match
       case _ => {
-        // TODO: slow?
-        if (Character.isLetter(m(0))) m(0) + "&#8208;"
-        else {
-          println(s"unmatched search? $m")
-          m
-        }
+        println(s"unmatched search? $m")
+        m
       }
     }
   }
@@ -145,7 +142,7 @@ object UML {
       | accentSP
   ) + ')')
 
-  println(s"typographyP $typographyP")
+  //println(s"typographyP $typographyP")
   private def typographies(m: String)
       : String =
   {
@@ -383,6 +380,7 @@ object UML {
     * "---" = em for new material, or sentence joining.
     * "--" = en for ranges.
     * "-." = dictionary hyphen.
+    * "-" = hyphen.
     * }}}
     *
     * Ellipse,

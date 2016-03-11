@@ -19,7 +19,13 @@ TML is written as a tool. It is formed round the parser, not the end result. Thi
 : For some markups, TML can be inelegant in use. It is not unobtrusive. However, TML gains the advantages of being easy to comprehend, learn and remember. The implemented parsers are generous with error reports, and at recovering data from malformed input.
 
 
+==== Explicit markup protection by filtering
+A common problem in markup is the need to filter, or protect, areas against parsing. Such areas may include embedded mathematical notation, or computer code.
 
+TML is a tool, so the attitude of the parser should be to ignore such problems. Bweyond the TML definition of literals, a TML parser should include no markup protection code. 
+
+If necessary, seperate tools may be provided to establish a pipeline. These are encouraged --- e.g. a filter to duck TML literals.
+ 
 
 == Input format
 Input is text. The form, stream, file, is not defined.
