@@ -58,11 +58,7 @@ verifyControlDefinitions()
     * Produces double quoted values for a common map of attributes.
     */
   private def attributesStockRender(attrs: MarkAttributes) {
-    if (attrs.id != "") {
-      b ++= " id=\""
-      b ++= attrs.id
-      b ++= "\""
-    }
+
     if (attrs.klass != "") {
       b ++= " class=\""
       b ++= attrs.klass
@@ -116,11 +112,7 @@ verifyControlDefinitions()
 
     b += '<'
     b ++= attrs.resolvedTagname
-    if (attrs.id != "") {
-      b ++= " id=\""
-      b ++= attrs.id
-      b ++= "\""
-    }
+
     if (attrs.klass != "") {
       b ++= " class=\""
       b ++= attrs.klass

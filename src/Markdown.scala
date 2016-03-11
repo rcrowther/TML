@@ -71,11 +71,7 @@ class Markdown
     *
     */
   private def attributesStockRender(attrs: MarkAttributes) {
-    if (attrs.id != "") {
-      b ++= " id=\""
-      b ++= attrs.id
-      b ++= "\""
-    }
+
     if (attrs.klass != "") {
       b ++= " class=\""
       b ++= attrs.klass
@@ -129,11 +125,7 @@ class Markdown
 
     b += '<'
     b ++= attrs.resolvedTagname
-    if (attrs.id != "") {
-      b ++= " id=\""
-      b ++= attrs.id
-      b ++= "\""
-    }
+
     if (attrs.klass != "") {
       b ++= " class=\""
       b ++= attrs.klass

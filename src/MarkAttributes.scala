@@ -15,7 +15,6 @@ package tml
 class MarkAttributes(
   var control: Char,
   var tagName: String,
-  var id: String,
   var klass: String,
   var url: String,
   var text: String
@@ -109,8 +108,6 @@ class MarkAttributes(
     b append control
     b ++= ", tagName:"
     b append tagName
-    b ++= ", id:"
-    b append id
     b ++= ", klass:"
     b append klass
     b ++= ", text:"
@@ -130,26 +127,25 @@ class MarkAttributes(
 object MarkAttributes {
   // NB: Woul;d need to override every allocation to return
   // new instances to make this work
-  //private val emptyThing: MarkAttributes = new MarkAttributes('\0', "", "", "", "", "")
+  //private val emptyThing: MarkAttributes = new MarkAttributes('\0', "", "", "", "")
   //def empty(): MarkAttributes = emptyThing
 
   def apply()
       : MarkAttributes =
   {
-    new MarkAttributes('\0', "", "", "", "", "")
+    new MarkAttributes('\0', "", "", "", "")
   }
 
   def apply(
     control: Char,
     tagName: String,
-    id: String,
     klass: String,
     text: String,
     url: String
   )
       : MarkAttributes =
   {
-    new MarkAttributes(control, tagName, id, klass, url, text)
+    new MarkAttributes(control, tagName, klass, url, text)
   }
 
 }//MarkAttributes

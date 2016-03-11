@@ -415,18 +415,14 @@ abstract class Parser()
     var ma = MarkAttributes()
     ma.control = controlChar
     ma.tagName = getUntil(
-      (c: Char) => { c == '#' || c == '.' || c == '{' || c == '[' || Character.isWhitespace(c) }
+      (c: Char) => { c == '.' || c == '{' || c == '[' || Character.isWhitespace(c) }
     )
 
     while (!Character.isWhitespace(currentChar)) {
       currentChar match {
-        case '#' => {
-          forward()
-          ma.id = getUntil((c: Char) => { c == '.' || c == '{' || c == '[' || Character.isWhitespace(c) })
-        }
         case '.' => {
           forward()
-          ma.klass = getUntil((c: Char) => { c == '#' || c == '{' || c == '[' || Character.isWhitespace(c) })
+          ma.klass = getUntil((c: Char) => { c == '{' || c == '[' || Character.isWhitespace(c) })
         }
         case '{' => {
           forward()
