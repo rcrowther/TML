@@ -17,14 +17,17 @@
   *
   *
   * ==UML==
-  * [[UML]] is a lightweight language for character markup,
-  * converting characters into Unicode. It handles conversion to
-  * Unicode copyright marks, quotes, fractions, accents, and others.
+  * [[UML]] is a lightweight language for character markup, converting
+  * characters into Unicode. Markup codes exist for copyright marks,
+  * quotes, fractions, accents, and others.
+  * 
   * {{{
-  * val res = UML(<string with UML markup>)
+  * val res = tml.UML(<string with UML markup>)
   * }}}
   *
-  * Will return simple text marked up with Unicode entities.
+  * Will return simple text marked up with Unicode entities. The
+  * package documentation contains full details of the markup
+  * available.
   *
   * ==EML==
   * [[EML]] is an object carrying methods for HTML escaping.

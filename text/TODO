@@ -1,7 +1,8 @@
 = General
 Namespace
 Get some test, someday
-Webpage defence code?
+Webpage/markup defence code?
+Filereader mixin
 
 = TML
 Macroformat extension
@@ -10,11 +11,12 @@ Fully abstract the char deefinitions
 New char for id
 Tidy
 Tail errors still not showing line data
-Healines as seperate paragraph altogether, avoid the default stuff?
+Headlines as seperate paragraph altogether, avoid the default stuff?
 
 = UML
-New brackets
- Writeup
+ Writeup package
+check spec
+Put UML in README.rst
 
 == EML
 Make your mind up, complementary object?

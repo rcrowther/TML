@@ -32,4 +32,12 @@ For the input string, some markup is needed. The package contains some documenta
 
     p("=== Some charms\n[a{coffee.fr} Not this] for now. So what?")
 
+UML
+---
+TML also includes a Unicode character markup method(s), called UML, ::
+
+    val res = tml.UML(<string with UML markup>)
+
+Converts simple markup code to curly brackets, trademark symbols, fractions, accented characters etc. See the documentation for details.
+
 ok.
