@@ -92,7 +92,7 @@ class HTML
     attrs: MarkAttributes
   )
   {
-    b ++= "<\\"
+    b ++= "</"
     b ++= attrs.resolvedTagname
     b += '>'
   }
@@ -138,7 +138,7 @@ class HTML
   }
 
   def renderParagraphClose(name: String) {
-    b ++= "<\\"
+    b ++= "</"
     b ++= name
     b += '>'
   }
@@ -163,7 +163,7 @@ class HTML
 
     // catch literal, ignore
     if (name != InlineLiteralTagname) {
-      b ++= "<\\"
+      b ++= "</"
       b ++= name
       b += '>'
     }
@@ -204,7 +204,47 @@ class HTML
   }
 
   def renderTextParagraphClose() {
-    b ++= "<\\p>"
+    b ++= "</p>"
+  }
+
+}//HTML
+
+
+
+object HTML {
+
+  def apply(str: String)
+  {
+    println("running apply")
+    val p = new HTML()
+    p.parse(str)
+    p.blockBalance(fix = false)
+    println
+    println(p.errorLog.toText())
+    println("out:")
+    println(s"'${p.result()}'")
+    println(p)
+  }
+
+// tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC""")
+// tml.HTML(tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC"""))
+  def apply(st: Traversable[String])
+  {
+    println("running apply")
+    val p = new HTML()
+    p.parse(st)
+    p.blockBalance(fix = false)
+    println
+    println(p.errorLog.toText())
+    println("out:")
+    println(s"'${p.result()}'")
+    println(p)
+  }
+
+  def apply()
+      : HTML =
+  {
+    new HTML()
   }
 
 }//HTML

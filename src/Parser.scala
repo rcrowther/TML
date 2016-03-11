@@ -7,6 +7,8 @@ import annotation._, elidable._
 
 /** A text markup parser.
   *
+* This class contains the mechanics of the parsing. It needs extending
+* to provide methods for rendering.
   */
 //TODO: Text position is broken. Needs paragraph detection.
 abstract class Parser()
@@ -1074,33 +1076,24 @@ abstract class Parser()
     */
   private def parseMainLoop()
   {
-    // Test for LF, or fail
-    // Ensure the parser ends in the following seq of 3 chars.
+
+    // Ensure the parser ends in the following seq of 2 chars.
     // NB: This parser makes no attempt to take the size of it's input,
-    //  it defines limits bay setting control characters to the
-    // end of input. In Java this can be expesive, as it is an
+    //  it defines limits by setting control characters to the
+    // end of input. In Java this can be expensive, as it is an
     // immutable string copy.
     // - LF
     // because most TML commands finish with LF
     // so this ensures trailing controls are completed.
     // - EOF
-    // For the main loop detection
-    // - EOF
-    // The Literal block makes an unrigorous search for
-    // the TML ending or EOF.
-    // - this allows us to bump limit when processing forward
-    // and also do an unchecked single forward for lookahead.
-
+    // For the main loop detection.
+    // ...this allows us to bump limit when processing forward.
+    // Test for LF, or fail
     errorIf(
       (in(in.size - 2) != LineFeed),
       s"String to parse (last - 2) must be LF in:'$in'"
     )
-    /*
-     errorIf(
-     (in(in.size - 2) != EOF),
-     s"String to parse (last - 2) must be TML EOF in:'$in'"
-     )
-     */
+
     // Test for EOF, or fail
     errorIf(
       (in(in.size - 1) != EOF),
@@ -1109,7 +1102,7 @@ abstract class Parser()
 
     println(s"parsing: 'in' size:${in.size}")
 
-    // this is ok to read '0', should always have EOF appended.
+    // this is ok to read '0', the string should always have EOF appended.
     resetCursor()
 
 
@@ -1158,8 +1151,12 @@ abstract class Parser()
     * terminating whitespace character. If required, the asserting
     * exception can be elided.
     *
+* *Note* Much Java code, if it reads by line from a file, strips
+* line ends. Such treated lines can be pushed directly to `parse`.
+*
     * @param line the string to be parsed for markup.
     */
+/*
   def parseLine(line: String)
   {
     // Test for LF, or fail
@@ -1172,17 +1169,34 @@ abstract class Parser()
 
     parseMainLoop()
   }
+*/
+
+  /** Processes a traversable of strings.
+    *
+* *Note* Much Java code, if it reads by line from a file, strips
+* line ends. This method works if linends are present, or not.
+*
+    * @param str the string to be parsed for markup.
+    */
+  def parse(st: Traversable[String])
+  {
+    val t = System.currentTimeMillis()
+
+st.foreach(parse)
+
+    println(s"time: ${System.currentTimeMillis() - t}")
+  }
 
   /** Processes results of a string builder.
     *
-    * In some circuemstances, this method may be faster than the other
+    * In some circumstances, this method may be faster than the other
     * methods, as the parser can take advantage of the string builder,
     * and not copy the string.
     * 
     * @param b the string builder containing the string to be parsed
     *  for markup.
     */
-  def parseString(b: StringBuilder)
+  def parse(b: StringBuilder)
   {
     b += LineFeed
     b += EOF
@@ -1195,7 +1209,7 @@ abstract class Parser()
     *
     * @param str the string to be parsed for markup.
     */
-  def parseString(str: String)
+  def parse(str: String)
   {
     val t = System.currentTimeMillis()
 
@@ -1285,11 +1299,12 @@ abstract class Parser()
     b.result
   }
 
+/*
   def apply(str: String)
   {
     println("running apply")
     clear()
-    parseString(str)
+    parse(str)
     blockBalance(fix = false)
     println
     println(errLog.toText())
@@ -1297,6 +1312,7 @@ abstract class Parser()
     println(s"'${b.result}'")
     println(toString())
   }
+*/
 
  def result() : String = b.result()
 
@@ -1304,12 +1320,4 @@ abstract class Parser()
 
 
 
-object Parser {
 
-  def apply()
-      : Parser =
-  {
-    new HTML()
-  }
-
-}//Parser

@@ -11,10 +11,24 @@
   * {{{
   * val p = new tml.HTML()
   * p.parse(<string with TML markup>)
+  * p.parse(tml.FileReader("""/home/rob/Code/scala/TML/textUML_SPEC"""))
   * p.result()
   * p.clear()
   * }}}
   *
+  *
+  * Or use the mini-filereader, built-in to preserve your sanity (no,
+  * no, I mean, "for ease of assessment and testing"),
+  *
+  * {{{
+  * val p = new tml.HTML()
+  * p.parse(tml.FileReader("""/home/<some filepath>/TML/text/SPEC"""))
+  * p.result()
+  * p.clear()
+  * }}}
+  *
+  * [[tml.FileReader]] is overloaded to accept paths of type `String`,
+  * `File`, or `Path`.
   *
   * ==UML==
   * [[UML]] is a lightweight language for character markup, converting

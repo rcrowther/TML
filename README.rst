@@ -28,13 +28,13 @@ In a REPL, try this, ::
     p.result()
     p.clear()
 
-For the input string, some markup is needed. The package contains some documentation. Try this (on the quick test ``apply'' method), ::
+For the input string, markup is needed. The package contains some documentation. Try this (on the quick test ``apply'' method), ::
 
     p("=== Some charms\n[a{coffee.fr} Not this] for now. So what?")
 
 UML
 ---
-TML also includes a Unicode character markup method(s), called UML, ::
+TML includes Unicode character markup method(s), called UML, ::
 
     val res = tml.UML(<string with UML markup>)
 

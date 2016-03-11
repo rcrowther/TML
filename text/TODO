@@ -2,7 +2,7 @@
 Namespace
 Get some test, someday
 Webpage/markup defence code?
-Filereader mixin
+TML parse traversable
 
 = TML
 Macroformat extension
@@ -12,11 +12,11 @@ New char for id
 Tidy
 Tail errors still not showing line data
 Headlines as seperate paragraph altogether, avoid the default stuff?
+deprecate id attribute
+
 
 = UML
- Writeup package
 check spec
-Put UML in README.rst
 
 == EML
 Make your mind up, complementary object?
