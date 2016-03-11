@@ -50,15 +50,14 @@ class HTML
 
   /** Test on construction that all marks are different.
     */
-verifyControlDefinitions()
+  verifyControlDefinitions()
 
   // Renderers
   /** Renders non-tag attributes.
     *
     * Produces double quoted values for a common map of attributes.
     */
-  private def attributesStockRender(attrs: MarkAttributes) {
-
+  protected def attributesStockRender(attrs: MarkAttributes) {
     if (attrs.klass != "") {
       b ++= " class=\""
       b ++= attrs.klass
@@ -80,19 +79,27 @@ verifyControlDefinitions()
   // ol, ul, dl,
   // li, dd, dt, blockquote
   def renderBlockOpen(attrs: MarkAttributes) = {
-    b += '<'
-    b ++= attrs.resolvedTagname
-    attributesStockRender(attrs)
-    b += '>'
+      b += '<'
+      b ++= attrs.resolvedTagname
+      attributesStockRender(attrs)
+      b += '>'
   }
 
   def renderBlockClose(
     attrs: MarkAttributes
   )
   {
-    b ++= "</"
+      b ++= "</"
+      b ++= attrs.resolvedTagname
+      b += '>'
+  }
+
+  // used for hr
+  def renderBlockSelfClosingMark(attrs: MarkAttributes) {
+    b += '<'
     b ++= attrs.resolvedTagname
-    b += '>'
+    attributesStockRender(attrs)
+    b ++= "/>"
   }
 
   // used for h?, pre
@@ -136,6 +143,16 @@ verifyControlDefinitions()
     b ++= name
     b += '>'
   }
+
+
+  def renderTextParagraphOpen() {
+    b ++= "<p>"
+  }
+
+  def renderTextParagraphClose() {
+    b ++= "</p>"
+  }
+
 
   // used for a, i, b, span
   def renderInlineOpen(attrs: MarkAttributes) = {
@@ -185,22 +202,6 @@ verifyControlDefinitions()
     b ++= "/>"
   }
 
-  // used for hr
-  def renderBlockSelfClosingMark(attrs: MarkAttributes) {
-    b += '<'
-    b ++= attrs.resolvedTagname
-    attributesStockRender(attrs)
-    b ++= "/>"
-  }
-
-  def renderTextParagraphOpen() {
-    b ++= "<p>"
-  }
-
-  def renderTextParagraphClose() {
-    b ++= "</p>"
-  }
-
 }//HTML
 
 
@@ -220,8 +221,8 @@ object HTML {
     println(p)
   }
 
-// tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC""")
-// tml.HTML(tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC"""))
+  // tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC""")
+  // tml.HTML(tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC"""))
   def apply(st: Traversable[String])
   {
     println("running apply")

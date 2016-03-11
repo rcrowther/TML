@@ -86,6 +86,7 @@ TML works by using one-character/codepoint controls embedded into a text documen
 For the purpose of this spec document, marks as realised as a control are named `chars', but may be Unicode codepoints.
 
 === Control Char definition
+?codeblock
 BlockParagraphMark = AnyOf('?', ...)
 BlockBracketMark = AnyOf('?', ...)
 BlockLiteralMark = '?'
@@ -93,13 +94,16 @@ BlockSelfClosingMark = '?'
 
 InlineBracketOpenMark = '?'
 InlineBracketCloseMark = '?'
+?
 
 Controls are initialized by defined chars. The chars can be any char, either defined in the parser or open to the user. All chars must be different.
 
 
 === Control Levels
 ==== Block
+?codeblock
 SideSignificant = NewLine ~ SkipSpace
+?
 
 Block-level control chars ar only active when  only  when preceeded by a newline, or
 a newline followed by space.
@@ -111,24 +115,22 @@ NB: If an inline control appears at block level, it will be assumed to start a p
 
 
 ==== Attributes
-#pre
-?code
+?codeblock
 AttributeValue = zeroOrMore(Letter)
 Attributes = (
-~ Option('#' ~ AttributeValue)
 ~ Option('.'  ~ AttributeValue)
 ~ Option('[' ~ zeroOrMore(Any) ~ (']' | NewLine))
 ~ Option('{'  ~ zeroOrMore(Any) ~ ('}' | NewLine))
 ) ~ Whitespace
 ?
-#
 
 Bracket opening and selfclosing marks can be followed by an attributes string. 
 
-# id attribute
+?codeblock
 . class attribute
-[] text attribute
+ text attribute
 {} URL attribute
+?
 
 All attributes are optional and can be presented in any order.
 
@@ -148,10 +150,9 @@ None of these characters can be used for other block-level codes.
 
 There is ambiguity between the control mark and the opening attribute mark. If ``#'' is an block-level open mark, is this, 
 
-#pre
-?code ##
+?codeblock
+ .##
 ?
-#
 
 a defaulting block control or a block with an empty ``id'' attibute?
 
@@ -164,9 +165,11 @@ TML does not say it is inline until it is in a paragraph, so the attribute codes
 Block level marks are all side-significant.
 
 === Bracketted blocks
+?codeblock
 BlockBracketed = BlockBracketMark ~ Attributes ~ SpaceDelimit
 ~ Paragraph ~ SideSignificant ~ BlockBracketMark
  ~ SpaceDelimit ~ Paragraph
+?
 
 Bracketted blocks open and close with BlockBracketMark.
 
@@ -240,6 +243,7 @@ An implication of this is, since paragraphs finish on newlines, all inline brack
 == Grammar
 A PEG-like grammar for TML
 
+?codeblock
 BlockParagraphMark = AnyOf('?', ...)
 BlockBracketMark = AnyOf('?', ...)
 BlockLiteralMark = '?'
@@ -273,8 +277,7 @@ SideSignificant = NewLine ~ SkipSpace
 AttributeValue = zeroOrMore(Letter)
 AttributeValueWithSpace = zeroOrMore(Letter | ' ')
 
-Attributes = 
-~ Option('#' ~ AttributeValue)
+Attributes =
 ~ Option('.'  ~ AttributeValue)
 ~ Option('[' ~ AttributeValueWithSpace ~ (']' | NewLine) )
 ~ Option('{' ~ AttributeValueWithSpace ~ ('}' | NewLine) )
@@ -317,5 +320,5 @@ BlockBracketted
 | BlockLiteral
 | Paragraph
 )
-
+?
 

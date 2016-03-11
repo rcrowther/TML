@@ -2,6 +2,7 @@
 Get some tests, someday
 Webpage/markup defence code?
 Update docs on HTML parser examples --- add FileReader
+add streamreader?
 
 = TML
 Macroformat extension
@@ -9,7 +10,6 @@ Finish Markdown extension
 Fully abstract the char definitions
 Tidy
 Tail errors still not showing line data
-deprecate id attribute
 
 codeblock tag extension (check for syntax highlighters?)
 

@@ -797,14 +797,17 @@ abstract class Parser()
         currentPos,
         s"Literal Block reached EOF without close\nStopping literal (will produce tail errors)."
       )
-
-
     }
+
     // back off one char, and pretend is LineFeed.
     // if on EOF, puts the parser on the newline preceeding
     // EOF, where main loop code can handle.
-    // if on a close, puts the parser on whatever preceeds. It may be a space,
-    // but we know it was side significant. Main loop code can handle the close (and also parse following paragraph, etc.).
+    // if on a close, puts the parser on whatever preceeds. It may be
+    // a space, but we know it was side significant. Main loop code
+    // can handle the close (and also parse following paragraph,
+    // etc.).
+
+//TODO: is popping?
     currentPos = currentPos - 1
     currentChar = LineFeed
   }
@@ -1234,13 +1237,13 @@ abstract class Parser()
     */
   def apply(str: String)
   {
-    val t = System.currentTimeMillis()
+    //val t = System.currentTimeMillis()
 
     in = str  + LineFeed + EOF
 
     parseMainLoop()
 
-    println(s"time: ${System.currentTimeMillis() - t}")
+    //println(s"time: ${System.currentTimeMillis() - t}")
   }
 
   /** Attempts fixes on bracketing.
