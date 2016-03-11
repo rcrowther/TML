@@ -1,17 +1,15 @@
 = General
-Namespace
-Get some test, someday
+Get some tests, someday
 Webpage/markup defence code?
-TML parse traversable
+Update docs on HTML parser examples --- add FileReader
 
 = TML
 Macroformat extension
 Finish Markdown extension
-Fully abstract the char deefinitions
+Fully abstract the char definitions
 New char for id
 Tidy
 Tail errors still not showing line data
-Headlines as seperate paragraph altogether, avoid the default stuff?
 deprecate id attribute
 
 

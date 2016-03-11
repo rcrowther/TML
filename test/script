@@ -1,6 +1,5 @@
 == Parser
-val p = Parser()
-val p = Parser2()
+val p = tml.HTML()
 
 == whitespace
 p("")
@@ -61,12 +60,11 @@ p("~ loner\nsee him")
 p("== well\n~ well\n: well")
 
 == paragraph control alternate
-p("~ loner\nsee him")
-p("~ loner\n")
-p("~ loner")
+p("~ loner\nstanding in the line of the cars")
+p(": standing in the line of the cars\n")
+p("~ loner\n: standing in the line of the cars")
 
 p("@ loner\nsee him")
-p("* loner\nsee him")
 
 
 
@@ -85,7 +83,7 @@ p("_ ")
 
 
 == Parser
-val p = Parser()
+val p = tml.HTML()
 
 
 
@@ -138,11 +136,11 @@ That
   is the question.
 ?
 """)
-p("\n?? \nTo be\n  ...or not to be?\nThat\n    [That!]\n  is the question.?\n")
+p("\n?? \nTo be\n  ...or not to be?\nThat\n    [That!]\n  is the question.\n?")
 
 == Parser
-val p = Parser()
-val p = Parser2()
+val p = tml.HTML()
+
 p.whitespaceEnd(2, "    k")
 p.whitespaceEnd("    k")
 
@@ -203,7 +201,7 @@ p("s\nq")
    
   
 == Parser
-val p = Parser()
+val p = tml.HTML()
   val p = Parser2()
   
  == Lines

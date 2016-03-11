@@ -7,8 +7,8 @@ import annotation._, elidable._
 
 /** A text markup parser.
   *
-* This class contains the mechanics of the parsing. It needs extending
-* to provide methods for rendering.
+  * This class contains the mechanics of the parsing. It needs
+  * extending to provide methods for rendering.
   */
 //TODO: Text position is broken. Needs paragraph detection.
 abstract class Parser()
@@ -122,7 +122,7 @@ abstract class Parser()
     *
     * See also
     */
-  def BlockParagraphMarks: Map[Char, String]
+  def BlockParagraphDefaultedMarks: Map[Char, String]
 
   /** Nominates paragraph marks as not defaulting.
     *
@@ -180,14 +180,14 @@ abstract class Parser()
     * multiple newlines.
     *
     * Inline marks in TML are pairs. They start on
-    * `InlineBracketStartMark`, then close on `InlineBracketEndMark`.
+    * `InlineBracketOpenMark`, then close on `InlineBracketCloseMark`.
     *
     * An empty tag name will be given the default.
     *
     * See also
     */
-  val InlineBracketStartMark: Char = '['
-  val InlineBracketEndMark: Char = ']'
+  val InlineBracketOpenMark: Char = '['
+  val InlineBracketCloseMark: Char = ']'
   def InlineMarkDefault: String
 
   /** Nominates an inline tagname to be parsed literally.
@@ -199,6 +199,14 @@ abstract class Parser()
 
 
 
+  /** Combined term for all side significant paragraph marks.
+    */
+  private lazy val BlockParagraphMarks: Seq[Char] = {
+    val b = Seq.newBuilder[Char]
+    b ++= BlockParagraphDefaultedMarks.map(_._1)
+    b ++= BlockParagraphNoDefaultMarks
+    b.result()
+  }
 
   /** Combined term for all side significant marks.
     */
@@ -206,14 +214,9 @@ abstract class Parser()
     val b = Seq.newBuilder[Char]
     b += BlockSelfClosingMark
     b ++= BlockBracketedMarks.map(_._1)
-    b ++= BlockParagraphMarks.map(_._1)
+    b ++= BlockParagraphMarks
     b.result()
   }
-
-  /** Test on construbtion that all marks are different.
-    */
-  //ensureControlDefinitions()
-
 
 
   //------------------
@@ -286,13 +289,21 @@ abstract class Parser()
 
 
   /** Test mark definitions are unique.
+    *
+    * Due to initialisation being varied, this must be called from
+    * implemented parsers.  The test is not necessary, but is little
+    * overload, as the tests may be elided on compilation.
     */
-  def ensureControlDefinitions()
+  def verifyControlDefinitions()
   {
     val bbc = BlockBracketedMarks.map(_._1).toSeq
-    val bpc = BlockParagraphMarks.map(_._1).toSeq
+    val bpc = BlockParagraphMarks
 
     val ict = bbc.intersect(bpc)
+
+    // blocks
+
+    // test no controls shared between block controls and paragraphs.
     errorIf(
       (
         !ict.isEmpty
@@ -300,17 +311,31 @@ abstract class Parser()
       "BlockBracketedMarks and BlockParagraphMarks share control char definitions shared chars: $ict"
     )
 
+    // test BlockSelfClosingMark not used in other block controls.
     errorIf(
       (
         bbc.contains(BlockSelfClosingMark)
           || bpc.contains(BlockSelfClosingMark)
       ),
-      "BlockBracketedMarks or BlockParagraphMarks contains BlockSelfClosingMark char: $InlineBracketStartMark"
+      "BlockBracketedMarks or BlockParagraphMarks contains BlockSelfClosingMark char: $InlineBracketOpenMark"
+    )
+    //BlockParagraphNoDefaultMarks
+
+    // inlines
+
+    // test InlineSelfClosingMark not used in other block controls.
+    errorIf(
+      (
+        InlineBracketOpenMark == InlineSelfClosingMark
+          || InlineBracketCloseMark == InlineSelfClosingMark
+      ),
+      "InlineBracketOpenMark or InlineBracketCloseMark equivalent to InlineSelfClosingMark char: $InlineSelfClosingMark"
     )
 
+    // test InlineBracketOpenMark not equvalent to InlineBracketCloseMark.
     errorIf(
-      (InlineBracketStartMark == InlineBracketEndMark),
-      "InlineBracketStartMark is equal to InlineBracketEndMark char: $InlineBracketStartMark"
+      (InlineBracketOpenMark == InlineBracketCloseMark),
+      "InlineBracketOpenMark is equivalent to InlineBracketCloseMark char: $InlineBracketOpenMark"
     )
   }
 
@@ -329,7 +354,7 @@ abstract class Parser()
     * this can be used whenever the current character is not
     * whitespace (then there is always another readable character).
     */
-  @inline def forward() {
+  @inline private def forward() {
     currentPos += 1
     currentChar = in(currentPos)
   }
@@ -339,7 +364,7 @@ abstract class Parser()
     *
     * Skips until `currentChar` is not a space.
     */
-  @inline def skipSpace() {
+  @inline private def skipSpace() {
     while (currentChar == ' ') {
       forward()
     }
@@ -355,7 +380,7 @@ abstract class Parser()
     * @param limiter a function returning false when the gathering should stop.
     * @return a string containing all gathered characters.
     */
-  def getUntil(limiter: (Char) => Boolean)
+  private def getUntil(limiter: (Char) => Boolean)
       : String =
   {
     val b = new StringBuilder()
@@ -383,7 +408,7 @@ abstract class Parser()
     * @param until parse to this limit.
     * @return a class representing the data recovered.
     */
-  def parseAttributes(controlChar: Char)
+  private def parseAttributes(controlChar: Char)
       : MarkAttributes =
   {
     // Get name
@@ -463,7 +488,7 @@ abstract class Parser()
     * @param charPos index of the control char.
     * @return true if the close was accepted and given markup, else false
     */
-  def handleBlockClose(charPos: Int, controlMark: Char)
+  private def handleBlockClose(charPos: Int, controlMark: Char)
       : Boolean =
   {
     if (blockStack.isEmpty) {
@@ -509,7 +534,7 @@ abstract class Parser()
 
   /** Resolve, stack, and render a block open mark.
     */
-  def handleBlockOpen(startPos: Int, attrs: MarkAttributes)
+  private def handleBlockOpen(startPos: Int, attrs: MarkAttributes)
   {
     //println(s"  group open attrs:$attrs")
     attrs.tagNameResolve(BlockBracketedMarks)
@@ -530,7 +555,7 @@ abstract class Parser()
   
   /** Unstack and render a paragraph close.
     */
-  def handleParagraphClose()
+  private def handleParagraphClose()
   {
     // Is ok, render and dispose? of the markdata
     if (paragraphMark.isTextParagraph) renderTextParagraphClose()
@@ -539,13 +564,13 @@ abstract class Parser()
 
   /** Resolve, stack, and render a paragraph.
     */
-  def handleParagraphOpen(startPos: Int, attrs: MarkAttributes)
+  private def handleParagraphOpen(startPos: Int, attrs: MarkAttributes)
   {
     //println(s"  paragraph open cmark:$controlMark attrs:$attrs")
 
-    // first, defend the noDefault mark
+    // first, defend the no-default marks
     if (!BlockParagraphNoDefaultMarks.contains(attrs.control)) {
-      attrs.tagNameResolve(BlockParagraphMarks)
+      attrs.tagNameResolve(BlockParagraphDefaultedMarks)
     }
     paragraphMark =
       MarkData(
@@ -558,7 +583,7 @@ abstract class Parser()
 
   /** Resolve and render an inline self-closing mark.
     */
-  def handleBlockSelfClose(controlPos: Int, attrs: MarkAttributes)
+  private def handleBlockSelfClose(controlPos: Int, attrs: MarkAttributes)
   {
     attrs.tagNameResolve(BlockSelfClosingMarkDefault)
     renderBlockSelfClosingMark(attrs)
@@ -566,7 +591,7 @@ abstract class Parser()
 
   /** Un-note and render an inline close.
     */
-  def handleInlineClose()
+  private def handleInlineClose()
   {
     if (inlineStack.isEmpty) {
       // Too many closes. Ignore.
@@ -592,7 +617,7 @@ abstract class Parser()
 
   /** Resolve, note, and render a inline open.
     */
-  def handleInlineOpen(controlPos: Int, attrs: MarkAttributes)
+  private def handleInlineOpen(controlPos: Int, attrs: MarkAttributes)
   {
     attrs.tagNameResolve(InlineMarkDefault)
 
@@ -612,7 +637,7 @@ abstract class Parser()
 
   /** Resolve and render an inline self-closing mark.
     */
-  def handleInlineSelfClose(controlPos: Int, attrs: MarkAttributes)
+  private def handleInlineSelfClose(controlPos: Int, attrs: MarkAttributes)
   {
     attrs.tagNameResolve(InlineSelfClosingMarkDefault)
     renderInlineSelfClosingMark(attrs)
@@ -625,14 +650,14 @@ abstract class Parser()
   // Parsers
   //---------
 
-  def parseBlockSelfClose()
+  private def parseBlockSelfClose()
   {
     val controlPos = currentPos
 
     // forward off the mark
     forward()
 
-    val attrs = parseAttributes(InlineBracketStartMark)
+    val attrs = parseAttributes(InlineBracketOpenMark)
     handleBlockSelfClose(controlPos, attrs)
     skipSpace()
     parsePostMarkParagraph()
@@ -642,7 +667,8 @@ abstract class Parser()
 
   /** Parse a block open.
     *
-    * The cursor must be on the control character. Parses any following unmarked paragraph.
+    * The cursor must be on the control character. Parses any
+    * following unmarked paragraph.
     *
     * @param firstChar the character from the index before `from`.
     * @param from index to start parsing. Should be on the name position,
@@ -651,7 +677,7 @@ abstract class Parser()
     * parsing. On error this will be `from`. The index after a parsed name may
     * match or exceed until.
     */
-  def parseBlockOpen()
+  private def parseBlockOpen()
   {
     // Stash for errors
     val startPos = currentPos
@@ -677,9 +703,10 @@ abstract class Parser()
   
   /** Parses a block close.
     *
-    * The cursor must be on the control character. Parses any following unmarked paragraph.
+    * The cursor must be on the control character. Parses any
+    * following unmarked paragraph.
     */
-  def parseBlockClose()
+  private def parseBlockClose()
   {
     // if suceed, move off and skip space,
     // else treat control as start of unmarked paragraph
@@ -708,9 +735,9 @@ abstract class Parser()
     * ignored, and whitespace will not be modified (according to TML
     * rules).
     */
-  def parseBlockLiteral()
+  private def parseBlockLiteral()
   {
-    println(s"parseBlockLiteral currentChar: $currentChar")
+    //println(s"parseBlockLiteral currentChar: $currentChar")
 
 
 
@@ -794,7 +821,7 @@ abstract class Parser()
     * This method leaves the cursor in block-level whitespace
     * (which may or may not be a newline).
     */
-  def parseBlockParagraph(controlMark: Char)
+  private def parseBlockParagraph(controlMark: Char)
   {
     // Stash for errors
     val startPos = currentPos
@@ -817,7 +844,7 @@ abstract class Parser()
     *
     * The cursor must be on the control character.
     */
-  def parseInlineClose()
+  private def parseInlineClose()
   {
     handleInlineClose()
     // Step off the control
@@ -830,19 +857,19 @@ abstract class Parser()
     *
     * The cursor must be on the initial control character.
     * 
-    * The cursor will usually finish at the the end of space after the attribute.
-    * In the case of literals, it will finish in the end of space after
-    * the closing delimiter. 
+    * The cursor will usually finish at the the end of space after the
+    * attribute.  In the case of literals, it will finish in the end
+    * of space after the closing delimiter.
     * 
     * The final char may be EOF or a newline.
     */
-  def parseInlineOpen()
+  private def parseInlineOpen()
   {
-    println(s"parseInlineOpen currentChar: $currentChar")
+    //println(s"parseInlineOpen currentChar: $currentChar")
 
     val controlPos = currentPos
     forward()
-    val attrs = parseAttributes(InlineBracketStartMark)
+    val attrs = parseAttributes(InlineBracketOpenMark)
     handleInlineOpen(controlPos, attrs)
 
     //println(s"parseInlineOpen attrs: $attrs")
@@ -866,20 +893,20 @@ abstract class Parser()
     * ignored, and whitespace will not be modified (according to TML
     * rules).
     */
-  def parseInlineLiteral()
+  private def parseInlineLiteral()
   {
     // println(s"parseInlineLiteral currentChar: $currentChar")
 
     // NB: no need to handle EOF
     // searches for newline, and should never start on EOF
-    while (currentChar != InlineBracketEndMark
+    while (currentChar != InlineBracketCloseMark
       && currentChar != LineFeed) {
       // output
       b += currentChar
       forward()
     }
     
-    println(s"parseInlineLiteral currentChar: $currentChar")
+    //println(s"parseInlineLiteral currentChar: $currentChar")
     if (currentChar == LineFeed) {
 
       errLog.warning(
@@ -902,11 +929,11 @@ abstract class Parser()
     }
   }
 
-  def parseInlineSelfClose()
+  private def parseInlineSelfClose()
   {
     val controlPos = currentPos
     forward()
-    val attrs = parseAttributes(InlineBracketStartMark)
+    val attrs = parseAttributes(InlineBracketOpenMark)
 
     // NB: Attributes ends on the delimiting space.
     handleInlineSelfClose(controlPos, attrs)
@@ -948,8 +975,8 @@ abstract class Parser()
         // not whitespace
         // Catch inline marks
         currentChar match {
-          case InlineBracketStartMark => parseInlineOpen()
-          case InlineBracketEndMark => parseInlineClose()
+          case InlineBracketOpenMark => parseInlineOpen()
+          case InlineBracketCloseMark => parseInlineClose()
           case InlineSelfClosingMark => parseInlineSelfClose()
           // is a free-text char
           // output
@@ -966,7 +993,7 @@ abstract class Parser()
     for (i <- 0 until inlineStack.size) {
       val d = inlineStack.pop()
 
-// NB: this positioning is ok as a paragraph is one line.
+      // NB: this positioning is ok as a paragraph is one line.
       errLog.warning(
         lineCount,
         currentLinePos,
@@ -990,7 +1017,7 @@ abstract class Parser()
     */
   // For use after marks. Falls through to block handline -
   // ends on newline
-  def parsePostMarkParagraph()
+  private def parsePostMarkParagraph()
   {
     // defend against generating unnecessary (empty) paragraph tags
     if (currentChar != LineFeed) parseUnmarkedParagraph()
@@ -1003,15 +1030,16 @@ abstract class Parser()
     * 
     * Brackets the contents  in paragraph marks.
     * 
-    * Asssumes currentPos on content. Compresses spacing, and handles inline marks. 
-    * Stops on a linefeed.
+    * Asssumes currentPos on content. Compresses spacing, and handles
+    * inline marks.  Stops on a linefeed.
     * 
-    * Used for unmarked paragraphs. See `parse`. Used for post-mark paragraphs,
-    * see `parsePostMarkParagraph`. Also used for block error recovery.
+    * Used for unmarked paragraphs. See `parse`. Used for post-mark
+    * paragraphs, see `parsePostMarkParagraph`. Also used for block
+    * error recovery.
     */
-  def parseUnmarkedParagraph()
+  private def parseUnmarkedParagraph()
   {
-    println(s"parseUnmarkedParagraph currentChar: $currentChar")
+    //println(s"parseUnmarkedParagraph currentChar: $currentChar")
 
     // it's always free text
     paragraphMark = MarkData.textParagraph()
@@ -1028,8 +1056,7 @@ abstract class Parser()
   }
 
 
-  // ok, fix this
-  def parseSideSignificant()
+  private def parseSideSignificant()
   {
     // in rough order of liklyhood?
     if (BlockBracketedMarks.contains(currentChar)) {
@@ -1100,7 +1127,7 @@ abstract class Parser()
       s"String to parse must end with TML EOF in:'$in'"
     )
 
-    println(s"parsing: 'in' size:${in.size}")
+    //println(s"parsing: 'in' size:${in.size}")
 
     // this is ok to read '0', the string should always have EOF appended.
     resetCursor()
@@ -1151,43 +1178,43 @@ abstract class Parser()
     * terminating whitespace character. If required, the asserting
     * exception can be elided.
     *
-* *Note* Much Java code, if it reads by line from a file, strips
-* line ends. Such treated lines can be pushed directly to `parse`.
-*
+    * *Note* Much Java code, if it reads by line from a file, strips
+    * line ends. Such treated lines can be pushed directly to `parse`.
+    *
     * @param line the string to be parsed for markup.
     */
-/*
-  def parseLine(line: String)
-  {
-    // Test for LF, or fail
-    errorIf(
-      (line(line.size - 1) != LineFeed),
-      s"String (representing line) to parse must end with LF line:'$line'"
-    )
-    
-    in = line + EOF
+  /*
+   def parseLine(line: String)
+   {
+   // Test for LF, or fail
+   errorIf(
+   (line(line.size - 1) != LineFeed),
+   s"String (representing line) to parse must end with LF line:'$line'"
+   )
+   
+   in = line + EOF
 
-    parseMainLoop()
-  }
-*/
+   parseMainLoop()
+   }
+   */
 
   /** Processes a traversable of strings.
     *
-* *Note* Much Java code, if it reads by line from a file, strips
-* line ends. This method works if linends are present, or not.
-*
+    * *Note* Much Java code, if it reads by line from a file, strips
+    * line ends. This method works if linends are present, or not.
+    *
     * @param str the string to be parsed for markup.
     */
-  def parse(st: Traversable[String])
+  def apply(st: Traversable[String])
   {
     val t = System.currentTimeMillis()
 
-st.foreach(parse)
+    st.foreach(apply(_))
 
     println(s"time: ${System.currentTimeMillis() - t}")
   }
 
-  /** Processes results of a string builder.
+  /** Processes results from a string builder.
     *
     * In some circumstances, this method may be faster than the other
     * methods, as the parser can take advantage of the string builder,
@@ -1196,7 +1223,7 @@ st.foreach(parse)
     * @param b the string builder containing the string to be parsed
     *  for markup.
     */
-  def parse(b: StringBuilder)
+  def apply(b: StringBuilder)
   {
     b += LineFeed
     b += EOF
@@ -1209,7 +1236,7 @@ st.foreach(parse)
     *
     * @param str the string to be parsed for markup.
     */
-  def parse(str: String)
+  def apply(str: String)
   {
     val t = System.currentTimeMillis()
 
@@ -1224,10 +1251,10 @@ st.foreach(parse)
     *
     * Exhausts the mark stores, writing tags as necessary. Since TML
     * will always place marks it has detected onto stacks, this will
-    * produce balanced markup. However, a final imbalance in the
-    * stack implies some problem in markup or detection, and this
-    * method can not protect against unintended or missed markup. But
-    * the result will always have balanced tags.
+    * produce balanced markup. However, a final imbalance in the stack
+    * implies some problem in markup or detection, and this method can
+    * not protect against unintended or missed markup. But the result
+    * will always have balanced tags.
     */
   def blockBalance(fix: Boolean)
   {
@@ -1299,22 +1326,7 @@ st.foreach(parse)
     b.result
   }
 
-/*
-  def apply(str: String)
-  {
-    println("running apply")
-    clear()
-    parse(str)
-    blockBalance(fix = false)
-    println
-    println(errLog.toText())
-    println("out:")
-    println(s"'${b.result}'")
-    println(toString())
-  }
-*/
-
- def result() : String = b.result()
+  def result() : String = b.result()
 
 }//Parser
 

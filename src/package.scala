@@ -5,26 +5,28 @@
   *
   * The base is [[Parser]]. This class is unusable on it's own. 
   *
-  * `Parser` has been extrended into [[HTML]], for the generation of
-  * HTML.
+  * `Parser` has been extended into [[HTML]], for the generation of
+  * HTML. Use the quick test `apply` method,
   *
   * {{{
-  * val p = new tml.HTML()
-  * p.parse(<string with TML markup>)
-  * p.parse(tml.FileReader("""/home/rob/Code/scala/TML/textUML_SPEC"""))
+  * tml.HTML("=== Some charms\n[a{coffee.fr} Not this] for now. So what?")
+  * }}}
+  *
+  * Store a reusable parser with the full methodology,
+  *
+  * {{{
+  * val p = tml.HTML()
+  * p(<string with TML markup>)
   * p.result()
   * p.clear()
   * }}}
   *
   *
-  * Or use the mini-filereader, built-in to preserve your sanity (no,
+  * Use the mini-filereader, built-in to preserve your sanity (no,
   * no, I mean, "for ease of assessment and testing"),
   *
   * {{{
-  * val p = new tml.HTML()
-  * p.parse(tml.FileReader("""/home/<some filepath>/TML/text/SPEC"""))
-  * p.result()
-  * p.clear()
+  * tml.HTML(tml.FileReader("""/home/<some filepath>/TML/text/SPEC"""))
   * }}}
   *
   * [[tml.FileReader]] is overloaded to accept paths of type `String`,

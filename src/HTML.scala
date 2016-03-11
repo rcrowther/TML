@@ -20,12 +20,10 @@ class HTML
     '?' -> "pre"
   )
 
-  val BlockParagraphMarks: Map[Char, String] = Map(
+  val BlockParagraphDefaultedMarks: Map[Char, String] = Map(
     '~' -> "dd",
     ':' -> "dt",
-    '@' -> "li",
-    // headlines don't have a default. One control is h1.
-    '=' -> "h1"
+    '@' -> "li"
   )
 
   override val BlockBracketedLiteralMark: Char = '?'
@@ -49,6 +47,10 @@ class HTML
   // Only used for img
   override val InlineSelfClosingMark: Char = '*'
   val InlineSelfClosingMarkDefault: String = "img"
+
+  /** Test on construction that all marks are different.
+    */
+verifyControlDefinitions()
 
   // Renderers
   /** Renders non-tag attributes.
@@ -217,7 +219,7 @@ object HTML {
   {
     println("running apply")
     val p = new HTML()
-    p.parse(str)
+    p(str)
     p.blockBalance(fix = false)
     println
     println(p.errorLog.toText())
@@ -232,7 +234,7 @@ object HTML {
   {
     println("running apply")
     val p = new HTML()
-    p.parse(st)
+    p(st)
     p.blockBalance(fix = false)
     println
     println(p.errorLog.toText())

@@ -4,7 +4,7 @@ TML
 
 ``TML`` is a Unix/Scala program. It has little use for non-Scala users.
 
-``TML`` is a Lightweight Markup Language and parser. It differs from other lightweight markup languages because it is not concise or invisible. It is based round the parser, and what a few methods can do.
+``TML`` is a Lightweight Markup Language parser (and Specification). It differs from other lightweight markup languages because it is not concise or invisible. It is based in the parser, and what the methods can do.
 
  
 Usage
@@ -21,16 +21,27 @@ It may be possible to coax ``SBT`` into compiling ``TML``.
 
 Running
 -------
-In a REPL, try this, ::
+In a REPL, try this (quick test static ``apply'' method), ::
 
-    val p = new tml.HTML()
-    p.parse(<string with TML markup>)
+    tml.HTML(<string with TML markup>)
+
+For the input string, markup is needed. The package contains some documentation. Try this, ::
+
+    tml.HTML("=== Some charms\n[a{coffee.fr} Not this] for now. So what?")
+
+Store a reusable parser, ::
+
+    val p = tml.HTML()
+    p(<string with TML markup>)
     p.result()
     p.clear()
 
-For the input string, markup is needed. The package contains some documentation. Try this (on the quick test ``apply'' method), ::
+Use the mini-filereader, built-in to preserve your sanity, ::
 
-    p("=== Some charms\n[a{coffee.fr} Not this] for now. So what?")
+    tml.HTML(tml.FileReader("""/home/<some filepath>/TML/text/SPEC"""))
+
+Wait until it goes wrong. Lightweight markup parsers always do...
+
 
 UML
 ---

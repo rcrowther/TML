@@ -36,12 +36,10 @@ class Markdown
     '?' -> "pre"
   )
 
-  val BlockParagraphMarks: Map[Char, String] = Map(
+  val BlockParagraphDefaultedMarks: Map[Char, String] = Map(
     '~' -> "dd",
     ':' -> "dt",
-    '@' -> "li",
-    // headlines don't have a default. One control is h1.
-    '=' -> "h1"
+    '@' -> "li"
   )
 
   override val BlockBracketedLiteralMark: Char = '?'
