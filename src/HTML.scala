@@ -5,7 +5,8 @@ package tml
 /** Parses TML markup to generate HTML.
   */
 class HTML
-    extends Parser {
+    extends Parser
+{
 
   val blockBracketedTagnameAliases = Map(
     "d" -> "div",
@@ -206,28 +207,17 @@ class HTML
 
 
 
-object HTML {
-
-  def apply(str: String)
-  {
-    println("running apply")
-    val p = new HTML()
-    p(str)
-    p.blockBalance(fix = false)
-    println
-    println(p.errorLog.toText())
-    println("out:")
-    println(s"'${p.result()}'")
-    println(p)
-  }
-
+object HTML
+{
+// val i = tml.InputIterator("/home/rob/Code/scala/TML/text/SPEC")
   // tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC""")
-  // tml.HTML(tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC"""))
-  def apply(st: Traversable[String])
+  // tml.HTML(tml.FileReader.stream("""/home/rob/Code/scala/TML/text/SPEC"""))
+
+  def apply(it: InputIterator)
   {
     println("running apply")
     val p = new HTML()
-    p(st)
+    p(it)
     p.blockBalance(fix = false)
     println
     println(p.errorLog.toText())

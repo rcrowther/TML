@@ -6,22 +6,41 @@ The parser has these characteristics,
 
 ++
 -- It is slow
-Stepping along arrays (String = array of codepoints) in Java is slow.
- Also, the string split creates new strings for each line 
- (in mitigation, the parser creates no other strings, for example, by trimming). 
+Stepping along arrays (String = array of codepoints) in Java is slow. 
 -  
 -- The code is plain and open
 As a result of the above (Regex and/or non-linebased algorithms are more complex)
 -
--- It handles any (Java-style) Unicode
+-- It handles Unicode
 Java Regex can handle Unicode, but I kept this parser plain.
 -
--- It handles any form of linebreak
-Using line splitting, this is easy.
--
 -- It should show even performance to length/complexity
-In some peoples terminology, is 'scalable'.
+In some people's terminology, is 'scalable'.
 +
+
+== The Java parser
+This Java parser uses simple character stepping. Indexing arrays in Java is slow. The parser will be slow. However, I wanted a simple implementation (first).
+
+The TML Java parser is flexible. It may be rewritten to work in different ways.
+ 
+
+== Unicode
+This parser handles Unicode, but only the Basic Multilingual Plane (BMP), i.e. the original Java implementation of 16 bits (inside, the code is typed as Char, not Int). 
+
+== Inputs
+One advantage of the stepping parser is that it handles a large number of input types. To do this, it wraps in InputIterator.
+
+InputIterator can take strings, mutiple strings, strings replacing newlines (from a file, say), or an Inputstream.
+
+=== FileReader
+
+
+=== Errors and reports
+TML parsers always use a stack or recursion. This TML maintains a stack.
+This means that TML, though slower than possible, is robust and can give some human-useful error reports.
+
+In this parser, error reporting can not be turned off. 
+
 
 == State of project
 The original was written on a Windows 10 laptop computer using Eclipse. This setup was horribly slow, sometimes stalled, and the intermittent power supply caused unrequested shutdowns. The Eclipse Scala pluging remains, for my purposes, an unhappy experience. After I lost 2 hours work on yet another shutdown, I finished off on a proper computer. As a result, no automated tests have been written.   

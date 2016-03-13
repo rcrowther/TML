@@ -3,6 +3,9 @@ package tml
 
 import annotation._, elidable._
 
+import java.io.InputStreamReader
+
+
 
 
 /** A text markup parser.
@@ -49,9 +52,9 @@ abstract class Parser()
 
   private var errLog = new ErrorLog()
 
-  private var in: String = ""
+  private var it = tml.InputIterator.empty
   private var currentChar = '\0'
-  private var currentPos = 0
+  //private var currentPos = 0
 
   /** Counts lines parsed.
     *
@@ -248,11 +251,6 @@ abstract class Parser()
   // Utility
   //---------
 
-  def resetCursor()
-  {
-    currentPos = 0
-    currentChar = in(currentPos)
-  }
 
   /** Throws a conditional elidable error.
     *
@@ -355,8 +353,7 @@ abstract class Parser()
     * whitespace (then there is always another readable character).
     */
   @inline private def forward() {
-    currentPos += 1
-    currentChar = in(currentPos)
+    currentChar = it.next()
   }
 
 
@@ -433,7 +430,7 @@ abstract class Parser()
             errLog.warning(
               lineCount,
               currentLinePos,
-              currentPos,
+              it.pos,
               s"URL attribute closed by newline: unintended?"
             )
           }
@@ -448,7 +445,7 @@ abstract class Parser()
             errLog.warning(
               lineCount,
               currentLinePos,
-              currentPos,
+              it.pos,
               s"Text attribute closed by newline: unintended?"
             )
           }
@@ -461,7 +458,7 @@ abstract class Parser()
           errLog += (
             lineCount,
             currentLinePos,
-            currentPos,
+            it.pos,
             s"Unable to match an attribute mark to current char. Char found: '$cm'"
           )
 
@@ -493,7 +490,7 @@ abstract class Parser()
       errLog += (
         lineCount,
         currentLinePos,
-        currentPos,
+        it.pos,
         s"Block stack is empty but a control mark is trying to close a block controlMark: '$cm'\nMark is ignored."
       )
       b += controlMark
@@ -512,7 +509,7 @@ abstract class Parser()
         errLog += (
           lineCount,
           currentLinePos,
-          currentPos,
+          it.pos,
           s"Control mark '$cm' does not match mark on stack '$stm'.\nMark is ignored."
         )
         b += controlMark
@@ -541,7 +538,7 @@ abstract class Parser()
 
     blockStack.push(
       MarkData(
-        currentPos,
+        it.pos,
         attrs
       )
     )
@@ -570,7 +567,7 @@ abstract class Parser()
     }
     paragraphMark =
       MarkData(
-        currentPos,
+        it.pos,
         attrs
       )
 
@@ -596,7 +593,7 @@ abstract class Parser()
       errLog += (
         lineCount,
         currentLinePos,
-        currentPos,
+        it.pos,
         s"Inline close mark but stack empty: mark: '$cm'\nMark is ignored."
       )
 
@@ -648,7 +645,7 @@ abstract class Parser()
 
   private def parseBlockSelfClose()
   {
-    val controlPos = currentPos
+    val controlPos = it.pos
 
     // forward off the mark
     forward()
@@ -676,7 +673,7 @@ abstract class Parser()
   private def parseBlockOpen()
   {
     // Stash for errors
-    val startPos = currentPos
+    val startPos = it.pos
     val controlMark = currentChar
     //println(s"controlMark:$controlMark")
 
@@ -706,7 +703,7 @@ abstract class Parser()
   {
     // if suceed, move off and skip space,
     // else treat control as start of unmarked paragraph
-    if(handleBlockClose(currentPos, currentChar)) {
+    if(handleBlockClose(it.pos, currentChar)) {
       forward()
       
       // Now on whitspace
@@ -756,7 +753,7 @@ abstract class Parser()
         && !(
           prevSignificantIsNewline
             && currentChar == BlockBracketedLiteralMark
-            && Character.isWhitespace(in(currentPos + 1))
+            && Character.isWhitespace(it.lookForward)
         )
     )
     {
@@ -768,7 +765,7 @@ abstract class Parser()
       // (not in main loop (automatic update) in literal)
       if (prevChar == LineFeed) {
         lineCount += 1
-        currentLinePos = currentPos
+        currentLinePos = it.pos
       }
 
       // Don't update if current is a space, previous newlines
@@ -794,10 +791,13 @@ abstract class Parser()
       errLog += (
         lineCount,
         currentLinePos,
-        currentPos,
+        it.pos,
         s"Literal Block reached EOF without close\nStopping literal (will produce tail errors)."
       )
     }
+else {
+parseBlockClose()
+}
 
     // back off one char, and pretend is LineFeed.
     // if on EOF, puts the parser on the newline preceeding
@@ -808,8 +808,8 @@ abstract class Parser()
     // etc.).
 
 //TODO: is popping?
-    currentPos = currentPos - 1
-    currentChar = LineFeed
+    //currentPos = currentPos - 1
+    //currentChar = LineFeed
   }
 
 
@@ -823,7 +823,7 @@ abstract class Parser()
   private def parseBlockParagraph(controlMark: Char)
   {
     // Stash for errors
-    val startPos = currentPos
+    val startPos = it.pos
 
     // Step on and read any data
     forward()
@@ -866,7 +866,7 @@ abstract class Parser()
   {
     //println(s"parseInlineOpen currentChar: $currentChar")
 
-    val controlPos = currentPos
+    val controlPos = it.pos
     forward()
     val attrs = parseAttributes(InlineBracketOpenMark)
     handleInlineOpen(controlPos, attrs)
@@ -911,7 +911,7 @@ abstract class Parser()
       errLog.warning(
         lineCount,
         currentLinePos,
-        currentPos,
+        it.pos,
         s"Inline literal closed by newline: unintended?"
       )
 
@@ -930,7 +930,7 @@ abstract class Parser()
 
   private def parseInlineSelfClose()
   {
-    val controlPos = currentPos
+    val controlPos = it.pos
     forward()
     val attrs = parseAttributes(InlineBracketOpenMark)
 
@@ -1059,11 +1059,12 @@ abstract class Parser()
   {
     // in rough order of liklyhood?
     if (BlockBracketedMarks.contains(currentChar)) {
+println(s"peek: ${it.lookForward}")
       // handles either mark and, for both, any following unsignificant paragraph
       // Short lookahead.
       // Need at least one extra non-whitespace char for an open
       // ...any whitespace is a close
-      if (Character.isWhitespace(in(currentPos + 1))) {
+      if (Character.isWhitespace(it.lookForward)) {
         parseBlockClose()
       }
       else {
@@ -1100,7 +1101,7 @@ abstract class Parser()
     *
     * Expects the line to contain LF  + EOF on the end.
     */
-  private def parseMainLoop()
+  def apply(itIn: InputIterator)
   {
 
     // Ensure the parser ends in the following seq of 2 chars.
@@ -1115,21 +1116,11 @@ abstract class Parser()
     // For the main loop detection.
     // ...this allows us to bump limit when processing forward.
     // Test for LF, or fail
-    errorIf(
-      (in(in.size - 2) != LineFeed),
-      s"String to parse (last - 2) must be LF in:'$in'"
-    )
 
-    // Test for EOF, or fail
-    errorIf(
-      (in(in.size - 1) != EOF),
-      s"String to parse must end with TML EOF in:'$in'"
-    )
-
-    //println(s"parsing: 'in' size:${in.size}")
 
     // this is ok to read '0', the string should always have EOF appended.
-    resetCursor()
+    it = itIn
+    currentChar = it.next()
 
 
     while (currentChar != EOF) {
@@ -1145,7 +1136,7 @@ abstract class Parser()
 
       if (currentChar == LineFeed) {
         lineCount += 1
-        currentLinePos = currentPos
+        //currentLinePos = currentPos
         forward()
       }
       else {
@@ -1155,6 +1146,7 @@ abstract class Parser()
 
         // handle block marks, else treat as paragraph.
         //println(s"skipped whitespace lastMarkWasNewline:$lastMarkWasNewline now: $currentChar")
+        //println(s"main block loop: $currentChar")
         if (SideSignificantMarks.contains(currentChar)) {
           parseSideSignificant()
         }
@@ -1167,85 +1159,10 @@ abstract class Parser()
     }
   }
 
-  /** Processes a line.
-    *
-    * The line should end in whitespace. For example, code which
-    * reads from a file will often supply lines as strings ending
-    * with a newline.
-    *
-    * The method throws an elidable exception if the line has no
-    * terminating whitespace character. If required, the asserting
-    * exception can be elided.
-    *
-    * *Note* Much Java code, if it reads by line from a file, strips
-    * line ends. Such treated lines can be pushed directly to `parse`.
-    *
-    * @param line the string to be parsed for markup.
-    */
-  /*
-   def parseLine(line: String)
-   {
-   // Test for LF, or fail
-   errorIf(
-   (line(line.size - 1) != LineFeed),
-   s"String (representing line) to parse must end with LF line:'$line'"
-   )
-   
-   in = line + EOF
 
-   parseMainLoop()
-   }
-   */
 
-  /** Processes a traversable of strings.
-    *
-    * *Note* Much Java code, if it reads by line from a file, strips
-    * line ends. This method works if linends are present, or not.
-    *
-    * @param str the string to be parsed for markup.
-    */
-  def apply(st: Traversable[String])
-  {
-    val t = System.currentTimeMillis()
 
-    st.foreach(apply(_))
-
-    println(s"time: ${System.currentTimeMillis() - t}")
-  }
-
-  /** Processes results from a string builder.
-    *
-    * In some circumstances, this method may be faster than the other
-    * methods, as the parser can take advantage of the string builder,
-    * and not copy the string.
-    * 
-    * @param b the string builder containing the string to be parsed
-    *  for markup.
-    */
-  def apply(b: StringBuilder)
-  {
-    b += LineFeed
-    b += EOF
-    in = b.result()
-
-    parseMainLoop()
-  }
-  
-  /** Processes a string.
-    *
-    * @param str the string to be parsed for markup.
-    */
-  def apply(str: String)
-  {
-    //val t = System.currentTimeMillis()
-
-    in = str  + LineFeed + EOF
-
-    parseMainLoop()
-
-    //println(s"time: ${System.currentTimeMillis() - t}")
-  }
-
+ 
   /** Attempts fixes on bracketing.
     *
     * Exhausts the mark stores, writing tags as necessary. Since TML
@@ -1296,7 +1213,7 @@ abstract class Parser()
   def clear()
   {
     currentChar = '\0'
-    currentPos = 0
+    //currentPos = 0
     blockStack.clear()
     paragraphMark = MarkData.textParagraph()
     inlineStack.clear()

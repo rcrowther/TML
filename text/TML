@@ -60,20 +60,8 @@ But any language with a regex replacement method can enable TML. TML parsing can
 === Spec
 TML has an incomplete but growing spec sheet. For questions about how spaces are handled in literals, how parsing of controls may work, go there.
 
-
-
-== The Java parser
-This Java parser uses simple character stepping. Indexing arrays in Java is slow. The parser will be slow. However, I wanted a simple implementation first.
-
-The TML Java parser is simple and flexible. It may be rewritten to work in different ways.
- 
 The following comments are all based on the HTML implementation of the Java parser. Please bear in mind that other markup parsers may define different codes. However, the basic ideas are the same for any TML parser.
 
-=== Errors and reports
-TML parsers always use a stack or recursion. This TML maintains a stack.
-This means that TML, though slower than possible, is robust and can give some human-useful error reports.
-
-In this parser, error reporting can not be turned off. 
 
 
 

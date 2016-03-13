@@ -65,26 +65,15 @@ class HTMLCodeblock
 
 object HTMLCodeblock {
 
-  def apply(str: String)
-  {
-    println("running apply")
-    val p = new HTMLCodeblock()
-    p(str)
-    p.blockBalance(fix = false)
-    println
-    println(p.errorLog.toText())
-    println("out:")
-    println(s"'${p.result()}'")
-    println(p)
-  }
 
   // tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC""")
   // tml.HTMLCodeblock(tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC"""))
-  def apply(st: Traversable[String])
+
+  def apply(it: InputIterator)
   {
     println("running apply")
     val p = new HTMLCodeblock()
-    p(st)
+    p(it)
     p.blockBalance(fix = false)
     println
     println(p.errorLog.toText())

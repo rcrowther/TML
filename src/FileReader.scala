@@ -7,7 +7,23 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import scala.collection.JavaConversions._
 
+
+
+import java.io.InputStreamReader
+import java.io.FileInputStream
+
 object FileReader {
+
+  def stream(s: String, charset: Charset)
+: InputStreamReader =
+ {
+new InputStreamReader(new FileInputStream(s), charset);
+}
+
+
+  def stream(s: String)
+: InputStreamReader =
+stream(s, StandardCharsets.UTF_8)
 
   def apply(s: String)
       : Traversable[String] =
