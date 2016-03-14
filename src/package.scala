@@ -5,6 +5,7 @@
   *
   * The base is [[Parser]]. This class is unusable on it's own. 
   *
+  * ==TML==
   * `Parser` has been extended into [[HTML]], for the generation of
   * HTML. Use the quick test `apply` method,
   *
@@ -22,8 +23,37 @@
   * }}}
   *
   *
-  * Use the mini-filereader, built-in to preserve your sanity (no,
-  * no, I mean, "for ease of assessment and testing"),
+  * ===Input===
+  * Input to the parser is by a wrapping class [[InputIterator]].
+  * 
+  * InputIterator wraps several fundamentally different options,
+  * including a string, multiple strings, multiple strings while
+  * restoring newlines (Java code often strips these on a fileread) or
+  * an [[java.io.InputStreamReader]].
+  *
+  * Implicits are provided, so there is often no need to state the
+  * wrap explicitly. This may only be required if a special
+  * InputIterator is required, for example, the iterator which
+  * restores lineends,
+  *
+  * {{{
+  * val p = tml.HTML()
+  * p(InputIterator.line(<collection of strings with line ends stripped>))
+  * p.result()
+  * p.clear()
+  * }}}
+  *
+  * ===Parser Extensions===
+  *
+  * Extended from the basic parser are,
+  *
+  *  - [[HTML]] for basic HTML
+  *  - [[HTMLCodeblock]] HTML plus a special tag 'codeblock'/'cb', which writes a pre/code tag.
+  *
+  * ====File reading====
+  * The mini-filereader is built-in to preserve your sanity (no, no, I
+  * mean, "for ease of assessment and testing"). Returning a stream,
+  * and assuming implicit wrap to an InputIterator,
   *
   * {{{
   * tml.HTML(tml.FileReader("""/home/<some filepath>/TML/text/SPEC"""))

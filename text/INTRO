@@ -1,0 +1,427 @@
+
+= TML
+
+TML is a lightweight markup language. Add codes to text. A parser reads the text, then transforms the codes into other kinds of markup codes.
+
+TML is probably not the language you want.
+
+
+
+== Overview
+=== TML, in short
+
+TML,
+
+++
+@ does not try to be comprehensive for any particular output.
+@ makes no attempt to be discrete or hidden.
+@ is inflexible.
+@ does not copy other lightweight markup syntax.
+@ has a consistent and low-weight syntax.
++
+
+=== Philosophy
+TML is a generic markup. It may perform unnaturally and inefficiently for some markup styles. For HTML markup, TML can not differentiate anchors from spans, so needs explicit statements for anchors (links). And TML has no way to escape and generate HTML entities.
+
+In general, TML syntax is aimed at typographical markup. The language may stress markup in unusual ways. In HTML there is a strong support for nested group support (divs, etc). Images, however, are treated as an afterthought. No support exists for marking up other material, such as tables.
+
+TML has no support for markup at character level (however, the implementation may include the complementary UML).
+
+TML is written as a tool, not a comprehensive solution. TML is written round the parser, not the end result.
+
+=== Output
+TML output is a single line of text interspaced by tags defined by the markup. If pretty-printing is required, the output must be run through external code.
+
+=== Why TML?
+I've added discouragement. This, you know, is because I dislike having my (or your) time wasted.
+
+++
+@ I don't markup that often --- I write naturally in TML.
+@ TML syntax is narrow, so I know what it is. 
+@ I have often written in TML with no parser on hand.
+@ TML is easy to fix using a text editor.
++
+On this last point, if I've forgotten the layout for some purpose, I can sketch something in. Then fix it afterwards.
+
+
+=== Documentation
+TML has an incomplete but growing TML Specification. For questions about how spaces are handled in literals, how parsing of controls works, and other questions, go there.
+
+The following comments are based on an HTML implementation of the Scala parser. Please bear in mind that TML is designed to be extended. Other implementations may define different codes. However, the basic ideas are the same for any TML parser.
+
+
+
+
+== Syntax
+=== Other markup
+Sometimes it is handy to insert other markups into a document. For TML, the results depend on the parser implementation.
+
+For the currrent HTML parser... if TML tries to parse HTML, then inline HTML is ignored (unless the HTML happens to inline character codes). Block-level HTML becomes paragraphed, so avoid it. If HTML parses TML, there is no effect---no TML is HTML. 
+
+Umm, that's it. Not as good as [a{https://daringfireball.net/projects/markdown/} Markdown], but mostly ok.
+
+=== Escaping
+TML has no escapes. It's a tool. A couple of literals are available---see down a bit.
+
+=== Newlines and spacing
+TML removes newlines. It crushes multiple space down to one space.
+
+
+
+== Marks and attributes
+TML marks are a single char/codepoint followed by attributes, followed by a whitespace.
+
+Here's the ampersand char, with attributes. The attributes may not make sense, may not render as anything, but are available on any mark,
+
+?codeblock
+@.class-attribute{url attribute}[text attribute]
+?
+
+The class attribute is introduced with the period, and can have no whitespace. The url attribute is curly-bracketted, and can have spaces. The text attrribute is square bracketted, and can have space.
+
+Text can come after the mark, but must be separated by whitespace,
+
+?codeblock
+@.class{attribute url}[attribute text] Some text...
+?
+
+
+Text can follow the mark (the newline is whitespace),
+
+?codeblock
+
+@.class{attribute url}[attribute text]
+Some text...
+?
+
+
+A control sometimes stands alone. 
+
+?codeblock
+@ Some text...
+?
+
+
+Right, details...
+
+
+== Block level
+Block-level markup is always to the side of text. Usually, the left-hand side. The markup may be separated from the side by space, but no other character.
+
+
+=== Anonymous paragraphs
+Text without a preceeding mark is a paragraph. Paragraphs end on a newline.
+
+e.g
+
+=== Marked paragraphs
+Some marks can introduce a paragraph. They will usually write markup to the output, wrapping the paragraph.
+
+In the HTML parser,
+
+??
+'=' makes a headline
+'~' makes a "dd"
+':' makes a"dt"
+'@' makes a one-line "li"
+?
+
+
+So,
+
+?codeblock
+
+~ Some charms
+Not this for sure.
+?
+
+
+(note that the newline finishes the paragraph) makes,
+
+?.result
+'<dd>Some charms<\dd><p>Not this for sure.<\p>
+?
+
+TML headlines are a paragraph. The parser looks at the number of indent controls to decide the level. Therefore, in the language of lightweight markup, they are [a{http://www.aaronsw.com/2002/atx/} Atx-style] (there is no support for underline titles, like [a{http://docutils.sourceforge.net/mirror/setext.html} Setext]).
+
+e.g.
+
+?codeblock
+=== Some charms
+?
+
+
+makes,
+
+?.result
+<h3>Some charms<\h3>
+?
+
+Let's fool the parser,
+
+?codeblock
+============ Some charms
+?
+
+
+makes,
+
+?.result
+<h12>Some charms<\h12>
+?
+
+=== Bracket marks
+Some marks form brackets.
+
+In the HTML parser, the bracket marks (and their defaults) are,
+
+??
+    '#' -> "section",
+    '+' -> "ul",
+    '-' -> "li",
+    '?' -> "pre"
+?
+
+A TML parser needs to see an open mark and a close mark for bracket marks. Open marks are followed by attributes, close marks are followed by whitespace,
+ 
+e.g.
+
+?codeblock
+#.georgian
+Some text
+#
+?
+
+makes,
+
+?.result
+<section class="georgian"><p>Some text<\p><\section>
+?
+
+Seems painful, always putting some attribute or other to identify the open mark? But TML allows a compression. For the opening mark, repeat the control,
+
+?codeblock
+##
+Some text
+#
+?
+
+makes,
+
+?.result
+<section><p>Some text<\p><\section>
+?
+
+``What", you say, ``no <div>?" Override any of the block controls with a new tagname,
+
+?codeblock
+#div
+Some text
+#
+?
+
+makes,
+
+?.result
+<div><p>Some text<\p><\div>
+?
+
+This method can be used to generate any HTML tag.
+
+
+==== Lists
+To TML, lists are a bracket mark. With paragraphs or other blocks inside them. Let's use paragraph-style list items,
+
+?codeblock
+++
+@ item1
+@ item2
++
+?
+
+makes,
+
+?.result
+<ul><li>item1<\li><li>item2<\li><\ul>
+?
+
+For more complex lists, use the block-style list item,
+
+?codeblock
+++
+-- item1
+Some text
+-
+-- item2
+Some text
+-
++
+?
+
+
+makes,
+
+?.result
+<ul><li><p>item1<\p><p>Some text<\p><\li><li><p>item2<\p><p>Some text<\p><\li><\ul>
+?
+
+==== Literal
+Some block-level brackets may be defined as literal. In HTML, any block starting with a '?'.
+
+?codeblock
+ &#63; &#63;
+Autumn comes in russet...
+    mantle
+ clad...
+ &#63;
+?
+
+
+makes,
+
+?.result
+<pre>
+Autumn comes in russet...
+    mantle
+ clad...
+</pre>
+?
+
+Class attributes can be added --- if a tagname is added, the block tagname can be somthing other than pre. But the contents will not be changed.
+
+
+=== Self-closing marks
+There's only one self-closing HTML block of much interest (not of much interest). In the parser, it is defined as,
+
+?codeblock
+_.dashed
+?
+
+
+makes,
+
+?.result
+<hr class="dashed"/>
+?
+
+
+
+
+== Inline level
+Inline marks work anyplace inside a paragraph (even at the start and end).
+
+=== Bracket marks
+Only one bracket mark is available inline, made from two marks. The HTML parser uses square brackets (defaulting to "span"),
+
+?codeblock
+   &#91; bell &#93;
+?
+
+makes,
+
+?.result
+<span>bell<\span>
+?
+
+Open marks can have attributes,
+
+?codeblock
+bell [i.stress not] cup
+?
+
+makes,
+
+?.result
+<p>bell <i class="stress">not<\i> cup<\p>
+?
+
+
+
+==== Links
+Ah, yes, links, HTML... the web. TML has no special provision for links. But they are not so bad. Override the inline bracket and add the attributes,
+
+?codeblock
+Go to [a.external[go now!]{otherwhere.com} the other side] 
+?
+
+
+makes,
+
+?.result
+<p>Go to <a class="external" title="go now!" href="otherwhere.com">the other side<\a><\p>
+?
+
+Note that links, in this HTML parser, are defined as an inline item (as WC3 defines). If placed at block-level, they will be paragraphed.
+
+==== Literal
+One inline tagname may be defined as literal (note: the tagname. At block level it is the control. The reason is, at inline level, only one control exists). 
+
+In HTML the tagname is '?', and the output will not print any tags at all, 
+
+
+?codeblock
+ &#63; &#63;
+Autumn comes in russet...
+    mantle
+ clad...
+ &#63;
+?
+
+
+makes,
+
+?.result
+<pre>
+Autumn comes in russet...
+    mantle
+ clad...
+</pre>
+?
+
+Not doing anything, aside from preserving space. However marking up text is often useful. This document defines inline literals, because HTML escape code can use the markup to ensure display, not action. Or, for example, the markdown parser uses the code to write Markdown escapes.
+
+ 
+=== Self-closing marks
+There's only one self-closing inline HTML block of much interest. It is of interest. In the parser, it is defined as,
+
+
+?codeblock
+*.medium[image of ceramic tiles]{blue-tile.png}
+?
+
+
+makes,
+
+?.result
+<p><img class="medium" alt="image of ceramic tiles" src="blue-tile.png"/><\p>
+?
+
+Note that, as an inline, the image is automatically paragraphed.
+
+(splat = image. Opinions, opinions, opinions)
+
+== TML extensions
+TML parsers are encouraged to be built in a way that can be extended. 
+
+What is on offer will depend on the implementation. For example, the Scala parser offers HTMLCodeblock. This is a parser some people may want to use a lot. It has a simple extension---any block-level mark with a tagname `codeblock' writes the officially recommended W3 tags for computer code,
+
+?codeblock
+ &#63;codeblock
+ def +(x: Int): Int = { x += 4 }
+ &#63;
+?
+
+
+makes,
+
+?.result
+<pre><code>
+ def +(x: Int): Int = { x += 4 }
+</code><\pre>
+?  
+
+and there is a parser which converts TML to Markdown, etc.
+
+== That's it
+Done. Have fun.
+

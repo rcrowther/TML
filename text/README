@@ -1,6 +1,5 @@
-== Java TML parser
-The Java parser is a non-regex character-stepping parser. 
-When given a string (potentially containing line ends) the parser splits by line.
+= Scala TML parser
+The Scala parser is a non-regex character-stepping parser.
 
 The parser has these characteristics,
 
@@ -18,10 +17,12 @@ Java Regex can handle Unicode, but I kept this parser plain.
 In some people's terminology, is 'scalable'.
 +
 
-== The Java parser
-This Java parser uses simple character stepping. Indexing arrays in Java is slow. The parser will be slow. However, I wanted a simple implementation (first).
+== Stepping
+This Scala parser uses simple character stepping. Indexing arrays in Java is slow. The parser will be slow.
 
-The TML Java parser is flexible. It may be rewritten to work in different ways.
+However, I wanted a simple implementation (first). The stepping algorithm also allows a vast number of input options.
+
+The Scala parser is very flexible. It may be rewritten to work in different ways.
  
 
 == Unicode
@@ -30,19 +31,23 @@ This parser handles Unicode, but only the Basic Multilingual Plane (BMP), i.e. t
 == Inputs
 One advantage of the stepping parser is that it handles a large number of input types. To do this, it wraps in InputIterator.
 
-InputIterator can take strings, mutiple strings, strings replacing newlines (from a file, say), or an Inputstream.
+InputIterator can take strings, multiple strings, strings replacing newlines (from a file, say), or an InputStreamReader.
 
 === FileReader
+Provides concise access to files. This is not provided as a final solution, but for assesssment and testing.
 
-
-=== Errors and reports
-TML parsers always use a stack or recursion. This TML maintains a stack.
+== Errors and reports
+TML parsers always use a stack or recursion. 
 This means that TML, though slower than possible, is robust and can give some human-useful error reports.
 
-In this parser, error reporting can not be turned off. 
+This TML parser maintains a stack with error reporting.
+
+Error reporting can not be turned off. 
 
 
 == State of project
-The original was written on a Windows 10 laptop computer using Eclipse. This setup was horribly slow, sometimes stalled, and the intermittent power supply caused unrequested shutdowns. The Eclipse Scala pluging remains, for my purposes, an unhappy experience. After I lost 2 hours work on yet another shutdown, I finished off on a proper computer. As a result, no automated tests have been written.   
+The original was written on a Windows 10 laptop computer using Eclipse. This setup was horribly slow, sometimes stalled, and the intermittent power supply caused unrequested shutdowns. The Eclipse Scala pluging remains, for my purposes, an unhappy experience. After I lost 2 hours work on yet another shutdown, I finished off on a proper computer.
+
+One result, no automated tests have been written.   
 
 

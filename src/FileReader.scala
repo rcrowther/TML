@@ -12,18 +12,25 @@ import scala.collection.JavaConversions._
 import java.io.InputStreamReader
 import java.io.FileInputStream
 
+
+
+/** Methods for the parser to access files.
+  *
+  * These methods are not provided as a final solution, but for
+  * assessment and testing.
+  */
 object FileReader {
 
   def stream(s: String, charset: Charset)
-: InputStreamReader =
- {
-new InputStreamReader(new FileInputStream(s), charset);
-}
+      : InputStreamReader =
+  {
+    new InputStreamReader(new FileInputStream(s), charset);
+  }
 
 
   def stream(s: String)
-: InputStreamReader =
-stream(s, StandardCharsets.UTF_8)
+      : InputStreamReader =
+    stream(s, StandardCharsets.UTF_8)
 
   def apply(s: String)
       : Traversable[String] =

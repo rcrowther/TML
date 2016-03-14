@@ -2,7 +2,9 @@
 Get some tests, someday
 Webpage/markup defence code?
 Update docs on HTML parser examples --- add FileReader
-add streamreader?
+abstract output for streams also?
+abstract lineend
+
 
 = TML
 Macroformat extension
@@ -12,6 +14,7 @@ Tidy
 Tail errors still not showing line data
 
 codeblock tag extension (check for syntax highlighters?)
+protect methods
 
 = UML
 check spec

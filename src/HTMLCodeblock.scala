@@ -79,6 +79,7 @@ object HTMLCodeblock {
     println(p.errorLog.toText())
     println("out:")
     println(s"'${p.result()}'")
+    println
     println(p)
   }
 

@@ -1,5 +1,5 @@
 = TML Parser Spec
-TML is a lightweight markup tool, designed to turn relaively human-readable markup into (simple) heavyweight markup.
+TML is a lightweight markup tool, designed to turn relatively human-readable markup into (a simple subset of) heavyweight markup.
 
 
 == Generalities
@@ -7,13 +7,13 @@ TML is a lightweight markup tool, designed to turn relaively human-readable mark
 === TML as typographical
 TML syntax is mainly aimed at generating typographical markup.
 
-TML is based round bracketting, not indenting.
+TML syntax is based round bracketing, not indenting.
 
 ~ Rationale
-: Bracketting is prone to errors of imbalance. However, it is natural for humans, and mimics the conventions of print typography.
+: Bracketing is prone to errors of imbalance. However, it is natural for humans, and mimics the conventions of print typography.
 
 === TML as a tool
-TML is written as a tool. It is formed round the parser, not the end result. This distingushes it from other Lightweght Markup Languages. 
+TML is written as a tool. It is formed round the parser, not the end result. This distinguishes it from other Lightweight Markup Languages. 
 
 ~ Rationale
 : For some markups, TML can be inelegant in use. It is not unobtrusive. However, TML gains the advantages of being easy to comprehend, learn and remember. The implemented parsers are generous with error reports, and at recovering data from malformed input.
@@ -22,13 +22,13 @@ TML is written as a tool. It is formed round the parser, not the end result. Thi
 ==== Explicit markup protection by filtering
 A common problem in markup is the need to filter, or protect, areas against parsing. Such areas may include embedded mathematical notation, or computer code.
 
-TML is a tool, so the attitude of the parser should be to ignore such problems. Bweyond the TML definition of literals, a TML parser should include no markup protection code. 
+TML is a tool, so the attitude of the parser should be to ignore such problems. Beyond the TML definition of literals, a TML parser should include no markup protection code. 
 
-If necessary, seperate tools may be provided to establish a pipeline. These are encouraged --- e.g. a filter to duck TML literals.
+If necessary, separate tools may be provided to establish a pipeline. These are encouraged --- e.g. a filter to duck TML literals.
  
 
 == Text format
-Input and output is text. The form, stream, file, is not defined.
+Input and output is text.
 
 === Unicode
 Unicode may be implemented. Unicode is encouraged, but not required.
@@ -44,10 +44,17 @@ Newlines are line feed (Latin/Unicode LF #10).
 === EOF
 If a parser needs EOF (End Of File), this is undefined, and regarded as implementation-dependant. However (Latin/Unicode ETX #3) is appropriate.
 
+== I/O
+
+=== I/O type
+The type; stream, file, etc. is not defined.
+
+It is worth saying that TML can be parsed as single chars, with no lookabout at all. So TML streaming parsers can be built. However, this spec makes no request for any I/O form.
+
 === Extended input recognition
 The base definition of TML does not cover many implementations of space and line ends.
 
-TML implemenations may add, or notate as, a "Universal Support" method. This should admit all Unicode newlines --- which include carriage return (CR), CR + LF and other. It should also convert/handle the full range of Unicode whitespace (which includes tabs, etc.) The method of handling can be in the parsing code itself, or in a pre-scanning conversion.
+TML implementations may add, or notate as, a "Universal Support" method. This should admit all Unicode newlines --- which include carriage return (CR), CR + LF and other. It should also convert/handle the full range of Unicode whitespace (which includes tabs, etc.) The method of handling can be in the parsing code itself, or in a pre-scanning conversion.
 
 ~ Rationale
 : It is more important that a user knows what a parser can or cannot do, as opposed to the parser erratically handling many cases.
@@ -55,15 +62,21 @@ TML implemenations may add, or notate as, a "Universal Support" method. This sho
 === Output options
 Output options may be provided. The first provided option should allow for the CR + LF line ending. 
 
+=== Output
+TML output is a single line of text interspaced by tags defined by the markup.
+If pretty-printing is required, the output must be run through pretty-printing
+formatting code.
+
+
 
 == Parsing generalities
 Before the rest of this spec, some basics of the parsing.
 
 === Paragraphs
-All non-TML text occours within paragraphs. Paragraphs are finished with a newline.
+All non-TML text occurs within paragraphs. Paragraphs are finished with a newline.
 
 === Whitespace parsing
-Exepting text in literal blocks, all space in paragraphs, single or multiple, is replaced by a single space. 
+Excepting text in literal blocks, all space in paragraphs, single or multiple, is replaced by a single space. 
 
 At block level, between markup, all whitespace, single or multiple, newline or space, is removed. 
 
@@ -134,27 +147,27 @@ Bracket opening and selfclosing marks can be followed by an attributes string.
 
 All attributes are optional and can be presented in any order.
 
-Whitespace, either newline or space. finishes the attribute set.\The bracketted options allow spacing in the contents. Other attribute values (''id' and ''class') must have not any space within them.
+Whitespace, either newline or space. finishes the attribute set.\The bracketed options allow spacing in the contents. Other attribute values (''id' and ''class') must have not any space within them.
 
 Attributes supplied with zero contents may render as an attribute with no content, or not at all, depending on the target markup.
 
-The two bracketted attributes, text attribute and URL attribute, can,  exceptionally, be closed with a newline. See [a Inline close by newline]
+The two bracketed attributes, text attribute and URL attribute, can,  exceptionally, be closed with a newline. See [a Inline close by newline]
 
 ~ Note 
-: a newline will terminate the bracketted options. See ''Inline close by newline'.
+: a newline will terminate the bracketed options. See ''Inline close by newline'.
 
 
 ===== Note for implementations
 None of these characters can be used for other block-level codes. 
 
 
-There is ambiguity between the control mark and the opening attribute mark. If ``#'' is an block-level open mark, is this, 
+There is ambiguity between the control mark and the opening attribute mark. If ``#'' is an block-level open mark then, is this, 
 
 ?codeblock
- .##
+  ##
 ?
 
-a defaulting block control or a block with an empty ``id'' attibute?
+a defaulting block control or a block with an empty ``id'' attribute?
 
 This can be made to work, but the fix produces inconsistent markup, and must not be implemented.
 
@@ -173,13 +186,13 @@ BlockBracketed = BlockBracketMark ~ Attributes ~ SpaceDelimit
 
 Bracketted blocks open and close with BlockBracketMark.
 
-TML uses the same control for open and close. However, TML can distinguish between open and close. An block open mark will always be followed by some form of text (attributes), wheras a close will be followed by whitespace.
+TML uses the same control for open and close. However, TML can distinguish between open and close. An block open mark will always be followed by some form of text (attributes), whereas a close will be followed by whitespace.
 
 === The repeated control convention (for opening marks)
 All block marks are provided with a default tagname (for the resulting markup). If a mark is repeated, then it should be given the default tagname.
 
 ~ Rationale
-: This repetition is unobtrusive, easy to type, and means opening tags can always be disingushed from close tags. 
+: This repetition is unobtrusive, easy to type, and means opening tags can always be distinguished from close tags. 
 
 
 === Paragraphs
@@ -188,7 +201,7 @@ TML detects non-whitepace and initiates a paragraph output of text (some markup 
 
 Within a paragraph, inline marks will be processed, and multiple spaces compressed to one.
 
-A paragraph ends on a newline (TML is typography-based, so this is fine. The implementation need not be newline based, and this will prove climbersome if you ever need to markup the final chapter of ``Portrait of the Artist as a Yund man", but that's a TML compromise).
+A paragraph ends on a newline (TML is typography-based, so this is fine. The implementation need not be newline based, and this will prove cumbersome if you ever need to markup the final chapter of ``Portrait of the Artist as a Young man", but that's a TML compromise).
 
 
 
@@ -199,12 +212,12 @@ In this state, the parser will not process the block content. The bulk of the fo
 
 In line with other opening marks, space following the opening mark is consumed.
 
-The spacing preceeding a literal block close is problem for TML. Usually TML can tell what to do with any character depending on the parser's state. But for a literal end mark, this can be expensive. The most consistent treatment is to remove the side significant mark preceeding a close mark i.e. the newline followed by the space. But this can only be identified if all space in the literal is cached, pending writing to the output (so the last space can be disposed, if it proves to preceed a close mark).
+The spacing preceding a literal block close is problem for TML. Usually TML can tell what to do with any character depending on the parser's state. But for a literal end mark, this can be expensive. The most consistent treatment is to remove the side significant mark preceding a close mark i.e. the newline followed by the space. But this can only be identified if all space in the literal is cached, pending writing to the output (so the last space can be disposed, if it proves to preced a close mark).
  
-Thus, TML defines two possibilities for closing block literal space. The first preferred method is to remove the definition of  of the significant space. Parsers based in a parsing program can do this naturally. The alternative algorithm is to remove the character preceeding the close mark, which may be a newline, or a space after a newline. This provides an easy solution for parsers which step  through input, requiring a cache of only one character. This second solution can also be implemented, if required and with a little extra complexity, with no lookback.
+Thus, TML defines two possibilities for closing block literal space. The first preferred method is to remove the definition of  of the significant space. Parsers based in a parsing program can do this naturally. The alternative algorithm is to remove the character preceding the close mark, which may be a newline, or a space after a newline. This provides an easy solution for parsers which step  through input, requiring a cache of only one character. This second solution can also be implemented, if required and with a little extra complexity, with no lookback.
  
 ~ Rationale
-: A special mark is preferred to a more semanticly meaningful tagname, because the search for the literal block end would fail on any legitimate block end, whereas a special mark positivly identifies the literal close.
+: A special mark is preferred to a more semanticly meaningful tagname, because the search for the literal block end would fail on any legitimate block end, whereas a special mark positively identifies the literal close.
 
 
 
@@ -216,13 +229,13 @@ Inline marks are active within paragraphs (excepting the contents of a block-lev
 === Self-closing inlines
 
 === Literal inline
-The literal inline is initiated by a special tagname. The literal inline is closed by an inline close or, exceptionally, a newline. For the newline close, see [a Inline close by newline]. In other resspects, the marks are handled as other inline bracket marks i.e. the first mark is followed by attributes. 
+The literal inline is initiated by a special tagname. The literal inline is closed by an inline close or, exceptionally, a newline. For the newline close, see [a Inline close by newline]. In other respects, the marks are handled as other inline bracket marks i.e. the first mark is followed by attributes. 
 
 In line with other opening marks, space following the opening mark is consumed.
 
 In this state, the parser will not process the block content. The bulk of the following text, including spaces and whitespace, is printed directly to the output, until a closing mark.
 
-The spacing preceeding a literal inline close is problem for TML. For a discussion on this, see the notes for the literal block close. Again, two methods are offered for implementation. First, and preferred, is to remove all space before the close mark. Second, especially for use if the parser does not cache many characters or there is a need for always scanning forward, print all space preceeding the close mark (the user can always compress this space themselves). 
+The spacing preceding a literal inline close is problem for TML. For a discussion on this, see the notes for the literal block close. Again, two methods are offered for implementation. First, and preferred, is to remove all space before the close mark. Second, especially for use if the parser does not cache many characters or there is a need for always scanning forward, print all space preceding the close mark (the user can always compress this space themselves). 
 
 ~ Rationale
 : Though more consistent with the block literal if it were a mark, a special tagname is preferred to a special mark. The special tagname is more semanticly meaningful, and keeps the number of possible inline marks to a minimum.
@@ -230,7 +243,7 @@ The spacing preceeding a literal inline close is problem for TML. For a discussi
 === Inline close by newline
 In some situations, brackets can be written which are intended as inline, but are followed by newlines.
 
-The situations are the two bracketted attributes, text and URL, and the inline bracket mark. For implementations, there is an important subsection of the inline mark, the bracketted literal mark, which may need to be seperately addressed.
+The situations are the two bracketed attributes, text and URL, and the inline bracket mark. For implementations, there is an important subsection of the inline mark, the bracketed literal mark, which may need to be separately addressed.
 
 TML is a soft parser, that is, it attempts to generate output when possible. So this situation is not defined as an error. The presence of a newline ends the lineline bracket, same as a close mark. The newline used as closure is not consumed.
 

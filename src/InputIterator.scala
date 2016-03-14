@@ -257,6 +257,15 @@ object InputIterator {
       if (frwd != -1) frwd.toChar else LF
   }
 
+def printout(it: InputIterator) {
+var c: Char = '\0'
+do {
+c = it.next()
+print(c)
+} while(c != 3)
+println
+}
+
 implicit def string2InputIterator(s: String) = InputIterator(s)
 implicit def stringBuilder2InputIterator(b: StringBuilder) = InputIterator(b)
 implicit def stringElems2InputIterator(elems: String *) = InputIterator(elems)

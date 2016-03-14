@@ -1059,7 +1059,7 @@ parseBlockClose()
   {
     // in rough order of liklyhood?
     if (BlockBracketedMarks.contains(currentChar)) {
-println(s"peek: ${it.lookForward}")
+//println(s"peek: ${it.lookForward}")
       // handles either mark and, for both, any following unsignificant paragraph
       // Short lookahead.
       // Need at least one extra non-whitespace char for an open
