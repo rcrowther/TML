@@ -15,25 +15,12 @@ import java.io.InputStreamReader
   */
 //TODO: Text position is broken. Needs paragraph detection.
 abstract class Parser()
+extends Definitions
 {
 
 
 
-  //---------------------
-  // General definitions
-  //---------------------
 
-  // ASCII control code - ETX (end of text)
-  val EOF: Char = 3
-  val LineFeed: Char = 10
-  val CarriageReturn: Char = 13
-
-  // What is this? Is a backslash.
-  //val EscapeChar: Char = 92
-  // Newline11
-  // Unix = LF
-  // Win/ASCII = CR ~ LF
-  //val CarrageReturn = 13
 
 
 
@@ -1245,7 +1232,6 @@ parseBlockClose()
   def result() : String = b.result()
 
 }//Parser
-
 
 
 

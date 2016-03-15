@@ -14,7 +14,9 @@ import java.io.FileInputStream
 
 
 
-/** Methods for the parser to access files.
+/** Methods for retrieving text/char data in files.
+  *
+  * All `apply` methods strip the lineend.
   *
   * These methods are not provided as a final solution, but for
   * assessment and testing.

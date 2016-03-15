@@ -33,106 +33,152 @@ import java.util.regex.Pattern
   * Also try
   * [[https://code.google.com/p/owasp-esapi-java/source/browse/trunk/src/main/java/org/owasp/esapi/codecs/HTMLEntityCodec.java]]
   */
-// EML("&")
-// EML("<div>")
-// EML("</div>")
-// EML("""<div id="top">""")
-// EML("<duff>")
-// EML("&")
-// EML.htmlToDisplayHTML("""<div id="top">""", true)
-// EML("&#x19")
-
+// tml.EML("&")
+// tml.EML("<div>")
+// tml.EML.defensive("</div>")
+// tml.EML("""<div id="top">""")
+// tml.EML("<duff>")
+// tml.EML("&")
+// tml.EML.htmlToDisplayHTML("""<div id="top">""", true)
+// tml.EML("&#x19")
+// tml.EML(tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC"""))
+//  tml.HTML(tml.EML(tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC""")))
 object EML {
+
+  // Utility and implicits
+  // making regex a little easier on the eye. A little...
+  private def nc(s: String) : String = "(?:" + s + ')'
+
+  private[this] class RegexConcat(s: String) {
+    def |(r: String): String = { s + '|' + r }
+  }
+
+  private[this] implicit def string2RegexConcat(s: String)
+      : RegexConcat = new RegexConcat(s)
+
+  /** Replaces matches, on group 1, in a string by applying a function.
+    */
+  private def stringReplace(
+    p: Pattern,
+    repCallback: (String) => String,
+    str: String
+  )
+      : String =
+  {
+    var b = new StringBuffer()
+
+    val m = p.matcher(str)
+    while (m.find()) {
+ // println(s" mr ${m.toMatchResult}")
+ // println(s" gc ${m.groupCount()}")
+
+      m.appendReplacement(b, repCallback(m.group(1)))
+    }
+    m.appendTail(b)
+    b.toString()
+  }
+
+
+
   // ?! = negative lookahead, so fails if present
   // so fails if following text matches
   // optional(entity marks) ~ (Hexlike number | word character) ~ ;
   // i.e. looks like an HTML entity
-  val ampToEntityRP = Pattern.compile("""&(?!#?[xX]?(?:[0-9a-fA-F]+|\w+);)""")
-  val htmlTags = ("""(?:div|span|blockquote|pre|code|h\d|p|ul|ol|dl|li|dt|dd|img|a|i|b)""")
-  val quotRP = Pattern.compile("\"")
+  private val ampToEntityDefensiveSP = nc("""(&)(?!#?[xX]?(?:[0-9a-fA-F]+|\w+);)""")
 
-  // "<" ~ ([lookahead] ~ optional(?) ~ tags)
-  val htmlOpenTagRP = Pattern.compile("""<(?=/?""" + htmlTags + ")")
-  // ([capture] tags | "\"") ~ ">"
-  val htmlCloseTagRP = Pattern.compile("""(""" + htmlTags + """|")>""")
-  println(s"htmlOpenTagRP: $htmlOpenTagRP")
-  println(s"htmlCloseTagRP: $htmlCloseTagRP")
-  println(s"ampToEntityRP: $ampToEntityRP")
 
-  def ampToEntity(str: String)
+  private val htmlTagsSP = nc("""[A-Za-z]""")
+
+  // "<" ~ ([lookahead] ~ optional(/) ~ Letter)
+  private val lbToEntityDefensiveSP = nc("""(<)(?=/?[A-Za-z])""")
+
+  // ([lookback] Letter | "\"") ~ ">"
+  private val rbToEntityDefensiveSP = nc("""(?<=[A-Za-z"])>""")
+
+  private val defensiveP = Pattern.compile( '(' + (
+     ampToEntityDefensiveSP
+      | lbToEntityDefensiveSP
+      | rbToEntityDefensiveSP
+  ) + ')')
+
+  private val simpleP = Pattern.compile("""([&<>])""")
+
+  //println(s"defensiveP: $defensiveP")
+  //println(s"htmlCloseTagP: $htmlCloseTagP")
+  //println(s"ampToEntitySP: $ampToEntitySP")
+
+
+  private def stringToNumericEntity(s: String)
+      : String =
   {
 
-    val b = new StringBuffer()
-    val m = ampToEntityRP.matcher(str)
+    s match {
+      case "&" => "&#26;"
+      case "<" => "&#60;"
+      case ">" => "&#62;"
 
-    // Ampersand-encoding based on Nat Irons's Amputator
-    // MT plugin: <http://bumppo.net/projects/amputator/>
-    // ...And nicked by us from the Drupal Markdown module.
-    while (m.find()) {
-      m.appendReplacement(b, "&amp;")
+      // source match, but no recognition match
+      case _ => {
+        println(s"unmatched search? $s")
+        s
+      }
     }
-    m.appendTail(b)
-
-    b.toString
   }
 
+
+  private def stringToNamedEntity(s: String)
+      : String =
+  {
+
+    s match {
+      case "&" => "&#amp;"
+      case "<" => "&#lt;"
+      case ">" => "&#gt;"
+      //        case '"' => b ++= "&#quot;"
+      // source match, but no recognition match
+      case _ => {
+        println(s"unmatched search? $s")
+        s
+      }
+    }
+  }
+
+  // htmlToDisplay
+  def defense(str: String, asNames: Boolean)
+      : String =
+  {
+    if (asNames) stringReplace(defensiveP, stringToNamedEntity _, str)
+    else stringReplace(defensiveP, stringToNumericEntity _, str)
+  }
+
+  def defensive(str: String)
+      : String =
+  {
+    stringReplace(defensiveP, stringToNamedEntity _, str)
+  }
+  def defensive(st: Traversable[String])
+      : Traversable[String] =
+  {
+    st.map{ s =>
+    stringReplace(simpleP, stringToNamedEntity _, s)
+}
+  }
+  def apply(str: String, asNames: Boolean)
+      : String =
+  {
+    if (asNames) stringReplace(simpleP, stringToNamedEntity _, str)
+    else stringReplace(simpleP, stringToNumericEntity _, str)
+  }
   def apply(str: String)
       : String =
   {
-    // Dont do this where? In pre blocks...
-    val pStart = Pattern.compile("<pre>")
-    val pEnd = Pattern.compile("</pre>")
-    val b = new StringBuffer()
-
-    val m0 = quotRP.matcher(str)
-    val o0 = m0.replaceAll("&quot;")
-    val m1 = htmlOpenTagRP.matcher(o0)
-    val o1 = m1.replaceAll("&lt;")
-    val m2 = htmlCloseTagRP.matcher(o1)
-    val o2 = m2.replaceAll("$1&gt;")
-    val m3 = ampToEntityRP.matcher(o2)
-    val o3 = m3.replaceAll("&amp;")
-
-    o3
+    stringReplace(simpleP, stringToNamedEntity _, str)
   }
-
-  def htmlToDisplayHTMLNumeric(str: String)
-      : String =
+  def apply(st: Traversable[String])
+      : Traversable[String] =
   {
-
-    val b = new StringBuilder()
-    str.foreach { c: Char =>
-      if (c == '"' || c == '<' || c == '>' || c == '&') {
-        b ++= "&#"
-        b append c.toInt
-        b += ';'
-      }
-    }
-    b.toString
+    st.map{ s =>
+    stringReplace(simpleP, stringToNamedEntity _, s)
+}
   }
-
-  def htmlToDisplayHTMLNamed(str: String)
-      : String =
-  {
-
-    val b = new StringBuilder()
-    str.foreach { c: Char =>
-      c match {
-        case '"' => b ++= "&#quot;"
-        case '<' => b ++= "&#lt;"
-        case '>' => b ++= "&#gt;"
-        case '&' => b ++= "&#amp;"
-        case chr => b append chr
-      }
-    }
-    b.toString
-  }
-
-  def htmlToDisplayHTML(str: String, asNames: Boolean)
-      : String =
-  {
-    if (asNames) htmlToDisplayHTMLNamed(str)
-    else htmlToDisplayHTMLNumeric(str)
-  }
-
 } //EML

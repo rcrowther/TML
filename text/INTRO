@@ -1,7 +1,7 @@
 
 = TML
 
-TML is a lightweight markup language. Add codes to text. A parser reads the text, then transforms the codes into other kinds of markup codes.
+TML is a lightweight markup language. First, add codes to text. A parser reads the text, then transforms the codes into other kinds of markup codes.
 
 TML is probably not the language you want.
 
@@ -187,9 +187,9 @@ A TML parser needs to see an open mark and a close mark for bracket marks. Open 
 e.g.
 
 ?codeblock
-#.georgian
+&#63;.georgian
 Some text
-#
+&#63;
 ?
 
 makes,
@@ -201,9 +201,9 @@ makes,
 Seems painful, always putting some attribute or other to identify the open mark? But TML allows a compression. For the opening mark, repeat the control,
 
 ?codeblock
-##
+&#63;&#63;
 Some text
-#
+&#63;
 ?
 
 makes,
@@ -215,9 +215,9 @@ makes,
 ``What", you say, ``no <div>?" Override any of the block controls with a new tagname,
 
 ?codeblock
-#div
+&#63;div
 Some text
-#
+&#63;
 ?
 
 makes,
@@ -269,7 +269,7 @@ makes,
 Some block-level brackets may be defined as literal. In HTML, any block starting with a '?'.
 
 ?codeblock
- &#63; &#63;
+ &#63;&#63;
 Autumn comes in russet...
     mantle
  clad...

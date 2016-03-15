@@ -324,6 +324,8 @@ object UML {
     b.toString()
   }
 
+/** Replaces matches, on group 1, in a string by applying a function. 
+*/
   private def stringReplace(
     p: Pattern,
     repCallback: (String) => String,
@@ -332,9 +334,7 @@ object UML {
       : String =
   {
     var b = new StringBuffer()
-    var currStr = ""
-    // Dash/Hyphens
-    // We test each side for space, so need to put it back.
+
     val m = p.matcher(str)
     while (m.find()) {
       m.appendReplacement(b, repCallback(m.group(1)))
@@ -474,6 +474,16 @@ object UML {
     typography(math(str))
   }
 
-
+  /** Attempt all UML encodings.
+    *
+    * May use some high-numeric encodings.
+    */
+  def apply(ts: Traversable[String])
+      : Traversable[String] =
+  {
+    // Math must come before typography
+    // (and it's rather flakey hyphen)
+    ts.map(s => typography(math(s)))
+  }
 
 }//UML

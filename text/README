@@ -44,6 +44,9 @@ This TML parser maintains a stack with error reporting.
 
 Error reporting can not be turned off. 
 
+== documentation
+tml.HTMLCodeblock(tml.InputIterator.line(tml.UML(tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC"""))))
+
 
 == State of project
 The original was written on a Windows 10 laptop computer using Eclipse. This setup was horribly slow, sometimes stalled, and the intermittent power supply caused unrequested shutdowns. The Eclipse Scala pluging remains, for my purposes, an unhappy experience. After I lost 2 hours work on yet another shutdown, I finished off on a proper computer.

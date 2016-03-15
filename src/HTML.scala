@@ -221,8 +221,8 @@ object HTML
     p.blockBalance(fix = false)
     println
     println(p.errorLog.toText())
-    println("out:")
-    println(s"'${p.result()}'")
+    //println("out:")
+    //println(s"'${p.result()}'")
     println(p)
   }
 

@@ -145,7 +145,7 @@ Bracket opening and selfclosing marks can be followed by an attributes string.
 {} URL attribute
 ?
 
-All attributes are optional and can be presented in any order.
+Attributes must be in this order. All attributes are optional. Parsers may allow attributes to be repeated. For repeated attributes, the set may be rejected, in part or whole, but only the first accepted instances are used. 
 
 Whitespace, either newline or space. finishes the attribute set.\The bracketed options allow spacing in the contents. Other attribute values (''id' and ''class') must have not any space within them.
 
