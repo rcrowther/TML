@@ -89,74 +89,6 @@ object InputIterator {
 
   /** Creates an iterator from given strings.
     *
-    * The iterater, in common with other iterators here, iterates the
-    * chars contained in the strings (not across the strings).
-    *
-    * This method will not correctly parse a collection of strings
-    * representing lines with lineends stripped. If lineends should be
-    * appended to the given strings, see the multi-string `line`
-    * method.
-    */
-  def apply(ts: Traversable[String]) = new InputIterator {
-    private var currPos = 0
-    private var currString = ""
-    private var currSize = 0
-    private var deliveredLF = false
-    private val strSeq = ts.toSeq
-    private var i = 0
-    private val strCount = strSeq.size
-
-    private def nextString() : Boolean = {
-      currPos = 0
-      val strNotExhausted = (i < strCount)
-      if (strNotExhausted) {
-        currString = strSeq(i)
-        i += 1
-        currSize = currString.size
-      }
-      else { currString = "" ; currSize = 0 }
-      strNotExhausted
-    }
-
-    def next() : Char =
-      if (currPos < currSize) {
-        val r = currString(currPos)
-        currPos += 1
-        // update overall position
-        pos += 1
-        r
-      }
-      else {
-        if (nextString()) next()
-        else {
-          // still use currPos as step
-          // for two virtual end chars
-          // also, update overall position
-          if (!deliveredLF) { pos += 1; deliveredLF = true; LF }
-          else EOF
-        }
-      }
-    
-
-    def lookForward : Char =
-      if ((currPos) < currSize) currString(currPos)
-      else {
-        var nextStrIdx = i
-        while (nextStrIdx < strCount && strSeq(nextStrIdx).isEmpty) {
-          nextStrIdx += 1
-        }
-        // may look onto final LF...
-        if (nextStrIdx < strCount)  strSeq(nextStrIdx)(0)
-        else LF
-      }
-  }
-
-
-  // val i = InputIterator("I", "my", "name")
-
-
-  /** Creates an iterator from given strings.
-    *
     * Appends a linend to every string.
     *
     * Much Java code, if it reads by line from a file, strips line
@@ -169,9 +101,9 @@ object InputIterator {
     * chars contained in the strings (not across the strings).
     *
     * If lineends should not be appended to the given strings, see the
-    * multi-string `apply` method.
+    * multi-string `concat` method.
     */
-  def line(ts: TraversableOnce[String]) = new InputIterator {
+  def apply(ts: TraversableOnce[String]) = new InputIterator {
     private var currPos = 0
     private var currString = ""
     private var currSize = 0
@@ -230,6 +162,72 @@ object InputIterator {
         }
       }
   }
+
+
+  /** Creates an iterator from given strings.
+    *
+    * The iterater, in common with other iterators here, iterates the
+    * chars contained in the strings (not across the strings).
+    *
+    * This method will not correctly parse a collection of strings
+    * representing lines with lineends stripped. If lineends should be
+    * appended to the given strings, see the multi-string `apply`
+    * method.
+    */
+  def concat(ts: Traversable[String]) = new InputIterator {
+    private var currPos = 0
+    private var currString = ""
+    private var currSize = 0
+    private var deliveredLF = false
+    private val strSeq = ts.toSeq
+    private var i = 0
+    private val strCount = strSeq.size
+
+    private def nextString() : Boolean = {
+      currPos = 0
+      val strNotExhausted = (i < strCount)
+      if (strNotExhausted) {
+        currString = strSeq(i)
+        i += 1
+        currSize = currString.size
+      }
+      else { currString = "" ; currSize = 0 }
+      strNotExhausted
+    }
+
+    def next() : Char =
+      if (currPos < currSize) {
+        val r = currString(currPos)
+        currPos += 1
+        // update overall position
+        pos += 1
+        r
+      }
+      else {
+        if (nextString()) next()
+        else {
+          // still use currPos as step
+          // for two virtual end chars
+          // also, update overall position
+          if (!deliveredLF) { pos += 1; deliveredLF = true; LF }
+          else EOF
+        }
+      }
+    
+
+    def lookForward : Char =
+      if ((currPos) < currSize) currString(currPos)
+      else {
+        var nextStrIdx = i
+        while (nextStrIdx < strCount && strSeq(nextStrIdx).isEmpty) {
+          nextStrIdx += 1
+        }
+        // may look onto final LF...
+        if (nextStrIdx < strCount)  strSeq(nextStrIdx)(0)
+        else LF
+      }
+  }
+
 
 
   /** Creates an iterator from an input stream.
