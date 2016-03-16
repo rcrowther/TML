@@ -1,233 +1,71 @@
-== Parser
-val p = tml.HTML()
+<!DOCTYPE html><html><head><title>Guide</title><meta http-equiv="content-type" content="text/html; charset=UTF-8" /><link rel="stylesheet" type="text/css" media="screen" href="/home/rob/Code/scala/TML/text/lib/doc.css"/></head><body><article><h1>TML</h1><p>TML is a lightweight markup language. First, add codes to text. A parser reads the text, then transforms the codes into other kinds of markup codes.</p><p>TML is probably not the language you want.</p><h2>Overview</h2><h3>TML, in short</h3><p>TML,</p><ul><li>does not try to be comprehensive for any particular output.</li><li>makes no attempt to be discrete or hidden.</li><li>is inflexible.</li><li>does not copy other lightweight markup syntax.</li><li>has a consistent and low&#8208;weight syntax.</li></ul><h3>Philosophy</h3><p>TML is a generic markup. It may perform unnaturally and inefficiently for some markup styles. For HTML markup, TML can not differentiate anchors from spans, so needs explicit statements for anchors (links). And TML has no way to escape and generate HTML entities.</p><p>In general, TML syntax is aimed at typographical markup. The language may stress markup in unusual ways. In HTML there is a strong support for nested group support (divs, etc). Images, however, are treated as an afterthought. No support exists for marking up other material, such as tables.</p><p>TML has no support for markup at character level (however, the implementation may include the complementary UML).</p><p>TML is written as a tool, not a comprehensive solution. TML is written round the parser, not the end result.</p><h3>Output</h3><p>TML output is a single line of text interspaced by tags defined by the markup. If pretty&#8208;printing is required, the output must be run through external code.</p><h3>Why TML?</h3><p>I&#8217ve added discouragement. This, you know, is because I dislike having my (or your) time wasted.</p><ul><li>I don&#8217t markup that often &#8212; I write naturally in TML.</li><li>TML syntax is narrow, so I know what it is.</li><li>I have often written in TML with no parser on hand.</li><li>TML is easy to fix using a text editor.</li></ul><p>On this last point, if I&#8217ve forgotten the layout for some purpose, I can sketch something in. Then fix it afterwards.</p><h3>Documentation</h3><p>TML has an incomplete but sometimes considered TML Specification. For questions about how spaces are handled in literals, how parsing of controls works, and other questions, go there.</p><p>The following comments are based on an HTML implementation of the Scala parser. Please bear in mind that TML is designed to be extended. Other implementations may define different codes. However, the basic ideas are the same for any TML parser.</p><h2>Syntax</h2><h3>Other markup</h3><p>Sometimes it is handy to insert other markups into a document. For TML, the results depend on the parser implementation.</p><p>For the currrent HTML parser&#8230; if TML tries to parse HTML, then inline HTML is ignored (unless the HTML happens to inline character codes). Block&#8208;level HTML becomes paragraphed, so avoid it. If HTML parses TML, there is no effect&#8212;no TML is HTML.</p><p>Umm, that&#8217s it. Not as good as <a href="https://daringfireball.net/projects/markdown/">Markdown</a>, but mostly ok.</p><h3>Escaping</h3><p>TML has no escapes. It&#8217s a tool. A couple of literals are available&#8212;see down a bit.</p><h3>Newlines and spacing</h3><p>TML removes newlines. It crushes multiple space down to one space.</p><h2>Marks and attributes</h2><p>TML marks are a single char/codepoint followed by attributes, followed by a whitespace.</p><p>Here&#8217s the ampersand char, working as a mark, with attributes. The attributes may not make sense, may not render as anything, but are available,</p><pre class="action"><code>@.class&#8208;attribute{url attribute}[text attribute]</code></pre><p>The class attribute is introduced with the period, and can contain no whitespace. The url attribute is curly&#8208;bracketed, and can contain spaces. The text attrribute is square bracketted, and can contain space.</p><p>Text can come after the mark, but must be separated by whitespace,</p><pre class="action"><code>@.class{attribute url}[attribute text] Some text&#8230;</code></pre><p>Text can follow the mark (the newline is whitespace),</p><pre class="action"><code>@.class{attribute url}[attribute text]
+Some text&#8230;</code></pre><p>A control sometimes stands alone.</p><pre class="action"><code>@ Some text&#8230;</code></pre><p>Right, details&#8230;</p><h2>Block level</h2><p>Block&#8208;level markup is always to the side of text. Usually, the left&#8208;hand side. The markup may be separated from the side by space, but no other character.</p><h3>Anonymous paragraphs</h3><p>Text without a preceeding mark is a paragraph. Paragraphs end on a newline.</p><p>e.g</p><h3>Marked paragraphs</h3><p>Some marks can introduce a paragraph. They will usually write markup to the output, wrapping the paragraph.</p><p>In the HTML parser,</p><pre>&#8217=&#8217 makes a headline
+&#8217~&#8217 makes a &#8221;dd&#8221;
+&#8217:&#8217 makes a&#8221;dt&#8221;
+&#8217@&#8217 makes a one&#8208;line &#8221;li&#8221;</pre><p>So,</p><pre class="action"><code>~ Some charms
+Not this for sure.</code></pre><p>(note that the newline finishes the paragraph) makes,</p><pre class="result"><code>&lt;dd&gt;Some charms&lt;\dd&gt;&lt;p&gt;Not this for sure.&lt;\p&gt;</code></pre><p>TML headlines are a paragraph. The parser looks at the number of indent controls to decide the level. Therefore, in the language of lightweight markup, they are <a href="http://www.aaronsw.com/2002/atx/">Atx&#8208;style</a> (there is no support for underline titles, like <a href="http://docutils.sourceforge.net/mirror/setext.html">Setext</a>).</p><p>e.g.</p><pre class="action"><code>=== Some charms</code></pre><p>makes,</p><pre class="result"><code>&lt;h3&gt;Some charms&lt;\h3&gt;</code></pre><p>Let&#8217s fool the parser,</p><pre class="action"><code>============ Some charms</code></pre><p>makes,</p><pre class="result"><code>&lt;h12&gt;Some charms&lt;\h12&gt;</code></pre><h3>Bracket marks</h3><p>Some marks form brackets.</p><p>In the HTML parser, the bracket marks (and their defaults) are,</p><pre>&#8217#&#8217 &#8208;&gt; &#8221;section&#8221;,
+    &#8217+&#8217 &#8208;&gt; &#8221;ul&#8221;,
+    &#8217&#8208;&#8217 &#8208;&gt; &#8221;li&#8221;,
+    &#8217?&#8217 &#8208;&gt; &#8221;pre&#8221;</pre><p>A TML parser needs to see an open mark and a close mark for bracket marks. Open marks are followed by attributes, close marks are followed by whitespace,</p><p>e.g.</p><pre class="action"><code>&amp;#63;.georgian
+Some text
+&amp;#63;</code></pre><p>makes,</p><pre class="result"><code>&lt;section class=&#8221;georgian&#8221;&gt;&lt;p&gt;Some text&lt;\p&gt;&lt;\section&gt;</code></pre><p>Seems painful, always putting some attribute or other to identify the open mark? But TML allows a compression. For the opening mark, repeat the control,</p><pre class="action"><code>&amp;#63;&amp;#63;
+Some text
+&amp;#63;</code></pre><p>makes,</p><pre class="result"><code>&lt;section&gt;&lt;p&gt;Some text&lt;\p&gt;&lt;\section&gt;</code></pre><p>``What&#8221;, you say, ``no &lt;div&gt;?&#8221; Override any of the block controls with a new tagname,</p><pre class="action"><code>&amp;#63;div
+Some text
+&amp;#63;</code></pre><p>makes,</p><pre class="result"><code>&lt;div&gt;&lt;p&gt;Some text&lt;\p&gt;&lt;\div&gt;</code></pre><p>This method can be used to generate any HTML tag.</p><h4>Lists</h4><p>To TML, lists are a bracket mark. With paragraphs or other blocks inside them. Let&#8217s use paragraph&#8208;style list items,</p><pre class="action"><code>++
+@ item1
+@ item2
++</code></pre><p>makes,</p><pre class="result"><code>&lt;ul&gt;&lt;li&gt;item1&lt;\li&gt;&lt;li&gt;item2&lt;\li&gt;&lt;\ul&gt;</code></pre><p>For more complex lists, use the block&#8208;style list item,</p><pre class="action"><code>++
+&#8211; item1
+Some text
+&#8208;
+&#8211; item2
+Some text
+&#8208;
++</code></pre><p>makes,</p><pre class="result"><code>&lt;ul&gt;&lt;li&gt;&lt;p&gt;item1&lt;\p&gt;&lt;p&gt;Some text&lt;\p&gt;&lt;\li&gt;&lt;li&gt;&lt;p&gt;item2&lt;\p&gt;&lt;p&gt;Some text&lt;\p&gt;&lt;\li&gt;&lt;\ul&gt;</code></pre><h4>Literal</h4><p>Some block&#8208;level brackets may be defined as literal. In HTML, any block starting with a &#8217?&#8217.</p><pre class="action"><code>&amp;#63;&amp;#63;
+Autumn comes in russet&#8230;
+    mantle
+ clad&#8230;
+ &amp;#63;</code></pre><p>makes,</p><pre class="result"><code>&lt;pre&gt;
+Autumn comes in russet&#8230;
+    mantle
+ clad&#8230;
+&lt;/pre&gt;</code></pre><p>Class attributes can be added &#8212; if a tagname is added, the block tagname can be somthing other than pre. But the contents will not be changed.</p><h3>Self&#8208;closing marks</h3><p>There&#8217s only one self&#8208;closing HTML block of much interest (not of much interest). In the parser, it is defined as,</p><pre class="action"><code>_.dashed</code></pre><p>makes,</p><pre class="result"><code>&lt;hr class=&#8221;dashed&#8221;/&gt;</code></pre><h2>Inline level</h2><p>Inline marks work anyplace inside a paragraph (even at the start and end).</p><h3>Bracket marks</h3><p>Only one bracket mark is available inline, made from two marks. The HTML parser uses square brackets (defaulting to &#8221;span&#8221;),</p><pre class="action"><code>&amp;#91; bell &amp;#93;</code></pre><p>makes,</p><pre class="result"><code>&lt;span&gt;bell&lt;\span&gt;</code></pre><p>Open marks can have attributes,</p><pre class="action"><code>bell [i.stress not] cup</code></pre><p>makes,</p><pre class="result"><code>&lt;p&gt;bell &lt;i class=&#8221;stress&#8221;&gt;not&lt;\i&gt; cup&lt;\p&gt;</code></pre><h4>Links</h4><p>Ah, yes, links, HTML&#8230; the web. TML has no special provision for links. But they are not so bad. Override the inline bracket and add the attributes,</p><pre class="action"><code>Go to [a.external[go now!]{otherwhere.com} the other side] </code></pre><p>makes,</p><pre class="result"><code>&lt;p&gt;Go to &lt;a class=&#8221;external&#8221; title=&#8221;go now!&#8221; href=&#8221;otherwhere.com&#8221;&gt;the other side&lt;\a&gt;&lt;\p&gt;</code></pre><p>Note that links, in this HTML parser, are defined as an inline item (as WC3 defines). If placed at block&#8208;level, they will be paragraphed.</p><h4>Literal</h4><p>One inline tagname may be defined as literal (note: the tagname. At block level it is the control. The reason is, at inline level, only one control exists).</p><p>In HTML the tagname is &#8216?&#8217, and the output will not print any tags at all,</p><pre class="action"><code>&amp;#63; &amp;#63;
+Autumn comes in russet&#8230;
+    mantle
+ clad&#8230;
+ &amp;#63;</code></pre><p>makes,</p><pre class="result"><code>&lt;pre&gt;
+Autumn comes in russet&#8230;
+    mantle
+ clad&#8230;
+&lt;/pre&gt;</code></pre><p>Not doing anything, aside from preserving space. However marking up text is often useful. This document defines inline literals, because HTML escape code can use the markup to ensure display, not action. Or, for example, the markdown parser uses the code to write Markdown escapes.</p><h3>Self&#8208;closing marks</h3><p>There&#8217s only one self&#8208;closing inline HTML block of much interest. It is of interest. In the parser, it is defined as,</p><pre class="action"><code>*.medium[image of ceramic tiles]{blue&#8208;tile.png}</code></pre><p>makes,</p><pre class="result"><code>&lt;p&gt;&lt;img class=&#8221;medium&#8221; alt=&#8221;image of ceramic tiles&#8221; src=&#8221;blue&#8208;tile.png&#8221;/&gt;&lt;\p&gt;</code></pre><p>Note that, as an inline, the image is automatically paragraphed.</p><p>(splat = image. Opinions, opinions, opinions)</p><h2>TML extensions</h2><p>TML parsers are encouraged to be built in a way that can be extended.</p><p>What is on offer will depend on the implementation. For example, the Scala parser offers HTMLCodeblock. This is a parser some people may want to use a lot. It has a simple extension&#8212;any block&#8208;level mark with a tagname &#8216codeblock&#8217 writes the officially recommended W3 tags for computer code,</p><pre class="action"><code>&amp;#63;codeblock
+ def +(x: Int): Int = { x += 4 }
+ &amp;#63;</code></pre><p>makes,</p><pre class="result"><code>&lt;pre&gt;&lt;code&gt;
+ def +(x: Int): Int = { x += 4 }
+&lt;/code&gt;&lt;\pre&gt;</code></pre><p>and there is a parser which converts TML to Markdown, etc.</p><h2>Utilities</h2><p>TML may be implemented with utilities. These can be used to create pipelines. Using the Scala version, here is the pipeline to create TML Documentation in HTML,</p><pre class="action"><code>// Use a FileReader to read the file
+// (returns an arry/sequence of String, one for each line)
+val data = tml.FileReader(&#8221;&lt;path to&#8230;&gt;TML/text/GUIDE&#8221;)
 
-== whitespace
-p("")
-p(" ")
-p("  ")
-p("\n")
-p("\n\n")
+// Apply the HTML escape method
+// (escapes all HTML used to describe results. The &#8216defensive&#8217 version avoids existing entities)
+val eData = tml.EML.defensive(data)
 
-== whitespace text
-p("x")
-p("duff ")
-p("duff")
-p(" duff")
+// Parse character codes using the UML parser
+// (this could be done before the escaping. As with any pipelne, order can influence results. It&#8217s not important here, no UML clashes with HTML)
+val uData = tml.UML(eData)
 
+// Create an instance of the input class used in Scala
+// (this wraps many types of input&#8212; Strings, Streams etc.) 
+val it = tml.InputIterator(uData)
 
-== block control full
- p("## oops\n a daisy\n#\n")
- p("## oops\n a daisy\n#")
- p("## oops\n a daisy\n#")
- p("##.klass oops\n a daisy\n\n#")
- p("#tag.klass oops\n a daisy\n#")
-  p("##.klass       oops\n a daisy\n#")
- 
- 
- p(" #tag.klass oops\n a daisy\n#")
- p(" #tag.klass oops\n a daisy\n#\n")
+// Parse to HTML
+//(the HTMLCodeblock parser has a special renderer to make code W3 compatible)
+val p = tml.HTMLCodeblock()
+p(it)
 
-== block control alternate
- p("#neato.hots oops\n a daisy\n\n#")
- p("\n\n++ oops\n a daisy\n\n+")
- p("\n\n+ol.success oops\n a daisy\n\n+")
- p("\n\n++.success \n\n-- oops\n\n-\n\n-- a daisy\n\n-\n\n+")
-p("#bq truth, covered in security \n#")
+// Use the utility webpage method to wrap in webpage tags.
+val r = tml.HTML.toWebpage(&#8221;Guide&#8221;, &#8221;&lt;path to&#8230;&gt;TML/text/lib/doc.css&#8221;, p.result())
 
-== Block control open
-p("#thing oops")
-p("\n#thing oops")
-p("#thing oops")
- p("## oops")
+// &#8230;to see results in a repl,
+println&#174;</code></pre><h2>That&#8217s it</h2><p>Done. Have fun. Or don&#8217t be driven mad.</p></article></body></html>
 
-== block control close
-p("#\n oops")
-p("\n#\n oops")
-p("\n#  \n oops")
-
-== Attribute warning
-p("#thing{dot.com\n oops")
-p("#thing[frankly... \n oops")
-
-
-== Block literal
-p("??.lost loner\n?\nsee him")
-p("??   \nloner\n?")
-p("?? loner\n")
-
-== paragraph control
-p("~ loner\nsee him")
-p("== well\n~ well\n: well")
-
-== paragraph control alternate
-p("~ loner\nstanding in the line of the cars")
-p(": standing in the line of the cars\n")
-p("~ loner\n: standing in the line of the cars")
-
-p("@ loner\nsee him")
-
-
-
-== paragraph control count
-p("=h3.tracks loner\nsee him")
-p("= loner\nsee him")
-p("== loner\nsee him")
-p("==yp.tracks loner\nsee him")
-p("===.tracks loner\nsee him")
-
-p("===== loner\n\nsee him")
-
-== Selfclosing paragraph
-p("\n_.dashed ")
-p("_ ")
-
-
-== Parser
-val p = tml.HTML()
-
-
-
-
-== inline full
-p("bell [stress ] cup")
-p("bell [stress not] cup")
-p("bell [stress.klass not] cup")
-p("bell [ not] cup")
-p("bell [italic not] cup")
-
-p("bell[stress not]cup")
-p("bell [stress       not] cup")
-p("bell [stress not      ] cup")
-
-== inlineOpen
-p("")
-p("sock[")
-p("[sock et")
-
-== inline close
-p("sock]")
-p("sock]it toem")
-
-
-== Inline closure warning
-p("bell [stress not\n cup")
-p("bell [? not\n cup")
-
-== inline mark
-p("bell*img.small[a bell]{church.com} cup")
-p("bell  *img.small    cup")
-
-p("bell\n*img.small cup")
-
-
-
-== Inline literal
-p("bell [?   not\\*#|[clusp   ] cup")
-
-p("?? play\n?")
-p("??\nplay\n?")
-
-p("""
-??
-To be
-  ...or not to be?
-That
-    [That!]
-  is the question.
-?
-""")
-p("\n?? \nTo be\n  ...or not to be?\nThat\n    [That!]\n  is the question.\n?")
-
-== Parser
-val p = tml.HTML()
-
-p.whitespaceEnd(2, "    k")
-p.whitespaceEnd("    k")
-
-== HTML
-// main.section etc.
-p("#main content\n\n#")
-// headline
-p("=== Some charms\nNot this for sure. But that?")
-p("=== Some charms\n[a{coffee.fr} Not this] for now. So what?")
-// image (inline)
-p("the dolphin,\n\n*.small[image of dolphin]{dolphin.mars.ok}\ndolphins are...")
-// horizontal rule? Block level?...
-p("_.dashed")
-// Span block
-p("Some special [ £2.99] text")
-p("Some special £[i 2.99] text")
-
-// links block
-p("through to\n\n#a.external[go now!]{otherwhere.com} the other side\n\n#")
-// links (inline)
-p("through to [a.external[go now!]{otherwhere.com} the other side]")
-// pre
-p("?? To be,\n   Or not to be\nWhat now?\n?")
-
-// code
-p("#pre\n?code       var prevChar = currentChar\n       var closing = false\n     forward(until)\n?\n#")
-
-====
-p("")
-p("bell")
-p("bell cup")
-p("bell    cup")
-p("bell cup   ")
-p("   bell cup")
-p("   bell\n \n cup")
-
-p("bell\\cup")
-p("bell\\")
-p("bell\\]cup")
-
-
-== processLine
-p("")
-p("bell")
-p("bell cup")
-p("bell    cup")
-p("bell cup   ")
-p("   bell cup")
-p("bell[cup")
-p("bell]cup")
-
-== Newlines
-p("  \n")
-p("  s\n")
-p("  s\nq")
-p("s\nq")
-     
-   
-  
-== Parser
-val p = tml.HTML()
-  val p = Parser2()
-  
- == Lines
-p("\n1\n2\n3\n4")
- 
-
-
-p("""
-== TML in short
-++
--- TML does not try to be comprehensive for any particular output. 
-It provides basic text structuring and a few ways to insert stand-alone markup tags.
--
--- TML makes no attempt to be discrete or hidden.
--
--- TML is inflexible
-It can not be customised except by re-writing the parser.
--
--- TML does not try to copy other lightweight markups. 
-Some markups do this, to help a user remember how to use them. After all, markup is
-is a job most users will only do now and then.
-
-However, TML does sometimes inherit a few marks that look similar to other notations.
--
-
--- TML has a consistent and low-weight syntax.
--
-+
-""")

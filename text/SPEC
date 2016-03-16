@@ -206,15 +206,15 @@ A paragraph ends on a newline (TML is typography-based, so this is fine. The imp
 
 
 === The literal block
-The literal block is opened by a special mark. The literal block is closed by the same mark. The marks are handled as other block bracket marks i.e. the first mark is followed by attributes or a default mark repetition. 
+The literal block is opened by a special mark, with attributes or a duplicated mark. The literal block is closed by the same mark. The marks are handled as other block bracket marks i.e. the first mark is followed by attributes or a default mark repetition. 
  
 In this state, the parser will not process the block content. The bulk of the following text, including spaces and whitespace, is printed directly to the output, until a closing mark.
 
-In line with other opening marks, space following the opening mark is consumed.
+In line with other opening block-level marks, whitespace following the opening mark is consumed. Note that, in some implementations, this may mean extra code. 
 
-The spacing preceding a literal block close is problem for TML. Usually TML can tell what to do with any character depending on the parser's state. But for a literal end mark, this can be expensive. The most consistent treatment is to remove the side significant mark preceding a close mark i.e. the newline followed by the space. But this can only be identified if all space in the literal is cached, pending writing to the output (so the last space can be disposed, if it proves to preced a close mark).
+The spacing preceding a literal block close is problem for TML. Usually TML can tell what to do with any character depending on the parser's state. But for a literal end mark, this can be expensive. The most consistent treatment is to remove the side significant mark preceding a close mark i.e. the newline followed by the space. But this can only be identified if all space in the literal is cached, pending writing to the output (so the last space can be disposed, if it proves to preceed a close mark).
  
-Thus, TML defines two possibilities for closing block literal space. The first preferred method is to remove the definition of  of the significant space. Parsers based in a parsing program can do this naturally. The alternative algorithm is to remove the character preceding the close mark, which may be a newline, or a space after a newline. This provides an easy solution for parsers which step  through input, requiring a cache of only one character. This second solution can also be implemented, if required and with a little extra complexity, with no lookback.
+Thus, TML defines two possibilities for closing block literal space. The first preferred method is to remove the definition of  of the significant space. Parsers based in a parsing program can do this naturally. The alternative algorithm is to remove the character preceding the close mark, which may be a newline, or a space after a newline. This provides an easy solution for parsers which step through input, requiring a cache of only one character. This second solution can also be implemented, if required and with a little extra complexity, with no lookback.
  
 ~ Rationale
 : A special mark is preferred to a more semanticly meaningful tagname, because the search for the literal block end would fail on any legitimate block end, whereas a special mark positively identifies the literal close.

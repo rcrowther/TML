@@ -354,7 +354,15 @@ extends Definitions
     }
   }
 
-
+ /** Skip whitespace.
+    *
+    * Skips until `currentChar` is not whitespace.
+    */
+  @inline private def skipWhitespace() {
+    while (currentChar == ' ' || currentChar == LineFeed) {
+      forward()
+    }
+  }
   
 
   /** String build from the current position to a specified limit.
@@ -719,9 +727,10 @@ extends Definitions
   {
     //println(s"parseBlockLiteral currentChar: $currentChar")
 
-
-
     // now in skipped space after attributes
+    // skip all whitespace, including newlines (as block-level would)
+    skipWhitespace()
+
     // ...parse the contents
     
     // setup prevChar
