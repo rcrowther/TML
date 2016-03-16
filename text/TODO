@@ -5,8 +5,14 @@ Update docs on HTML parser examples --- add FileReader
 abstract output for streams also?
 abstract lineend
 
+test Unicode
+Convert to unicode method
+fix attributes
+tail errors
 
 = TML
+define remove whitespace after block literal?
+
 Macroformat extension
 Finish Markdown extension
 Fully abstract the char definitions

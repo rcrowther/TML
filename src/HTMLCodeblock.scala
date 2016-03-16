@@ -6,7 +6,7 @@ package tml
   *
   * This versiion of the HTML parser has a light but significant
   * addition to rendering - either `cb`, or `codeblock` as a tagname
-  * generates &lt;pre> &ltcode>; &lt;/code> &lt;/pre>. So,
+  * generates &lt;pre> &lt;code>... &lt;/code> &lt;/pre>. So,
   *
   * {{{
   * ?codeblock
@@ -17,8 +17,18 @@ package tml
   * Will both render the contents literally, and wrap in the W3 recommended
   * HTML tags. 
   *
-  * If a class attribute is added, this will also work with some
-  * Javascript syntax highlighters.
+  * Note the W3 intentions: the &lt;pre> tag is block level, this
+  * defines a presentation area, and `pre` should define literal
+  * contents. The &lt;code> tag is character-level, representing a
+  * fragment of computer code.
+  *
+  * If attributes are added, they will be added to the &lt;pre>
+  * tag. Sematically, this allows different approaches to
+  * presentation, but code is always code. This is a
+  * text-based/book-like approach. If some different attribute or name
+  * scheme is needed, for example, to trigger Javascript syntax
+  * highlighting, copy this class and substitute the new attribute
+  * name.
   */
 class HTMLCodeblock
     extends HTML
@@ -37,9 +47,9 @@ class HTMLCodeblock
   // li, dd, dt, blockquote
   override def renderBlockOpen(attrs: MarkAttributes) = {
     if(attrs.resolvedTagname == "codeblock") {
-      b ++= "<pre><code"
+      b ++= "<pre" 
       attributesStockRender(attrs)
-      b += '>'
+      b ++= "><code>"
     }
     else {
       super.renderBlockOpen(attrs)

@@ -33,6 +33,7 @@ import java.util.regex.Pattern
   * Also try
   * [[https://code.google.com/p/owasp-esapi-java/source/browse/trunk/src/main/java/org/owasp/esapi/codecs/HTMLEntityCodec.java]]
   */
+//TODO: allow space before >?
 // tml.EML("&")
 // tml.EML("<div>")
 // tml.EML.defensive("</div>")
@@ -131,10 +132,10 @@ object EML {
   {
 
     s match {
-      case "&" => "&#amp;"
-      case "<" => "&#lt;"
-      case ">" => "&#gt;"
-      //        case '"' => b ++= "&#quot;"
+      case "&" => "&amp;"
+      case "<" => "&lt;"
+      case ">" => "&gt;"
+      //        case '"' => b ++= "&quot;"
       // source match, but no recognition match
       case _ => {
         println(s"unmatched search? $s")
