@@ -1,7 +1,7 @@
 
 = TML
 
-TML is a lightweight markup language. First, add codes to text. A parser reads the text, then transforms the codes into other kinds of markup codes.
+TML is a lightweight markup language. First, add codes to text. A parser reads the text, then transforms the codes into other kinds of markup code.
 
 TML is probably not the language you want.
 
@@ -21,16 +21,16 @@ TML,
 +
 
 === Philosophy
-TML is a generic markup. It may perform unnaturally and inefficiently for some markup styles. For HTML markup, TML can not differentiate anchors from spans, so needs explicit statements for anchors (links). And TML has no way to escape and generate HTML entities.
+TML is a generic markup. For some markup styles, it may perform unnaturally and inefficiently. For HTML markup, TML can not differentiate anchors from spans, so needs explicit statements for anchors (links). And TML has no way to escape or generate HTML entities.
 
-In general, TML syntax is aimed at typographical markup. The language may stress markup in unusual ways. In HTML there is a strong support for nested group support (divs, etc). Images, however, are treated as an afterthought. No support exists for marking up other material, such as tables.
+In general, TML syntax is aimed at typographical markup. The language may stress markup in unusual ways. In HTML there is a strong support for nested group support (divs, etc). Images, however, are treated as an afterthought. No support exists for marking up material such as tables.
 
 TML has no support for markup at character level (however, the implementation may include the complementary UML).
 
 TML is written as a tool, not a comprehensive solution. TML is written round the parser, not the end result.
 
 === Output
-TML output is a single line of text interspaced by tags defined by the markup. If pretty-printing is required, the output must be run through external code.
+TML output is a single line of text (mostly) interspaced by tags defined by the markup. If pretty-printing is required, the output must be run through external code.
 
 === Why TML?
 I've added discouragement. This, you know, is because I dislike having my (or your) time wasted.
@@ -47,7 +47,7 @@ On this last point, if I've forgotten the layout for some purpose, I can sketch 
 === Documentation
 TML has an incomplete but sometimes considered TML Specification. For questions about how spaces are handled in literals, how parsing of controls works, and other questions, go there.
 
-The following comments are based on an HTML implementation of the Scala parser. Please bear in mind that TML is designed to be extended. Other implementations may define different codes. However, the basic ideas are the same for any TML parser.
+The following comments are based on an HTML implementation of the Scala parser. Please bear in mind that TML is designed to be extended. Other implementations may define different codes. However, for any TML parser, the basic ideas are the same.
 
 
 
@@ -71,25 +71,25 @@ TML removes newlines. It crushes multiple space down to one space.
 == Marks and attributes
 TML marks are a single char/codepoint followed by attributes, followed by a whitespace.
 
-Here's the ampersand char, working as a mark, with attributes. The attributes may not make sense, may not render as anything, but are available,
+Here's the ampersand char working as a mark, with attributes. The attributes may not make sense, may not render as anything, but are available,
 
 ?codeblock.action
-@.class-attribute{url attribute}[text attribute]
+@tagname-attribute.class-attribute[attribute text]{url attribute}
 ?
 
-The class attribute is introduced with the period, and can contain no whitespace. The url attribute is curly-bracketed, and can contain spaces. The text attrribute is square bracketted, and can contain space.
+The class attribute is introduced with the period, and can contain no whitespace. The text attribute is square bracketed, and can contain space. The url attribute is curly-bracketed, and can contain spaces.
 
 Text can come after the mark, but must be separated by whitespace,
 
 ?codeblock.action
-@.class{attribute url}[attribute text] Some text...
+@tagname-attribute.class[attribute text]{attribute url} Some text...
 ?
 
 
 Text can follow the mark (the newline is whitespace),
 
 ?codeblock.action
-@.class{attribute url}[attribute text]
+@.class[attribute text]{attribute url}
 Some text...
 ?
 
@@ -129,7 +129,7 @@ makes,
 <p>The queen consented, allowing her to go for a day...</p>
 ?
 
-Some credit,
+(credits),
 
 ??
 Welsh Fairy-Tales And Other Stories, by Anonymous
@@ -165,7 +165,7 @@ Not this for sure.
 <dd>Some charms<\dd><p>Not this for sure.<\p>
 ?
 
-TML headlines are a paragraph. The parser looks at the number of indent controls to decide the level. Therefore, in the language of lightweight markup, they are [a{http://www.aaronsw.com/2002/atx/} Atx-style] (there is no support for underline titles, like [a{http://docutils.sourceforge.net/mirror/setext.html} Setext]).
+TML headline marks are a paragraph. The parser looks at the number of indent controls to decide the level. Therefore, in the language of lightweight markup, they are [a{http://www.aaronsw.com/2002/atx/} Atx-style] (there is no support for underline titles, like [a{http://docutils.sourceforge.net/mirror/setext.html} Setext]).
 
 e.g.
 
@@ -220,7 +220,7 @@ makes,
 <section class="georgian"><p>Some text<\p><\section>
 ?
 
-Seems painful, always putting some attribute or other to identify the open mark? But TML allows a compression. For the opening mark, repeat the control,
+Seems painful, always appending some attribute or other to identify the open mark? TML allows a compression. For the opening mark, repeat the control,
 
 ?codeblock.action
 ##
@@ -234,7 +234,7 @@ makes,
 <section><p>Some text<\p><\section>
 ?
 
-``What", you say, ``no <div>?" Override any of the block controls with a new tagname,
+""What", you say, ""no <div>?" Override any of the block controls with a new tagname,
 
 ?codeblock.action
 #div
@@ -248,7 +248,7 @@ makes,
 <div><p>Some text<\p><\div>
 ?
 
-This method can be used to generate any HTML tag.
+This method can generate any HTML tag.
 
 
 ==== Lists
@@ -345,7 +345,7 @@ makes,
 <span>bell<\span>
 ?
 
-Why the space after the opening bracket (it did not appear in the output)? Because, like block marks, open marks can have attributes,
+Why the funny space after the opening bracket (it did not appear in the output)? Because, like block marks, open marks can have attributes,
 
 ?codeblock.action
 bell [i.stress not] cup
@@ -373,7 +373,7 @@ makes,
 <p>Go to <a class="external" title="go now!" href="otherwhere.com">the other side<\a><\p>
 ?
 
-Note that links, in this HTML parser, are defined as an inline item (as WC3 defines). If placed at block-level, they will be paragraphed.
+Note that links, in this HTML parser, are defined as inline (as W3 defines). If placed at block-level, they will be paragraphed.
 
 ==== Literal
 One inline tagname may be defined as literal (note: the tagname. At block level it is the control. The reason is, at inline level, only one control exists). 
@@ -454,7 +454,7 @@ val data = tml.FileReader("<path to...>TML/text/GUIDE")
 
 // Apply the HTML escape method
 // (escapes all HTML used to describe results. The ''defensive' version avoids existing entities)
-val eData = tml.EML.defensive(data)
+val eData = tml.HTMLUtils.toDisplayDefensive(data)
 
 // Parse character codes using the UML parser
 // (this could be done before the escaping. As with any pipelne, order can influence results. It's not important here, no UML clashes with HTML)
@@ -470,10 +470,10 @@ val p = tml.HTMLCodeblock()
 p(it)
 
 // Use the utility webpage method to wrap in webpage tags.
-val r = tml.HTML.toWebpage("Guide", "<path to...>TML/text/lib/doc.css", p.result())
+val rs = tml.HTMLUtils.toWebpage("Guide", "<path to...>TML/text/lib/doc.css", p.result())
 
 // ...to see results in a repl,
-println(r)
+println(rs)
 ?
  
 == That's it

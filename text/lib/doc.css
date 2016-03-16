@@ -1,7 +1,7 @@
 *{
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
 font-size: 14px;
 line-height: 21px;
 font-weight: normal;
@@ -46,19 +46,31 @@ line-height: 21px;
 margin-top: 35px;
 }
 
+h5 {
+font-size: 14px;
+line-height: 21px;
+margin-top: 35px;
+}
+
 pre {
 margin-top: 14px;
-padding-left: 21px;
+padding-left: 7px;
 display: block;
 }
 
 ul, ol, dl {
-padding-left: 21px;
+padding-left: 7px;
 margin-top: 14px;
 }
 
 p {
 margin-top: 14px;
+}
+
+dd{
+margin-top: 14px;
+padding-left: 7px;
+font-style: italic;
 }
 
 code {
@@ -67,12 +79,12 @@ font-family: monospace;
 
 .action{
 margin: 21px 0;
-padding: 7px 42px;
+padding: 7px 21px;
 border-top: 1px dashed gray;
 border-bottom: 1px dashed gray;
 }
 
 .result{
 margin: 36px 0;
-padding-left: 42px;
+padding-left: 21px;
 }

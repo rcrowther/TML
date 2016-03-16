@@ -44,13 +44,19 @@
   * }}}
   *
   * ===Parser Extensions===
-  *
   * Extended from the basic parser are,
   *
   *  - [[HTML]] for basic HTML
-  *  - [[HTMLCodeblock]] HTML plus a special tag 'codeblock'/'cb', which writes a pre/code tag.
+  *  - [[HTMLCodeblock]] HTML plus a special tagname 'codeblock'/'cb', which writes a pre/code tag.
   *
-  * ====File reading====
+  * 
+  * ===*Utils===
+  * Each parser may have a corresponding `Utils` object, for example,
+  * [[HTMLUtils]].  HTMLUtils has methods for escaping and webpage
+  * building.
+  *
+  * 
+  * ==File reading==
   * The mini-filereader is built-in to preserve your sanity (no, no, I
   * mean, "for ease of assessment and testing"). Returning a stream,
   * and assuming implicit wrap to an InputIterator,
@@ -62,6 +68,7 @@
   * [[tml.FileReader]] is overloaded to accept paths of type `String`,
   * `File`, or `Path`.
   *
+  * 
   * ==UML==
   * [[UML]] is a lightweight language for character markup, converting
   * characters into Unicode. Markup codes exist for copyright marks,
@@ -75,9 +82,7 @@
   * package documentation contains full details of the markup
   * available.
   *
-  * ==EML==
-  * [[EML]] is an object carrying methods for HTML escaping.
-  *
+  * 
   * ==Alternatives==
   * Many. See
   * [[https://en.wikipedia.org/wiki/Lightweight_markup_language]].

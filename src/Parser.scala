@@ -727,9 +727,10 @@ extends Definitions
   {
     //println(s"parseBlockLiteral currentChar: $currentChar")
 
-    // now in skipped space after attributes
-    // skip all whitespace, including newlines (as block-level would)
-    skipWhitespace()
+    // now in space after attributes
+    skipSpace()
+
+    if (currentChar == LineFeed) forward()
 
     // ...parse the contents
     
