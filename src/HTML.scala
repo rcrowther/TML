@@ -58,20 +58,21 @@ class HTML
     *
     * Produces double quoted values for a common map of attributes.
     */
-  protected def attributesStockRender(attrs: MarkAttributes) {
-    if (attrs.klass != "") {
+  protected def attributesStockRender(md: MarkData)
+{
+    if (md.klass != "") {
       b ++= " class=\""
-      b ++= attrs.klass
+      b ++= md.klass
       b ++= "\""
     }
-    if (attrs.text != "") {
+    if (md.text != "") {
       b ++= " title=\""
-      b ++= attrs.text
+      b ++= md.text
       b ++= "\""
     }
-    if (attrs.url != "") {
+    if (md.url != "") {
       b ++= " href=\""
-      b ++= attrs.url
+      b ++= md.url
       b ++= "\""
     }
   }
@@ -79,99 +80,106 @@ class HTML
   // div, main, section, article, aside
   // ol, ul, dl,
   // li, dd, dt, blockquote
-  def renderBlockOpen(attrs: MarkAttributes) = {
+  def renderBlockOpen(md: MarkData)
+ {
     b += '<'
-    b ++= attrs.resolvedTagname
-    attributesStockRender(attrs)
+    b ++= md.resolvedTagname
+    attributesStockRender(md)
     b += '>'
   }
 
   def renderBlockClose(
-    attrs: MarkAttributes
+    md: MarkData
   )
   {
     b ++= "</"
-    b ++= attrs.resolvedTagname
+    b ++= md.resolvedTagname
     b += '>'
   }
 
   // used for hr
-  def renderBlockSelfClosingMark(attrs: MarkAttributes) {
+  def renderBlockSelfClosingMark(md: MarkData)
+ {
     b += '<'
-    b ++= attrs.resolvedTagname
-    attributesStockRender(attrs)
+    b ++= md.resolvedTagname
+    attributesStockRender(md)
     b ++= "/>"
   }
 
   // used for h?, pre
-  def renderParagraphOpen(attrs: MarkAttributes) = {
+  def renderParagraphOpen(md: MarkData)
+ {
     // fix the headline tag name
     // headlines are a little complex.
     // If there is no prefixed control char in the name,
     // then the tag name was given or defaulted, so do nothing.
     // If prefixes exist, they are counted to form the
     // resolvedTagnamename
-    if (attrs.control == '=') {
-      val (ctrls, tag) = attrs.splitTagControls
-      attrs.resolvedTagname =
+    if (md.control == '=') {
+      val (ctrls, tag) = md.splitTagControls
+      md.resolvedTagname =
         if (tag.size > 0) tag
         else "h" + (ctrls.size + 1)
     }
 
     b += '<'
-    b ++= attrs.resolvedTagname
+    b ++= md.resolvedTagname
 
-    if (attrs.klass != "") {
+    if (md.klass != "") {
       b ++= " class=\""
-      b ++= attrs.klass
+      b ++= md.klass
       b ++= "\""
     }
-    if (attrs.text != "") {
+    if (md.text != "") {
       b ++= " title=\""
-      b ++= attrs.text
+      b ++= md.text
       b ++= "\""
     }
-    if (attrs.url != "") {
+    if (md.url != "") {
       b ++= " href=\""
-      b ++= attrs.url
+      b ++= md.url
       b ++= "\""
     }
     b += '>'
   }
 
-  def renderParagraphClose(name: String) {
+  def renderParagraphClose(md: MarkData)
+{
     b ++= "</"
-    b ++= name
+    b ++= md.resolvedTagname
     b += '>'
   }
 
 
-  def renderTextParagraphOpen() {
+  def renderTextParagraphOpen()
+ {
     b ++= "<p>"
   }
 
-  def renderTextParagraphClose() {
+  def renderTextParagraphClose()
+ {
     b ++= "</p>"
   }
 
 
   // used for a, i, b, span
-  def renderInlineOpen(attrs: MarkAttributes) = {
+  def renderInlineOpen(md: MarkData)
+{
     // catch literal, ignore
-    if (attrs.resolvedTagname != InlineLiteralTagname) {
+    if (md.resolvedTagname != InlineLiteralTagname) {
       b += '<'
-      b ++= attrs.resolvedTagname
-      attributesStockRender(attrs)
+      b ++= md.resolvedTagname
+      attributesStockRender(md)
       b += '>'
     }
   }
 
 
   def renderInlineClose(
-    attrs: MarkAttributes
+    md: MarkData
   )
   {
-    val name  = attrs.resolvedTagname
+    val name  = md.resolvedTagname
 
     // catch literal, ignore
     if (name != InlineLiteralTagname) {
@@ -182,22 +190,23 @@ class HTML
   }
 
   // Used for img
-  def renderInlineSelfClosingMark(attrs: MarkAttributes) {
+  def renderInlineSelfClosingMark(md: MarkData) 
+{
     b += '<'
-    b ++= attrs.resolvedTagname
-    if (attrs.klass != "") {
+    b ++= md.resolvedTagname
+    if (md.klass != "") {
       b ++= " class=\""
-      b ++= attrs.klass
+      b ++= md.klass
       b ++= "\""
     }
-    if (attrs.text != "") {
+    if (md.text != "") {
       b ++= " alt=\""
-      b ++= attrs.text
+      b ++= md.text
       b ++= "\""
     }
-    if (attrs.url != "") {
+    if (md.url != "") {
       b ++= " src=\""
-      b ++= attrs.url
+      b ++= md.url
       b ++= "\""
     }
     b ++= "/>"

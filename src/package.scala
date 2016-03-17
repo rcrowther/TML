@@ -13,7 +13,7 @@
   * tml.HTML("=== Some charms\n[a{coffee.fr} Not this] for now. So what?")
   * }}}
   *
-  * Store a reusable parser with the full methodology,
+  * Store a reusable parser,
   *
   * {{{
   * val p = tml.HTML()
@@ -27,7 +27,7 @@
   * Input to the parser is by a wrapping class [[InputIterator]].
   * 
   * InputIterator wraps several fundamentally different options,
-  * including a string, multiple strings, multiple strings while
+  * including a string, multiple strings while
   * restoring newlines (Java code often strips these on a fileread) or
   * an [[java.io.InputStreamReader]].
   *

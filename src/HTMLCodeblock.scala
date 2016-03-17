@@ -45,26 +45,27 @@ class HTMLCodeblock
   // div, main, section, article, aside
   // ol, ul, dl,
   // li, dd, dt, blockquote
-  override def renderBlockOpen(attrs: MarkAttributes) = {
-    if(attrs.resolvedTagname == "codeblock") {
+  override def renderBlockOpen(md: MarkData)
+{
+    if(md.resolvedTagname == "codeblock") {
       b ++= "<pre" 
-      attributesStockRender(attrs)
+      attributesStockRender(md)
       b ++= "><code>"
     }
     else {
-      super.renderBlockOpen(attrs)
+      super.renderBlockOpen(md)
     }
   }
 
   override def renderBlockClose(
-    attrs: MarkAttributes
+    md: MarkData
   )
   {
-    if(attrs.resolvedTagname == "codeblock") {
+    if(md.resolvedTagname == "codeblock") {
       b ++= "</code></pre>"
     }
     else {
-      super.renderBlockClose(attrs)
+      super.renderBlockClose(md)
     }
   }
 

@@ -70,21 +70,22 @@ class Markdown
     *  Double quoted and mapped,
     *
     */
-  private def attributesStockRender(attrs: MarkAttributes) {
+  private def attributesStockRender(md: MarkData)
+ {
 
-    if (attrs.klass != "") {
+    if (md.klass != "") {
       b ++= " class=\""
-      b ++= attrs.klass
+      b ++= md.klass
       b ++= "\""
     }
-    if (attrs.text != "") {
+    if (md.text != "") {
       b ++= " title=\""
-      b ++= attrs.text
+      b ++= md.text
       b ++= "\""
     }
-    if (attrs.url != "") {
+    if (md.url != "") {
       b ++= " href=\""
-      b ++= attrs.url
+      b ++= md.url
       b ++= "\""
     }
   }
@@ -92,53 +93,55 @@ class Markdown
   // div, main, section, article, aside
   // ol, ul, dl,
   // li, dd, dt, blockquote
-  def renderBlockOpen(attrs: MarkAttributes) = {
+  def renderBlockOpen(md: MarkData)
+ {
     b += '<'
-    b ++= attrs.resolvedTagname
-    attributesStockRender(attrs)
+    b ++= md.resolvedTagname
+    attributesStockRender(md)
     b += '>'
   }
 
   def renderBlockClose(
-    attrs: MarkAttributes
+    md: MarkData
   )
   {
     b ++= "<\\"
-    b ++= attrs.resolvedTagname
+    b ++= md.resolvedTagname
     b += '>'
   }
 
   // used for h?, pre
-  def renderParagraphOpen(attrs: MarkAttributes) = {
+  def renderParagraphOpen(md: MarkData)
+{
     // fix the headline tag name
     // headlines are a little complex.
     // If there is no prefixed control char in the name,
     // then the tag name was given or defaulted, so do nothing.
     // If prefixes exist, they are counted to form the
     // resolvedTagnamename
-    if (attrs.control == '=') {
-      val (ctrls, tag) = attrs.splitTagControls
-      attrs.resolvedTagname =
+    if (md.control == '=') {
+      val (ctrls, tag) = md.splitTagControls
+      md.resolvedTagname =
         if (tag.size > 0) tag
         else "h" + (ctrls.size + 1)
     }
 
     b += '<'
-    b ++= attrs.resolvedTagname
+    b ++= md.resolvedTagname
 
-    if (attrs.klass != "") {
+    if (md.klass != "") {
       b ++= " class=\""
-      b ++= attrs.klass
+      b ++= md.klass
       b ++= "\""
     }
-    if (attrs.text != "") {
+    if (md.text != "") {
       b ++= " title=\""
-      b ++= attrs.text
+      b ++= md.text
       b ++= "\""
     }
-    if (attrs.url != "") {
+    if (md.url != "") {
       b ++= " href=\""
-      b ++= attrs.url
+      b ++= md.url
       b ++= "\""
     }
     b += '>'
@@ -146,30 +149,32 @@ class Markdown
     //println(s"renderOpen... '${b.result}'")
   }
 
-  def renderParagraphClose(name: String) {
+  def renderParagraphClose(md: MarkData)
+ {
     b ++= "<\\"
-    b ++= name
+    b ++= md.resolvedTagname
     b += '>'
   }
 
   // used for a, i, b, span
-  def renderInlineOpen(attrs: MarkAttributes) = {
+  def renderInlineOpen(md: MarkData)
+{
 
     // Markdown link
     // link = [an example](http://example.com/ "Title")
-    if (attrs.resolvedTagname == "a") {
+    if (md.resolvedTagname == "a") {
       b += '['
     }
     else {
-      if (attrs.resolvedTagname == "em") {
+      if (md.resolvedTagname == "em") {
         b += '*'
       }
       else {
         // catch literal, ignore
-        if (attrs.resolvedTagname != InlineLiteralTagname) {
+        if (md.resolvedTagname != InlineLiteralTagname) {
           b += '<'
-          b ++= attrs.resolvedTagname
-          attributesStockRender(attrs)
+          b ++= md.resolvedTagname
+          attributesStockRender(md)
           b += '>'
         }
       }
@@ -179,29 +184,29 @@ class Markdown
 
 
   def renderInlineClose(
-    attrs: MarkAttributes
+    md: MarkData
   )
   {
 
-    val name  = attrs.resolvedTagname
+    val name  = md.resolvedTagname
 
     // Markdown link
     // link = [an example](http://example.com/ "Title")
     if (name == "a") {
       b ++= "]("
-      if (attrs.url != "") {
-        b ++= attrs.url
+      if (md.url != "") {
+        b ++= md.url
       }
 
-      if (attrs.text != "") {
+      if (md.text != "") {
         b += '\"'
-        b ++= attrs.text
+        b ++= md.text
         b += '\"'
       }
       b += ')'
     }
     else {
-      if (attrs.resolvedTagname == "em") {
+      if (md.resolvedTagname == "em") {
         b += '*'
       }
       else {
@@ -216,21 +221,22 @@ class Markdown
   }
 
   // Used for img
-  def renderInlineSelfClosingMark(attrs: MarkAttributes) {
+  def renderInlineSelfClosingMark(md: MarkData)
+ {
 
     // Markdown img
     //img = ![Alt text](/path/to/img.jpg "Optional title")
     b += '!'
 
-    if (attrs.text != "") {
+    if (md.text != "") {
       b += '['
-      b ++= attrs.text
+      b ++= md.text
       b += ']'
     }
 
-    if (attrs.url != "") {
+    if (md.url != "") {
       b += '('
-      b ++= attrs.url
+      b ++= md.url
       b += ')'
     }
 
@@ -238,17 +244,20 @@ class Markdown
   }
 
   // used for hr
-  def renderBlockSelfClosingMark(attrs: MarkAttributes) {
+  def renderBlockSelfClosingMark(md: MarkData) 
+{
     // Markdown hr
     b ++= "* * *"
   }
 
-  def renderTextParagraphOpen() {
+  def renderTextParagraphOpen() 
+{
     // put the newline back
     b += '\n'
   }
 
-  def renderTextParagraphClose() {
+  def renderTextParagraphClose() 
+{
     // put the newline back
     b += '\n'
   }

@@ -19,11 +19,6 @@ extends Definitions
 {
 
 
-
-
-
-
-
   //---------------------
   // Parser definitions
   //---------------------
@@ -47,7 +42,7 @@ extends Definitions
     *
     * For error displays.
     */
-  private var lineCount = 0
+  //private var lineCount = 0
 
   /** Position of the start of the current line.
     *
@@ -56,7 +51,7 @@ extends Definitions
     *
     * For error displays (line position calculation).
     */
-  private var currentLinePos = 0
+  //private var currentLinePos = 0
 
 
 
@@ -122,7 +117,7 @@ extends Definitions
     *
     * The main reason for preventing defaulting is so the renderer
     * can look at the control and tag name directly, usually to use
-    * the methods in [[MarkAttributes]] to count the number of
+    * the methods in [[MarkData]] to count the number of
     * controls.
     *
     * For example, a non defaulting paragraph mark can implement the
@@ -213,17 +208,17 @@ extends Definitions
   // Render callbacks
   //------------------
 
-  def renderBlockOpen(attrs: MarkAttributes)
-  def renderBlockClose(attrs: MarkAttributes)
+  def renderBlockOpen(md: MarkData)
+  def renderBlockClose(md: MarkData)
 
-  def renderParagraphOpen(attrs: MarkAttributes)
-  def renderParagraphClose(name: String)
+  def renderParagraphOpen(md: MarkData)
+  def renderParagraphClose(md: MarkData)
 
-  def renderInlineOpen(attrs: MarkAttributes)
-  def renderInlineClose(attrs: MarkAttributes)
+  def renderInlineOpen(md: MarkData)
+  def renderInlineClose(md: MarkData)
 
-  def renderBlockSelfClosingMark(attrs: MarkAttributes)
-  def renderInlineSelfClosingMark(attrs: MarkAttributes)
+  def renderBlockSelfClosingMark(md: MarkData)
+  def renderInlineSelfClosingMark(md: MarkData)
 
   def renderTextParagraphOpen()
   def renderTextParagraphClose()
@@ -253,23 +248,6 @@ extends Definitions
     */
   def errorLog: ErrorLog = errLog
 
-  /** Represents a control char as a string.
-    *
-    * Converts whitespace into something human-readable.
-    */
-  private def controlMarkToString(controlMark: Char): String = {
-    if (controlMark == ' ') {
-      "<space>"
-    }
-    else {
-      if (controlMark == LineFeed) {
-        "<linefeed (13)>"
-      }
-      else {
-        controlMark.toString
-      }
-    }
-  }
 
 
 
@@ -400,13 +378,10 @@ extends Definitions
     * @param until parse to this limit.
     * @return a class representing the data recovered.
     */
-  private def parseAttributes(controlChar: Char)
-      : MarkAttributes =
+  private def parseAttributes(md: MarkData)
   {
-    // Get name
-    var ma = MarkAttributes()
-    ma.control = controlChar
-    ma.tagName = getUntil(
+    // Get tagname
+    md.tagName = getUntil(
       (c: Char) => { c == '.' || c == '{' || c == '[' || Character.isWhitespace(c) }
     )
 
@@ -414,47 +389,39 @@ extends Definitions
       currentChar match {
         case '.' => {
           forward()
-          ma.klass = getUntil((c: Char) => { c == '{' || c == '[' || Character.isWhitespace(c) })
+          md.klass = getUntil((c: Char) => { c == '{' || c == '[' || Character.isWhitespace(c) })
         }
-        case '{' => {
-          forward()
-          ma.url = getUntil((c: Char) => { c == '}' })
 
-          // if newline, give warning, else move off the closing bracket
-          if(currentChar == LineFeed) {
-            errLog.warning(
-              lineCount,
-              currentLinePos,
-              it.pos,
-              s"URL attribute closed by newline: unintended?"
-            )
-          }
-          else forward()
-
-        }
         case '[' => {
           forward()
-          ma.text = getUntil((c: Char) => { c == ']' })
+          md.text = getUntil((c: Char) => { c == ']' })
           // if newline, give warning, else move off the closing bracket
           if(currentChar == LineFeed) {
-            errLog.warning(
-              lineCount,
-              currentLinePos,
-              it.pos,
-              s"Text attribute closed by newline: unintended?"
+            errLog.textAttributeClosedByNewline(
+              it
+            )
+          }
+          else forward()
+        }
+
+        case '{' => {
+          forward()
+          md.url = getUntil((c: Char) => { c == '}' })
+
+          // if newline, give warning, else move off the closing bracket
+          if(currentChar == LineFeed) {
+            errLog.urlAttributeClosedByNewline(
+              it
             )
           }
           else forward()
 
         }
-        case _ => {
-          val cm = controlMarkToString(currentChar)
 
-          errLog += (
-            lineCount,
-            currentLinePos,
-            it.pos,
-            s"Unable to match an attribute mark to current char. Char found: '$cm'"
+        case _ => {
+          errLog.unknownAttributeMark(
+            it,
+            currentChar
           )
 
           forward()
@@ -463,9 +430,6 @@ extends Definitions
     }
     
     // Now on whitespace
-
-
-    ma
   }
 
 
@@ -476,17 +440,16 @@ extends Definitions
     * @param charPos index of the control char.
     * @return true if the close was accepted and given markup, else false
     */
-  private def handleBlockClose(charPos: Int, controlMark: Char)
+  private def handleBlockClose()
       : Boolean =
   {
+val controlMark = currentChar
+
     if (blockStack.isEmpty) {
-      val cm = controlMarkToString(controlMark)
       // Too many closes. Ignore.
-      errLog += (
-        lineCount,
-        currentLinePos,
-        it.pos,
-        s"Block stack is empty but a control mark is trying to close a block controlMark: '$cm'\nMark is ignored."
+      errLog.emptyBlockStack(
+        it,
+        controlMark
       )
       b += controlMark
 
@@ -495,17 +458,13 @@ extends Definitions
     else {
       //println("  block close")
 
-      val stackTextMark = blockStack.head.attrs.control
-      if (stackTextMark != controlMark) {
-        val cm = controlMarkToString(controlMark)
-        val stm = controlMarkToString(stackTextMark)
-
+      val stackTextMark = blockStack.head
+      if (stackTextMark.control != controlMark) {
         //error, don't know why, ignore
-        errLog += (
-          lineCount,
-          currentLinePos,
-          it.pos,
-          s"Control mark '$cm' does not match mark on stack '$stm'.\nMark is ignored."
+        errLog.misMatchBlockStack(
+          it,
+stackTextMark,
+          controlMark
         )
         b += controlMark
 
@@ -513,8 +472,7 @@ extends Definitions
       }
       else {
         // Is ok, render and dispose of the markdata
-        renderBlockClose(blockStack.head.attrs)
-        blockStack.pop()
+        renderBlockClose(blockStack.pop())
         true
       }
     }
@@ -522,23 +480,20 @@ extends Definitions
 
   /** Resolve, stack, and render a block open mark.
     */
-  private def handleBlockOpen(startPos: Int, attrs: MarkAttributes)
+  private def handleBlockOpen(md: MarkData)
   {
-    //println(s"  group open attrs:$attrs")
-    attrs.tagNameResolve(BlockBracketedMarks)
+    //println(s"  group open md:$md")
+    md.tagNameResolve(BlockBracketedMarks)
 
     // resolve against the name map
-    val n = attrs.resolvedTagname
-    attrs.resolvedTagname = blockBracketedTagnameAliases.get(n).getOrElse(n)
+    val n = md.resolvedTagname
+    md.resolvedTagname = blockBracketedTagnameAliases.get(n).getOrElse(n)
 
     blockStack.push(
-      MarkData(
-        it.pos,
-        attrs
-      )
+     md
     )
 
-    renderBlockOpen(attrs)
+    renderBlockOpen(md)
   }
   
   /** Unstack and render a paragraph close.
@@ -547,34 +502,30 @@ extends Definitions
   {
     // Is ok, render and dispose? of the markdata
     if (paragraphMark.isTextParagraph) renderTextParagraphClose()
-    else renderParagraphClose(paragraphMark.attrs.resolvedTagname)
+    else renderParagraphClose(paragraphMark)
   }
 
   /** Resolve, stack, and render a paragraph.
     */
-  private def handleParagraphOpen(startPos: Int, attrs: MarkAttributes)
+  private def handleParagraphOpen(md: MarkData)
   {
-    //println(s"  paragraph open cmark:$controlMark attrs:$attrs")
+    //println(s"  paragraph open cmark:$controlMark md:$md")
 
     // first, defend the no-default marks
-    if (!BlockParagraphNoDefaultMarks.contains(attrs.control)) {
-      attrs.tagNameResolve(BlockParagraphDefaultedMarks)
+    if (!BlockParagraphNoDefaultMarks.contains(md.control)) {
+      md.tagNameResolve(BlockParagraphDefaultedMarks)
     }
-    paragraphMark =
-      MarkData(
-        it.pos,
-        attrs
-      )
+    paragraphMark = md
 
-    renderParagraphOpen(attrs)
+    renderParagraphOpen(md)
   }
 
   /** Resolve and render an inline self-closing mark.
     */
-  private def handleBlockSelfClose(controlPos: Int, attrs: MarkAttributes)
+  private def handleBlockSelfClose(md: MarkData)
   {
-    attrs.tagNameResolve(BlockSelfClosingMarkDefault)
-    renderBlockSelfClosingMark(attrs)
+    md.tagNameResolve(BlockSelfClosingMarkDefault)
+    renderBlockSelfClosingMark(md)
   }
 
   /** Un-note and render an inline close.
@@ -583,20 +534,17 @@ extends Definitions
   {
     if (inlineStack.isEmpty) {
       // Too many closes. Ignore.
-      val cm = controlMarkToString(currentChar)
+// this could be a space.
 
-      errLog += (
-        lineCount,
-        currentLinePos,
-        it.pos,
-        s"Inline close mark but stack empty: mark: '$cm'\nMark is ignored."
+      errLog.emptyInlineStack(
+        it
       )
 
       b += currentChar
     }
     else {
       // Is ok, render and dispose of the markdata
-      renderInlineClose(inlineStack.head.attrs)
+      renderInlineClose(inlineStack.head)
       inlineStack.pop()
     }
   }
@@ -605,30 +553,25 @@ extends Definitions
 
   /** Resolve, note, and render a inline open.
     */
-  private def handleInlineOpen(controlPos: Int, attrs: MarkAttributes)
+  private def handleInlineOpen(md: MarkData)
   {
-    attrs.tagNameResolve(InlineMarkDefault)
+    md.tagNameResolve(InlineMarkDefault)
 
     // resolve against the name map
-    val n = attrs.resolvedTagname
-    attrs.resolvedTagname = inlineBracketedTagnameAliases.get(n).getOrElse(n)
+    val n = md.resolvedTagname
+    md.resolvedTagname = inlineBracketedTagnameAliases.get(n).getOrElse(n)
 
-    inlineStack.push(
-      MarkData.inline(
-        controlPos,
-        attrs
-      )
-    )
+    inlineStack.push(md)
 
-    renderInlineOpen(attrs)
+    renderInlineOpen(md)
   }
 
   /** Resolve and render an inline self-closing mark.
     */
-  private def handleInlineSelfClose(controlPos: Int, attrs: MarkAttributes)
+  private def handleInlineSelfClose(md: MarkData)
   {
-    attrs.tagNameResolve(InlineSelfClosingMarkDefault)
-    renderInlineSelfClosingMark(attrs)
+    md.tagNameResolve(InlineSelfClosingMarkDefault)
+    renderInlineSelfClosingMark(md)
   }
 
 
@@ -640,13 +583,14 @@ extends Definitions
 
   private def parseBlockSelfClose()
   {
-    val controlPos = it.pos
+    //val controlPos = it.pos
+val md = MarkData(currentChar, it)
 
     // forward off the mark
     forward()
 
-    val attrs = parseAttributes(InlineBracketOpenMark)
-    handleBlockSelfClose(controlPos, attrs)
+    parseAttributes(md)
+    handleBlockSelfClose(md)
     skipSpace()
     parsePostMarkParagraph()
   }
@@ -668,18 +612,19 @@ extends Definitions
   private def parseBlockOpen()
   {
     // Stash for errors
-    val startPos = it.pos
-    val controlMark = currentChar
+    //val startPos = it.pos
+    //val controlMark = currentChar
     //println(s"controlMark:$controlMark")
+    val md = MarkData(currentChar, it)
 
     // Step on and read any data
     forward()
 
-    val attrs = parseAttributes(controlMark)
-    handleBlockOpen(startPos, attrs)
+    parseAttributes(md)
+    handleBlockOpen(md)
     skipSpace()
 
-    if (attrs.control == BlockBracketedLiteralMark) {
+    if (md.control == BlockBracketedLiteralMark) {
       // parses literal block
       parseBlockLiteral()
     }
@@ -698,7 +643,7 @@ extends Definitions
   {
     // if suceed, move off and skip space,
     // else treat control as start of unmarked paragraph
-    if(handleBlockClose(it.pos, currentChar)) {
+    if(handleBlockClose()) {
       forward()
       
       // Now on whitspace
@@ -760,10 +705,10 @@ extends Definitions
       
       // update linecount
       // (not in main loop (automatic update) in literal)
-      if (prevChar == LineFeed) {
-        lineCount += 1
-        currentLinePos = it.pos
-      }
+     // if (prevChar == LineFeed) {
+     //   lineCount += 1
+     //   currentLinePos = it.pos
+     // }
 
       // Don't update if current is a space, previous newlines
       // can still cause a block end
@@ -785,11 +730,9 @@ extends Definitions
     // so main loop catch will not work.
     // NB: Double EOF string tail protects agsinst EOF.
     if (currentChar == EOF) {
-      errLog += (
-        lineCount,
-        currentLinePos,
-        it.pos,
-        s"Literal Block reached EOF without close\nStopping literal (will produce tail errors)."
+// stack head must be there,...
+      errLog.overrunInlineLiteral(
+         blockStack.head
       )
     }
 else {
@@ -820,13 +763,13 @@ parseBlockClose()
   private def parseBlockParagraph(controlMark: Char)
   {
     // Stash for errors
-    val startPos = it.pos
+    val md = MarkData(controlMark, it)
 
     // Step on and read any data
     forward()
 
-    val attrs = parseAttributes(controlMark)
-    handleParagraphOpen(startPos, attrs)
+    parseAttributes(md)
+    handleParagraphOpen(md)
     skipSpace()
     // stops on a lineend.
     parseParagraphContent()
@@ -863,18 +806,18 @@ parseBlockClose()
   {
     //println(s"parseInlineOpen currentChar: $currentChar")
 
-    val controlPos = it.pos
+    val md = MarkData(InlineBracketOpenMark, it)
     forward()
-    val attrs = parseAttributes(InlineBracketOpenMark)
-    handleInlineOpen(controlPos, attrs)
+    parseAttributes(md)
+    handleInlineOpen(md)
 
-    //println(s"parseInlineOpen attrs: $attrs")
+    //println(s"parseInlineOpen md: $md")
     skipSpace()
 
     // Now in post-attribute space skip.
     // parseInlineLiteral walks the inline brackets, contents, stops on close mark.
     // ...or let inline loop continue
-    if (attrs.tagName == InlineLiteralTagname) parseInlineLiteral()
+    if (md.tagName == InlineLiteralTagname) parseInlineLiteral()
 
   }
 
@@ -889,6 +832,7 @@ parseBlockClose()
     * ignored, and whitespace will not be modified (according to TML
     * rules).
     */
+// Not stacked?
   private def parseInlineLiteral()
   {
     // println(s"parseInlineLiteral currentChar: $currentChar")
@@ -903,36 +847,22 @@ parseBlockClose()
     }
     
     //println(s"parseInlineLiteral currentChar: $currentChar")
-    if (currentChar == LineFeed) {
 
-      errLog.warning(
-        lineCount,
-        currentLinePos,
-        it.pos,
-        s"Inline literal closed by newline: unintended?"
-      )
-
-      //position on linefeed is fine for paragraph ending.
-    }
-    else {
       // leave on control - loop catches on next round
-      // off the control
-      //forward()
-      // skip spaces
-      //skipSpace()
-      // back to paragraph code, no need to do anything,
+      // ... last char\ dropped, so back to paragraph code, no need to do anything,
       // even spaces.
-    }
+
   }
 
   private def parseInlineSelfClose()
   {
-    val controlPos = it.pos
+    //val controlPos = it.pos
+val md = MarkData(InlineBracketOpenMark, it)
     forward()
-    val attrs = parseAttributes(InlineBracketOpenMark)
+   parseAttributes(md)
 
     // NB: Attributes ends on the delimiting space.
-    handleInlineSelfClose(controlPos, attrs)
+    handleInlineSelfClose(md)
 
     // at post attribute space end
     // if stopped because of newline, this will quit the
@@ -987,16 +917,14 @@ parseBlockClose()
     // If inline stack not exhausted
     // then is closing on newlines
     for (i <- 0 until inlineStack.size) {
-      val d = inlineStack.pop()
+      val md = inlineStack.pop()
 
       // NB: this positioning is ok as a paragraph is one line.
-      errLog.warning(
-        lineCount,
-        currentLinePos,
-        d.startPos,
-        s"Inline mark closed by newline: '${d.attrs.control}${d.attrs.tagName}'\nUnintended?"
+      errLog.inlineClosedByNewline(
+        it,
+        md
       )
-      renderInlineClose(d.attrs)
+      renderInlineClose(md)
     }
 
   }
@@ -1132,7 +1060,7 @@ parseBlockClose()
       
 
       if (currentChar == LineFeed) {
-        lineCount += 1
+        //lineCount += 1
         //currentLinePos = currentPos
         forward()
       }
@@ -1171,33 +1099,16 @@ parseBlockClose()
     */
   def blockBalance(fix: Boolean)
   {
-    // TODO: Inline is automatic, should always close?
-
-    for (i <- 0 until inlineStack.size) {
-      val d = inlineStack.head
-      //val cm = controlMarkToString(controlMark)
-      errLog.tailError(
-        lineCount,
-        99,
-        d.startPos,
-        s"Unclosed inline: '${d.attrs.control}${d.attrs.tagName}'"
-      )
-
-      if (fix) renderInlineClose(d.attrs)
-      inlineStack.pop()
-    }
+    // Inline is automatic, should always close
 
     for (i <- 0 until blockStack.size) {
-      val d = blockStack.head
-      errLog.tailError(
-        lineCount,
-        99,
-        d.startPos,
-        s"Unclosed block: '${d.attrs.control}${d.attrs.tagName}'"
+      val md = blockStack.head
+      errLog.unclosedBlock(
+        md
       )
 
       // Is ok, render and dispose of the markdata
-      if (fix) renderBlockClose(d.attrs)
+      if (fix) renderBlockClose(md)
       blockStack.pop()
 
     }
@@ -1216,8 +1127,8 @@ parseBlockClose()
     inlineStack.clear()
     b.clear()
     errLog.clear()
-    lineCount = 0
-    currentLinePos = 0
+    //lineCount = 0
+    //currentLinePos = 0
   }
 
   /** Returns a string representating this parser.
