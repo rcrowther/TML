@@ -85,28 +85,18 @@ final class ErrorLog
   //-----------------
 
   // too close to bother with mark data
-  def textAttributeClosedByNewline(
+  def bracketAttributeClosedByNewline(
     it: InputIterator
   )
   {
     warnings += Error(
       it,
-      "Text attribute closed by newline",
+      "Bracketed attribute closed by newline",
       "unintended?"
     )
   }
 
-  def urlAttributeClosedByNewline(
-    it: InputIterator
-  )
-  {
-    warnings += Error(
-      it,
-      "URL attribute closed by newline",
-      "unintended?"
-    )
-  }
-
+/*
   def unknownAttributeMark(
     it: InputIterator,
     cm: Char
@@ -118,6 +108,7 @@ final class ErrorLog
       "trying forward"
     )
   }
+*/
 
   def emptyBlockStack(
     it: InputIterator,

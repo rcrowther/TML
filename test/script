@@ -131,7 +131,7 @@ tml.HTML("#main content\n\n#")
 tml.HTML("=== Some charms\nNot this for sure. But that?")
 tml.HTML("=== Some charms\n[a{coffee.fr} Not this] for now. So what?")
 // image (inline)
-tml.HTML("the dolphin,\n\n*.small[image of dolphin]{dolphin.mars.ok}\ndolphins are...")
+tml.HTML("the dolphin,\n\n*.small{image of dolphin}{dolphin.mars.ok}\ndolphins are...")
 // horizontal rule? Block level?...
 tml.HTML("_.dashed")
 // Span block
@@ -139,7 +139,7 @@ tml.HTML("Some special [ £2.99] text")
 tml.HTML("Some special £[i 2.99] text")
 
 // links block
-tml.HTML("through to\n\n#a.external[go now!]{otherwhere.com} the other side\n\n#")
+tml.HTML("through to\n\n#a.external{go now!}{otherwhere.com} the other side\n\n#")
 // links (inline)
 tml.HTML("through to [a.external[go now!]{otherwhere.com} the other side]")
 // pre
@@ -149,7 +149,6 @@ tml.HTML("?? To be,\n   Or not to be\nWhat now?\n?")
 tml.HTML("#pre\n?code       var prevChar = currentChar\n       var closing = false\n     forward(until)\n?\n#")
 
 == Errors
-tml.HTML("#thing[abrup...")
 tml.HTML("#thing{abrup...")
 tml.HTML("#thing[ig]:nope")
 tml.HTML("#\n oops")

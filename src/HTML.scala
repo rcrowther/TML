@@ -65,14 +65,14 @@ class HTML
       b ++= md.klass
       b ++= "\""
     }
-    if (md.text != "") {
+    if (md.params.isDefinedAt(0) && md.params(0) != "") {
       b ++= " title=\""
-      b ++= md.text
+      b ++= md.params(0)
       b ++= "\""
     }
-    if (md.url != "") {
+    if (md.params.isDefinedAt(1) && md.params(1) != "") {
       b ++= " href=\""
-      b ++= md.url
+      b ++= md.params(1)
       b ++= "\""
     }
   }
@@ -130,14 +130,14 @@ class HTML
       b ++= md.klass
       b ++= "\""
     }
-    if (md.text != "") {
+    if (md.params.isDefinedAt(0) && md.params(0) != "") {
       b ++= " title=\""
-      b ++= md.text
+      b ++= md.params(0)
       b ++= "\""
     }
-    if (md.url != "") {
+    if (md.params.isDefinedAt(1) && md.params(1) != "") {
       b ++= " href=\""
-      b ++= md.url
+      b ++= md.params(1)
       b ++= "\""
     }
     b += '>'
@@ -199,14 +199,14 @@ class HTML
       b ++= md.klass
       b ++= "\""
     }
-    if (md.text != "") {
+    if (md.params.isDefinedAt(0) && md.params(0) != "") {
       b ++= " alt=\""
-      b ++= md.text
+      b ++= md.params(0)
       b ++= "\""
     }
-    if (md.url != "") {
+    if (md.params.isDefinedAt(1) && md.params(1) != "") {
       b ++= " src=\""
-      b ++= md.url
+      b ++= md.params(1)
       b ++= "\""
     }
     b ++= "/>"

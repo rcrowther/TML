@@ -456,9 +456,12 @@ val data = tml.FileReader("<path to...>TML/text/GUIDE")
 // (escapes all HTML used to describe results. The ''defensive' version avoids existing entities)
 val eData = tml.HTMLUtils.toDisplayDefensive(data)
 
+
 // Parse character codes using the UML parser
-// (this could be done before the escaping. As with any pipelne, order can influence results. It's not important here, no UML clashes with HTML)
-val uData = tml.UML(eData)
+// The UML conversion is universal, wreaking example UML codes in literals.
+// ...so feed the conversion method to the TML mapping method, asking it to
+// avoid literals
+val uData = tml.Util.mapWhenNot('?', "", eData, tml.UML.apply _)
 
 // Create an instance of the input class used in Scala
 // (this wraps many types of input--- Strings, Streams etc.) 
@@ -470,10 +473,10 @@ val p = tml.HTMLCodeblock()
 p(it)
 
 // Use the utility webpage method to wrap in webpage tags.
-val rs = tml.HTMLUtils.toWebpage("Guide", "<path to...>TML/text/lib/doc.css", p.result())
+val r = tml.HTMLUtils.toWebpage("Guide", "<path to...>TML/text/lib/doc.css", p.result())
 
 // ...to see results in a repl,
-println(rs)
+println(r)
 ?
  
 == That's it

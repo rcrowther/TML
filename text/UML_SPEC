@@ -1,5 +1,5 @@
-= Spec
-UML is markup used to translate keyboard-available characters into Unicode. In no way is it intended as comprehensive. But it may help to make simple typograaphy more available.
+= UML Mapping Spec
+UML is markup used to translate keyboard-available characters into Unicode. In no way is it intended as comprehensive. But it may help make some typography available.
 
 == Generalities
 If any match fails, the input symbols should be printed to output as they lie in the input.
@@ -7,29 +7,35 @@ If any match fails, the input symbols should be printed to output as they lie in
 UML depends on typographical input. Some of the character sequences are bound to create unexpected conversions if the text is in some way complex.
 
 
-== Input format
-Input is text. The form of input, stream, file, etc. is not defined.
+== I/O format
+Input is text. The form of input and output; stream, file, etc. is not defined.
 
 === Unicode
-UML must always be Unicode (not, for example, some subsection handling Latin).
+UML input would usually be Latin/ASCII/UTF-8. UML should, if writing to solid format, encode and output as Unicode.
+
+In circumstances where the output is not solid, or specifically designed to handle Unicode, UML can output Latin/ASCII. For example, this may include HTML entity coding. However, even in this situation, a stream of Unicode codepoints is preferred.
 
 == Parsing generalities
-Each group in the character references should be available as a seperate call. 
-Some more combined groups may be implemented also.
+Each group in the character references should be available as a separate call. 
+Combination groups may be implemented also.
+
 Subgroups are detailed for purpose of information.
 
 
 == Character sequences
-A pseudo-PEG grammar shows the required match and format (for complex matches, sometimes detailed below). The format is designed to be readable, efficent code will be optomised.
+A pseudo-PEG grammar shows the required match and format (...for complex matches). The format is designed to be readable---efficient implementations will be optimised.
 
 
 === basic
-Legal marks, hyphens, dashes and elipses.
+Legal marks, hyphens, dashes and ellipse.
 
 ==== Legal marks
+
+?codeblock
 "(c)" = copyright
 "(t)" = trademark
 "(r)" = registered
+?
 
 The copyright, trademark, and registered legal marks.
 
@@ -39,16 +45,18 @@ The copyright, trademark, and registered legal marks.
 
 ==== Hyphen/Dashes
 
+?codeblock
 "---" = em
 "--" = en
 "-" = hyphen
 "-." = dictionary hyphen
 "-" = hyphen
+?
 
 ~ Rationale
-: The hyphen is a particularly difficult character. The keyboard character is the multipurpose, and well-named, ''hyphen-minus'. The ''hyphen-minus' is wrong for all true hyphen usage. Conversion to a true hyphen encouners two difficulties,
+: The hyphen is a particularly difficult character. The keyboard character is the multi-purpose, and well-named, ''hyphen-minus'. The ''hyphen-minus' is wrong for hyphen usage. Conversion to a true hyphen encounters two difficulties...
 
-First, the use of the ''-' character is UML-ambiguous, it clashes with the mat minus code '':m-'. However, UML specifes that the tighter definitions of ''math' are run before ''typography', so all is ok here.
+First, the detection of the ''-' char is UML-ambiguous, a simple hyphen clashes with the marks for the mathematical minus mark '':m-'. However, UML specifies that the tighter definitions of ''math' are run before ''typography', so all is ok.
 
 Second, it would be foolish to ignore that much TML code will be embedded with mathematical notation or computer code---which a hyphen conversion will damage. However, TML encourages explicit filtering for markup protection so, again, UML is free to make a simple conversion. 
 
@@ -57,9 +65,11 @@ Second, it would be foolish to ignore that much TML code will be embedded with m
 
 
 === Typography
-Should include basic, and the following,
+Should include ''basic' methods in the previous section, and the following,
 
 ==== Combining marks
+
+?codeblock
 ":" ~ oneOf(
 | "c" CEDILLA
 | ":" DIAERESIS
@@ -70,42 +80,49 @@ Should include basic, and the following,
 | "\" GRAVE ACCENT
 | "/" ACUTE ACCENT
 ) ~ LETTER
+?
 
 The tables may match a character first. If character matching is attempted, they should first implement ''Latin-1 Supplement' Letters, meaning vowels (vowels includes ''y') for accents, not including BREVE and CARRON.
 
-If character tables fail, they should fall back to using combining characters.
+If character tables fail, the code should fall back to using Unicode combining characters.
 
-Java advice: "never build your own tables".
+Java advice: ""never build your own tables".
 
 ==== Quotes
+
+?codeblock
 "''"  single quotes open
 "'" single quote close and apostrophe
 "\"\""  double quote open 
 "\"" double quote close
 "<<" guillemet open
 ">>" guillemet close
+?
 
 ~ Rationale
-: An unusual quote system. However, TML convention suggests an open should be distinguished from a close, and that characters should be, where possible, repeated.
+: UML has an unusual quote system. However, TML convention suggests an open mark should be distinguished from a close mark, and that characters should, where possible, be repeated.
 
 This system allows (as do some other systems) single quote close to be an apostrophe (Unicode approved usage).
 
 ~ Rationale
-: The UML setup does deny the user the ability to use the straight apostrophe for foot and inch marks. However, Uncode has seperate characters for these --- the keyboard mappings are wrong anyway (maybe sometime provide a solution?). 
+: The UML setup denies the user the ability to use the straight apostrophe for foot and inch marks. However, Unicode has separate characters for these---the keyboard mappings are wrong anyway (maybe sometime provide a solution?). 
 
 === Math
 Fractions, math symbols (inc. mathematical multiply/minus, and degree).
 
 ==== Fractions
+?codeblock
 anyOf(1235678) ~ "/" ~ anyOf(234568)
+?
 
-All non-reducable fractions with factorial 2,3,4,5,7,8. Non-reducable means 3/4 exists, but not 2/4 (reduces to 1/2).
+All non-reducible fractions with factorial 2,3,4,5,7,8. Non-reducible means 3/4 exists, but not 2/4 (reduces to 1/2).
 
 ==== Maths symbols
+?codeblock
 ":mx" multiply
 ":m-" minus
 ":mo" degree
-
+?
 
 ~ Rationale
 : Degree also has use as the unit of temperature. However, use for temperature can still be regarded as ''math', and spares symbols for other uses.
@@ -116,7 +133,7 @@ All non-reducable fractions with factorial 2,3,4,5,7,8. Non-reducable means 3/4 
 
 == Notes
 === ligatures
-Unicode regards ligatures as a feature of presentation. They have an effect on semantic parsing, so Unicode discourage their use. Consequently, they are not enabled.
+Unicode regards ligatures as a feature of presentation. They have an effect on semantic parsing, so Unicode discourages their use. Consequently, they are not enabled.
 
 === Math before typography
-If used tohether, ''math' should be parsed before ''typography'. The math definition of ''minus' is unlikley to be ambiguous, but the typographical hyphen wil replace it if typography is used first.   
+If used together, ''math' should be parsed before ''typography'. The ''math' definition of ''minus' is unlikly to be ambiguous, but the typographical hyphen will replace it if typography is used first.   

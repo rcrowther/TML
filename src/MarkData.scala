@@ -17,8 +17,7 @@ final class MarkData(
   val control: Char,
   var tagName: String,
   var klass: String,
-  var url: String,
-  var text: String,
+  var params: Seq[String],
   val pos: Int,
   val lineNum: Int,
   val linePos: Int
@@ -119,10 +118,8 @@ final class MarkData(
     b append tagName
     b ++= ", klass:"
     b append klass
-    b ++= ", text:"
-    b append text
-    b ++= ", url:"
-    b append url
+    b ++= ", params:"
+    b append params
     b ++= ", resolvedTagname:"
     b append resolvedTagname
     b ++= "pos:"
@@ -155,8 +152,7 @@ object MarkData {
       control,
       "",
       "",
-      "",
-      "",
+      Seq.empty[String],
       it.pos,
       it.lineCount,
       it.lastNewlinePos
@@ -167,22 +163,21 @@ object MarkData {
   def apply()
       : MarkData =
   {
-    new MarkData('\0', "", "", "", "", 0, 0, 0)
+    new MarkData('\0', "", "", Seq.empty[String], 0, 0, 0)
   }
 
   def apply(
     control: Char,
     tagName: String,
     klass: String,
-    text: String,
-    url: String,
+    params: Seq[String],
     pos: Int,
     lineNum: Int,
     linePos: Int
   )
       : MarkData =
   {
-    new MarkData(control, tagName, klass, url, text, pos, lineNum, linePos)
+    new MarkData(control, tagName, klass, params, pos, lineNum, linePos)
   }
 
 }//MarkData

@@ -78,14 +78,14 @@ class Markdown
       b ++= md.klass
       b ++= "\""
     }
-    if (md.text != "") {
-      b ++= " title=\""
-      b ++= md.text
+    if (md.params.isDefinedAt(0) && md.params(0) != "") {
+      b ++= " alt=\""
+      b ++= md.params(0)
       b ++= "\""
     }
-    if (md.url != "") {
-      b ++= " href=\""
-      b ++= md.url
+    if (md.params.isDefinedAt(1) && md.params(1) != "") {
+      b ++= " src=\""
+      b ++= md.params(1)
       b ++= "\""
     }
   }
@@ -134,14 +134,14 @@ class Markdown
       b ++= md.klass
       b ++= "\""
     }
-    if (md.text != "") {
+    if (md.params.isDefinedAt(0) && md.params(0) != "") {
       b ++= " title=\""
-      b ++= md.text
+      b ++= md.params(0)
       b ++= "\""
     }
-    if (md.url != "") {
+    if (md.params.isDefinedAt(1) && md.params(1) != "") {
       b ++= " href=\""
-      b ++= md.url
+      b ++= md.params(1)
       b ++= "\""
     }
     b += '>'
@@ -194,13 +194,13 @@ class Markdown
     // link = [an example](http://example.com/ "Title")
     if (name == "a") {
       b ++= "]("
-      if (md.url != "") {
-        b ++= md.url
+    if (md.params.isDefinedAt(1) && md.params(1) != "") {
+        b ++= md.params(1)
       }
 
-      if (md.text != "") {
+    if (md.params.isDefinedAt(0) && md.params(0) != "") {
         b += '\"'
-        b ++= md.text
+      b ++= md.params(0)
         b += '\"'
       }
       b += ')'
@@ -228,18 +228,16 @@ class Markdown
     //img = ![Alt text](/path/to/img.jpg "Optional title")
     b += '!'
 
-    if (md.text != "") {
+    if (md.params.isDefinedAt(0) && md.params(0) != "") {
       b += '['
-      b ++= md.text
+      b ++= md.params(0)
       b += ']'
     }
-
-    if (md.url != "") {
+    if (md.params.isDefinedAt(1) && md.params(1) != "") {
       b += '('
-      b ++= md.url
+      b ++= md.params(1)
       b += ')'
     }
-
     //println(s"render... '${b.result}'")
   }
 

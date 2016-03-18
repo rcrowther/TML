@@ -15,7 +15,7 @@ import java.io.InputStreamReader
   */
 //TODO: Text position is broken. Needs paragraph detection.
 abstract class Parser()
-extends Definitions
+    extends Definitions
 {
 
 
@@ -332,7 +332,7 @@ extends Definitions
     }
   }
 
- /** Skip whitespace.
+  /** Skip whitespace.
     *
     * Skips until `currentChar` is not whitespace.
     */
@@ -378,60 +378,98 @@ extends Definitions
     * @param until parse to this limit.
     * @return a class representing the data recovered.
     */
+  /*
+   private def parseAttributes(md: MarkData)
+   {
+   // Get tagname
+   md.tagName = getUntil(
+   (c: Char) => { c == '.' || c == '{' || c == '[' || Character.isWhitespace(c) }
+   )
+
+   while (!Character.isWhitespace(currentChar)) {
+   currentChar match {
+   case '.' => {
+   forward()
+   md.klass = getUntil((c: Char) => { c == '{' || c == '[' || Character.isWhitespace(c) })
+   }
+
+   case '[' => {
+   forward()
+   md.text = getUntil((c: Char) => { c == ']' })
+   // if newline, give warning, else move off the closing bracket
+   if(currentChar == LineFeed) {
+   errLog.textAttributeClosedByNewline(
+   it
+   )
+   }
+   else forward()
+   }
+
+   case '{' => {
+   forward()
+   md.url = getUntil((c: Char) => { c == '}' })
+
+   // if newline, give warning, else move off the closing bracket
+   if(currentChar == LineFeed) {
+   errLog.urlAttributeClosedByNewline(
+   it
+   )
+   }
+   else forward()
+
+   }
+
+   case _ => {
+   errLog.unknownAttributeMark(
+   it,
+   currentChar
+   )
+
+   forward()
+   }
+   }
+   }
+   
+   // Now on whitespace
+   }
+   */
+
   private def parseAttributes(md: MarkData)
   {
+    //val t = System.nanoTime()
+
     // Get tagname
     md.tagName = getUntil(
-      (c: Char) => { c == '.' || c == '{' || c == '[' || Character.isWhitespace(c) }
+      (c: Char) => { c == '.' || c == '{' || Character.isWhitespace(c) }
     )
 
-    while (!Character.isWhitespace(currentChar)) {
-      currentChar match {
-        case '.' => {
-          forward()
-          md.klass = getUntil((c: Char) => { c == '{' || c == '[' || Character.isWhitespace(c) })
-        }
+    if (currentChar == '.') {
+      forward()
+      md.klass = getUntil(
+        (c: Char) => { c == '{' ||  Character.isWhitespace(c) }
+      )
+    }
 
-        case '[' => {
-          forward()
-          md.text = getUntil((c: Char) => { c == ']' })
-          // if newline, give warning, else move off the closing bracket
-          if(currentChar == LineFeed) {
-            errLog.textAttributeClosedByNewline(
-              it
-            )
-          }
-          else forward()
-        }
 
-        case '{' => {
-          forward()
-          md.url = getUntil((c: Char) => { c == '}' })
+    var attsB = Seq.newBuilder[String]
 
-          // if newline, give warning, else move off the closing bracket
-          if(currentChar == LineFeed) {
-            errLog.urlAttributeClosedByNewline(
-              it
-            )
-          }
-          else forward()
+    while (currentChar == '{') {
+      forward()
+      attsB += getUntil(
+        (c: Char) => { c == '}' || c == LineFeed }
 
-        }
-
-        case _ => {
-          errLog.unknownAttributeMark(
-            it,
-            currentChar
-          )
-
-          forward()
-        }
+      )
+      if (currentChar != LineFeed) forward()
+      else {
+        errLog.bracketAttributeClosedByNewline(
+          it
+        )
       }
     }
-    
-    // Now on whitespace
-  }
 
+    md.params = attsB.result()
+    //println(s"time: ${System.nanoTime() - t}")
+  }
 
 
 
@@ -443,7 +481,7 @@ extends Definitions
   private def handleBlockClose()
       : Boolean =
   {
-val controlMark = currentChar
+    val controlMark = currentChar
 
     if (blockStack.isEmpty) {
       // Too many closes. Ignore.
@@ -463,7 +501,7 @@ val controlMark = currentChar
         //error, don't know why, ignore
         errLog.misMatchBlockStack(
           it,
-stackTextMark,
+          stackTextMark,
           controlMark
         )
         b += controlMark
@@ -490,7 +528,7 @@ stackTextMark,
     md.resolvedTagname = blockBracketedTagnameAliases.get(n).getOrElse(n)
 
     blockStack.push(
-     md
+      md
     )
 
     renderBlockOpen(md)
@@ -534,7 +572,7 @@ stackTextMark,
   {
     if (inlineStack.isEmpty) {
       // Too many closes. Ignore.
-// this could be a space.
+      // this could be a space.
 
       errLog.emptyInlineStack(
         it
@@ -584,7 +622,7 @@ stackTextMark,
   private def parseBlockSelfClose()
   {
     //val controlPos = it.pos
-val md = MarkData(currentChar, it)
+    val md = MarkData(currentChar, it)
 
     // forward off the mark
     forward()
@@ -705,10 +743,10 @@ val md = MarkData(currentChar, it)
       
       // update linecount
       // (not in main loop (automatic update) in literal)
-     // if (prevChar == LineFeed) {
-     //   lineCount += 1
-     //   currentLinePos = it.pos
-     // }
+      // if (prevChar == LineFeed) {
+      //   lineCount += 1
+      //   currentLinePos = it.pos
+      // }
 
       // Don't update if current is a space, previous newlines
       // can still cause a block end
@@ -730,14 +768,14 @@ val md = MarkData(currentChar, it)
     // so main loop catch will not work.
     // NB: Double EOF string tail protects agsinst EOF.
     if (currentChar == EOF) {
-// stack head must be there,...
+      // stack head must be there,...
       errLog.overrunInlineLiteral(
-         blockStack.head
+        blockStack.head
       )
     }
-else {
-parseBlockClose()
-}
+    else {
+      parseBlockClose()
+    }
 
     // back off one char, and pretend is LineFeed.
     // if on EOF, puts the parser on the newline preceeding
@@ -747,7 +785,7 @@ parseBlockClose()
     // can handle the close (and also parse following paragraph,
     // etc.).
 
-//TODO: is popping?
+    //TODO: is popping?
     //currentPos = currentPos - 1
     //currentChar = LineFeed
   }
@@ -832,7 +870,7 @@ parseBlockClose()
     * ignored, and whitespace will not be modified (according to TML
     * rules).
     */
-// Not stacked?
+  // Not stacked?
   private def parseInlineLiteral()
   {
     // println(s"parseInlineLiteral currentChar: $currentChar")
@@ -848,18 +886,18 @@ parseBlockClose()
     
     //println(s"parseInlineLiteral currentChar: $currentChar")
 
-      // leave on control - loop catches on next round
-      // ... last char\ dropped, so back to paragraph code, no need to do anything,
-      // even spaces.
+    // leave on control - loop catches on next round
+    // ... last char\ dropped, so back to paragraph code, no need to do anything,
+    // even spaces.
 
   }
 
   private def parseInlineSelfClose()
   {
     //val controlPos = it.pos
-val md = MarkData(InlineBracketOpenMark, it)
+    val md = MarkData(InlineBracketOpenMark, it)
     forward()
-   parseAttributes(md)
+    parseAttributes(md)
 
     // NB: Attributes ends on the delimiting space.
     handleInlineSelfClose(md)
@@ -984,7 +1022,7 @@ val md = MarkData(InlineBracketOpenMark, it)
   {
     // in rough order of liklyhood?
     if (BlockBracketedMarks.contains(currentChar)) {
-//println(s"peek: ${it.lookForward}")
+      //println(s"peek: ${it.lookForward}")
       // handles either mark and, for both, any following unsignificant paragraph
       // Short lookahead.
       // Need at least one extra non-whitespace char for an open
@@ -1087,7 +1125,7 @@ val md = MarkData(InlineBracketOpenMark, it)
 
 
 
- 
+  
   /** Attempts fixes on bracketing.
     *
     * Exhausts the mark stores, writing tags as necessary. Since TML

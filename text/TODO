@@ -7,16 +7,13 @@ abstract output for streams also?
 test Unicode
 Convert to unicode method
 fix attributes
-tail errors
 
 = TML
 Macroformat extension
 Finish Markdown extension
 Fully abstract the char definitions
 Tidy
-Tail errors still not showing line data
 
-codeblock tag extension (check for syntax highlighters?)
 protect methods
 
 = UML
