@@ -163,7 +163,7 @@ object MarkData {
   def apply()
       : MarkData =
   {
-    new MarkData('\0', "", "", Seq.empty[String], 0, 0, 0)
+    new MarkData('\u0000', "", "", Seq.empty[String], 0, 0, 0)
   }
 
   def apply(

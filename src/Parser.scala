@@ -14,7 +14,7 @@ import java.io.InputStreamReader
   * extending to provide methods for rendering.
   */
 //TODO: Text position is broken. Needs paragraph detection.
-abstract class Parser()
+trait Parser
     extends Definitions
 {
 
@@ -31,27 +31,12 @@ abstract class Parser()
   /** Stringbuilder for output.
     */
   protected val b = new StringBuilder()
-
-  private var errLog = new ErrorLog()
+//new ActiveLogger()
+  protected var logger : Logger = Logger.inactive()
 
   private var it = tml.InputIterator.empty
-  private var currentChar = '\0'
-  //private var currentPos = 0
+  private var currentChar = '\u0000'
 
-  /** Counts lines parsed.
-    *
-    * For error displays.
-    */
-  //private var lineCount = 0
-
-  /** Position of the start of the current line.
-    *
-    * When a string is indexed to seek for lines,
-    * holds the index of the line currently displayed.
-    *
-    * For error displays (line position calculation).
-    */
-  //private var currentLinePos = 0
 
 
 
@@ -246,7 +231,7 @@ abstract class Parser()
 
   /** Returns the error log from this parser.
     */
-  def errorLog: ErrorLog = errLog
+  def errorLog: Logger = logger
 
 
 
@@ -398,7 +383,7 @@ abstract class Parser()
    md.text = getUntil((c: Char) => { c == ']' })
    // if newline, give warning, else move off the closing bracket
    if(currentChar == LineFeed) {
-   errLog.textAttributeClosedByNewline(
+   logger.textAttributeClosedByNewline(
    it
    )
    }
@@ -411,7 +396,7 @@ abstract class Parser()
 
    // if newline, give warning, else move off the closing bracket
    if(currentChar == LineFeed) {
-   errLog.urlAttributeClosedByNewline(
+   logger.urlAttributeClosedByNewline(
    it
    )
    }
@@ -420,7 +405,7 @@ abstract class Parser()
    }
 
    case _ => {
-   errLog.unknownAttributeMark(
+   logger.unknownAttributeMark(
    it,
    currentChar
    )
@@ -461,7 +446,7 @@ abstract class Parser()
       )
       if (currentChar != LineFeed) forward()
       else {
-        errLog.bracketAttributeClosedByNewline(
+        logger.bracketAttributeClosedByNewline(
           it
         )
       }
@@ -485,7 +470,7 @@ abstract class Parser()
 
     if (blockStack.isEmpty) {
       // Too many closes. Ignore.
-      errLog.emptyBlockStack(
+      logger.emptyBlockStack(
         it,
         controlMark
       )
@@ -499,7 +484,7 @@ abstract class Parser()
       val stackTextMark = blockStack.head
       if (stackTextMark.control != controlMark) {
         //error, don't know why, ignore
-        errLog.misMatchBlockStack(
+        logger.misMatchBlockStack(
           it,
           stackTextMark,
           controlMark
@@ -574,7 +559,7 @@ abstract class Parser()
       // Too many closes. Ignore.
       // this could be a space.
 
-      errLog.emptyInlineStack(
+      logger.emptyInlineStack(
         it
       )
 
@@ -769,7 +754,7 @@ abstract class Parser()
     // NB: Double EOF string tail protects agsinst EOF.
     if (currentChar == EOF) {
       // stack head must be there,...
-      errLog.overrunInlineLiteral(
+      logger.overrunInlineLiteral(
         blockStack.head
       )
     }
@@ -958,7 +943,7 @@ abstract class Parser()
       val md = inlineStack.pop()
 
       // NB: this positioning is ok as a paragraph is one line.
-      errLog.inlineClosedByNewline(
+      logger.inlineClosedByNewline(
         it,
         md
       )
@@ -1141,7 +1126,7 @@ abstract class Parser()
 
     for (i <- 0 until blockStack.size) {
       val md = blockStack.head
-      errLog.unclosedBlock(
+      logger.unclosedBlock(
         md
       )
 
@@ -1158,13 +1143,13 @@ abstract class Parser()
     */
   def clear()
   {
-    currentChar = '\0'
+    currentChar = '\u0000'
     //currentPos = 0
     blockStack.clear()
     paragraphMark = MarkData.textParagraph()
     inlineStack.clear()
     b.clear()
-    errLog.clear()
+    logger.clear()
     //lineCount = 0
     //currentLinePos = 0
   }

@@ -344,7 +344,7 @@ object InputIterator {
   }
 
   def printout(it: InputIterator) {
-    var c: Char = '\0'
+    var c: Char = '\u0000'
     do {
       c = it.next()
       print(c)

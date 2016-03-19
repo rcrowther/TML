@@ -2,10 +2,12 @@ package tml
 
 
 
-/** Stores errors for print output.
+/** Stores messages for print output.
+  *
+  * For a no-op logger, see `Logger.inactive`.
   */
-final class ErrorLog
-    extends Definitions
+final class ActiveLogger
+    extends Logger
 {
 
   private val warnings = new collection.mutable.ArrayBuffer[Error]
@@ -81,6 +83,42 @@ final class ErrorLog
 
 
   //-----------------
+  // General errors
+  //-----------------
+
+  /** Log a warning from a renderer.
+    */
+  def rendererWarning(
+    it: InputIterator,
+    message: String,
+    advice: String
+  )
+  {
+    warnings += Error(
+      it,
+      message,
+      advice
+    )
+  }
+
+  /** Log an error from a renderer.
+    */
+  def rendererError(
+    it: InputIterator,
+    message: String,
+    advice: String
+  )
+  {
+    errors += Error(
+      it,
+      message,
+      advice
+    )
+  }
+
+
+
+  //-----------------
   // Specific errors
   //-----------------
 
@@ -96,19 +134,19 @@ final class ErrorLog
     )
   }
 
-/*
-  def unknownAttributeMark(
-    it: InputIterator,
-    cm: Char
-  )
-  {
-    errors += Error(
-      it,
-      s"Unknown mark in attribute list: mark: '${controlMarkToString(cm)}'",
-      "trying forward"
-    )
-  }
-*/
+  /*
+   def unknownAttributeMark(
+   it: InputIterator,
+   cm: Char
+   )
+   {
+   errors += Error(
+   it,
+   s"Unknown mark in attribute list: mark: '${controlMarkToString(cm)}'",
+   "trying forward"
+   )
+   }
+   */
 
   def emptyBlockStack(
     it: InputIterator,
@@ -263,4 +301,4 @@ final class ErrorLog
     b.result
   }
 
-}//ErrorLog
+}//ActiveLogger

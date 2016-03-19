@@ -229,14 +229,14 @@ object Util
       : Tuple2[Int, Char] =
   {
     var pos = line.indexWhere(_ != ' ')
-    if (pos == -1) (-1, '\0')
+    if (pos == -1) (-1, '\u0000')
     else {
       val c = line(pos)
       pos += 1
       if (pos >= line.size) (pos, c)
       else {
         if (Character.isWhitespace(line(pos))) (pos, c)
-        else (-1, '\0')
+        else (-1, '\u0000')
       }
     }
   }

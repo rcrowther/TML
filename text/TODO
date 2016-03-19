@@ -6,7 +6,6 @@ abstract output for streams also?
 
 test Unicode
 Convert to unicode method
-fix attributes
 
 = TML
 Macroformat extension
@@ -14,7 +13,8 @@ Finish Markdown extension
 Fully abstract the char definitions
 Tidy
 
-protect methods
+protect methods in Utils?
+Enhance the logger
 
 = UML
 check spec
