@@ -5,6 +5,8 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 
+import scala.language.implicitConversions
+
 
 
 /** Utilities for html parsing.

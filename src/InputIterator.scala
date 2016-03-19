@@ -3,6 +3,8 @@ package tml
 
 import java.io.InputStreamReader
 
+import scala.language.implicitConversions
+
 
 //tml.HTML2(InputIterator(FileReader("/home/rob/Code/scala/TML/text/SPEC")))
 
@@ -94,7 +96,7 @@ object InputIterator {
 
   /** Creates an iterator from a string.
     */
-  def apply(s: String) = new InputIterator {
+  def apply(s: String): InputIterator = new InputIterator {
     private val sz = s.size
     def next() : Char =
       if (pos < sz) {
@@ -115,9 +117,11 @@ object InputIterator {
       else LineFeed
   }
 
-  /** Creates an iterator from a string.
+  /** Creates an iterator from a char array.
+*
+* Note that the array must be UTF-16.
     */
-  def apply(a: Array[Char]) = new InputIterator {
+  def apply(a: Array[Char]): InputIterator = new InputIterator {
     private val sz = a.size
     def next() : Char =
       if (pos < sz) {
@@ -138,9 +142,13 @@ object InputIterator {
       else LineFeed
   }
 
+// TODO: probably need...
+// def utf8(a: Array[Char]): InputIterator =  ...
+
+
   /** Creates an iterator from a string builder.
     */
-  def apply(b: StringBuilder) = new InputIterator {
+  def apply(b: StringBuilder): InputIterator = new InputIterator {
     b += LineFeed
     b += EOF
     private val s = b.result()
@@ -176,7 +184,7 @@ object InputIterator {
     */
   // Pos will represent stripped linends, 
   // so updates on iterator additions.
-  def apply(ts: TraversableOnce[String]) = new InputIterator {
+  def apply(ts: TraversableOnce[String]): InputIterator = new InputIterator {
     private var currPos = 0
     private var currString = ""
     private var currSize = 0
@@ -254,7 +262,7 @@ object InputIterator {
     * method.
     */
   /*
-   def concat(ts: Traversable[String]) = new InputIterator {
+   def concat(ts: Traversable[String]): InputIterator = new InputIterator {
    private var currPos = 0
    private var currString = ""
    private var currSize = 0
@@ -314,7 +322,7 @@ object InputIterator {
     *
     * When the stream is created, codings may be specified.
     */
-  def apply(s: InputStreamReader) = new InputIterator {
+  def apply(s: InputStreamReader): InputIterator = new InputIterator {
 
     private var frwd: Int = s.read()
     private var deliveredLF = false
@@ -356,7 +364,7 @@ object InputIterator {
   implicit def charArray2InputIterator(a: Array[Char]) = InputIterator(a)
   implicit def stringBuilder2InputIterator(b: StringBuilder) = InputIterator(b)
   implicit def stringElems2InputIterator(elems: String *) = InputIterator(elems)
-  implicit def string2InputIterator(s: InputStreamReader) = InputIterator(s)
+  implicit def stream2InputIterator(s: InputStreamReader) = InputIterator(s)
 
 }//InputIterator
 

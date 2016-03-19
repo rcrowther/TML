@@ -87,7 +87,7 @@ object HTMLCodeblock {
     p(it)
     p.blockBalance(fix = false)
     println
-    println(p.errorLog.toText())
+    println(p.logger.toText())
     println("out:")
     println(s"'${p.result()}'")
     println

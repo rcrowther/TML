@@ -31,8 +31,13 @@ trait Parser
   /** Stringbuilder for output.
     */
   protected val b = new StringBuilder()
+
+  /** The error log for this parser.
+    */
 //new ActiveLogger()
-  protected var logger : Logger = Logger.inactive()
+// Public so it can be set/unset, read,
+//etc.
+  var logger : Logger = Logger.inactive()
 
   private var it = tml.InputIterator.empty
   private var currentChar = '\u0000'
@@ -228,12 +233,6 @@ trait Parser
       throw new Exception(msg)
     }
   }
-
-  /** Returns the error log from this parser.
-    */
-  def errorLog: Logger = logger
-
-
 
 
   /** Test mark definitions are unique.

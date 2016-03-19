@@ -4,7 +4,7 @@ package tml
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-
+import scala.language.implicitConversions
 
 
 /** Markup for creating unicode entities.

@@ -3,6 +3,8 @@ package tml
 
 
 /** Parses TML markup to generate HTML.
+*
+* Only additions to TML are some tagname definitions, rendering,  and tagname aliases.
   */
 class HTML
     extends Parser
@@ -217,12 +219,14 @@ class HTML
 
 
 object HTML
+extends ParserCompanion[HTML]
 {
 
   // val i = tml.InputIterator("/home/rob/Code/scala/TML/text/SPEC")
   // tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC""")
   // tml.HTML(tml.FileReader.stream("""/home/rob/Code/scala/TML/text/SPEC"""))
 
+/*
   def apply(it: InputIterator)
   {
     println("running apply")
@@ -230,13 +234,14 @@ object HTML
     p(it)
     p.blockBalance(fix = false)
     println
-    println(p.errorLog.toText())
+    println(p.logger.toText())
     println("out:")
     println(s"'${p.result()}'")
     println(p)
   }
+*/
 
-  def apply()
+  def builder()
       : HTML =
   {
     new HTML()

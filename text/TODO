@@ -7,6 +7,8 @@ abstract output for streams also?
 test Unicode
 Convert to unicode method
 
+Abstracted ParserCompanion
+
 = TML
 Macroformat extension
 Finish Markdown extension
@@ -18,5 +20,6 @@ Enhance the logger
 
 = UML
 check spec
+change to codepoints
 
 
