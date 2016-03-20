@@ -3,8 +3,25 @@ package tml
 
 
 /** Parses TML markup to generate HTML.
-*
-* Only additions to TML are some tagname definitions, rendering,  and tagname aliases.
+  *
+  * Direct-mapped HTML. Only contents are tagname
+  * definitions/allocations, rendering, and systematic tagname
+  * aliases.
+  *
+  * The only attributes available are,
+  *
+  * 'class' shortcut attribute renders as 'class="..."'
+  *
+  * For inline tagname 'a'
+  * attribute1 = 'href="..."'
+  *
+  * For inline self-closing (tagname 'img')
+  *  attribute1 'src="..."'
+  * or...
+  *  attribute1 = 'alt="..."', attribute2 'src="..."'
+  *
+  * NB: title attribute = "Relying on the title attribute is currently
+  * discouraged" W3C HTML 5.1
   */
 class HTML(val ot: OutputTarget)
     extends Parser
@@ -40,7 +57,8 @@ class HTML(val ot: OutputTarget)
   val inlineBracketedTagnameAliases = Map(
     "s" -> "span",
     "bold" -> "b",
-    "italic" -> "i"
+    "italic" -> "i",
+    "emphasis" -> "em"
   )
 
   // Only used for hr
@@ -60,63 +78,72 @@ class HTML(val ot: OutputTarget)
     *
     * Produces double quoted values for a common map of attributes.
     */
-  protected def attributesStockRender(md: MarkData)
-{
+  protected def classAttributeRender(md: MarkData)
+  {
     if (md.klass != "") {
-     ot ++= " class=\""
-     ot ++= md.klass
-     ot ++= "\""
+      ot ++= " class=\""
+      ot ++= md.klass
+      ot ++= "\""
     }
-    if (md.params.isDefinedAt(0) && md.params(0) != "") {
-     ot ++= " title=\""
-     ot ++= md.params(0)
-     ot ++= "\""
-    }
-    if (md.params.isDefinedAt(1) && md.params(1) != "") {
-     ot ++= " href=\""
-     ot ++= md.params(1)
-     ot ++= "\""
-    }
+
   }
+
+  protected def renderAttribute(
+    ot: OutputTarget,
+    name: String,
+    value: String
+  )
+  {
+    ot += ' '
+    ot ++= name
+    ot ++= "=\""
+    ot ++= value
+    ot ++= "\""
+  }
+
 
   // div, main, section, article, aside
   // ol, ul, dl,
   // li, dd, dt, blockquote
   def renderBlockOpen(md: MarkData)
- {
-   ot += '<'
-   ot ++= md.resolvedTagname
-    attributesStockRender(md)
-   ot += '>'
+  {
+    ot += '<'
+    ot ++= md.resolvedTagname
+    classAttributeRender(md)
+    ot += '>'
+
+    logger.attributeRangeWarning(md, 0)
   }
 
   def renderBlockClose(
     md: MarkData
   )
   {
-   ot ++= "</"
-   ot ++= md.resolvedTagname
-   ot += '>'
+    ot ++= "</"
+    ot ++= md.resolvedTagname
+    ot += '>'
   }
 
   // used for hr
   def renderBlockSelfClosingMark(md: MarkData)
- {
-   ot += '<'
-   ot ++= md.resolvedTagname
-    attributesStockRender(md)
-   ot ++= "/>"
+  {
+    ot += '<'
+    ot ++= md.resolvedTagname
+    classAttributeRender(md)
+    ot ++= "/>"
+
+    logger.attributeRangeWarning(md, 0)
   }
 
   // used for h?, pre
   def renderParagraphOpen(md: MarkData)
- {
+  {
     // fix the headline tag name
     // headlines are a little complex.
     // If there is no prefixed control char in the name,
     // then the tag name was given or defaulted, so do nothing.
     // If prefixes exist, they are counted to form the
-    // resolvedTagnamename
+    // resolvedTagname.
     if (md.control == '=') {
       val (ctrls, tag) = md.splitTagControls
       md.resolvedTagname =
@@ -124,55 +151,51 @@ class HTML(val ot: OutputTarget)
         else "h" + (ctrls.size + 1)
     }
 
-   ot += '<'
-   ot ++= md.resolvedTagname
+    ot += '<'
+    ot ++= md.resolvedTagname
+    classAttributeRender(md)
+    ot += '>'
 
-    if (md.klass != "") {
-     ot ++= " class=\""
-     ot ++= md.klass
-     ot ++= "\""
-    }
-    if (md.params.isDefinedAt(0) && md.params(0) != "") {
-     ot ++= " title=\""
-     ot ++= md.params(0)
-     ot ++= "\""
-    }
-    if (md.params.isDefinedAt(1) && md.params(1) != "") {
-     ot ++= " href=\""
-     ot ++= md.params(1)
-     ot ++= "\""
-    }
-   ot += '>'
+    logger.attributeRangeWarning(md, 0)
   }
 
   def renderParagraphClose(md: MarkData)
-{
-   ot ++= "</"
-   ot ++= md.resolvedTagname
-   ot += '>'
+  {
+    ot ++= "</"
+    ot ++= md.resolvedTagname
+    ot += '>'
   }
 
 
   def renderTextParagraphOpen()
- {
-   ot ++= "<p>"
+  {
+    ot ++= "<p>"
   }
 
   def renderTextParagraphClose()
- {
-   ot ++= "</p>"
+  {
+    ot ++= "</p>"
   }
 
 
   // used for a, i, b, span
   def renderInlineOpen(md: MarkData)
-{
+  {
     // catch literal, ignore
     if (md.resolvedTagname != InlineLiteralTagname) {
-     ot += '<'
-     ot ++= md.resolvedTagname
-      attributesStockRender(md)
-     ot += '>'
+      ot += '<'
+      ot ++= md.resolvedTagname
+      classAttributeRender(md)
+
+      if (md.resolvedTagname == "a") {
+        if (md.params.size > 0) {
+          renderAttribute(ot, "href", md.params(0))
+        }
+        logger.attributeRangeWarning(md, 1)
+      }
+      else logger.attributeRangeWarning(md, 0)
+
+      ot += '>'
     }
   }
 
@@ -185,33 +208,35 @@ class HTML(val ot: OutputTarget)
 
     // catch literal, ignore
     if (name != InlineLiteralTagname) {
-     ot ++= "</"
-     ot ++= name
-     ot += '>'
+      ot ++= "</"
+      ot ++= name
+      ot += '>'
     }
   }
 
+
+
+
   // Used for img
-  def renderInlineSelfClosingMark(md: MarkData) 
-{
-   ot += '<'
-   ot ++= md.resolvedTagname
-    if (md.klass != "") {
-     ot ++= " class=\""
-     ot ++= md.klass
-     ot ++= "\""
+  def renderInlineSelfClosingMark(md: MarkData)
+  {
+    ot += '<'
+    ot ++= md.resolvedTagname
+    classAttributeRender(md)
+
+    if (md.params.size == 1) {
+      renderAttribute(ot, "src", md.params(0))
     }
-    if (md.params.isDefinedAt(0) && md.params(0) != "") {
-     ot ++= " alt=\""
-     ot ++= md.params(0)
-     ot ++= "\""
+    else {
+      if (md.params.size > 1) {
+        renderAttribute(ot, "alt", md.params(0))
+        renderAttribute(ot, "src", md.params(1))
+      }
     }
-    if (md.params.isDefinedAt(1) && md.params(1) != "") {
-     ot ++= " src=\""
-     ot ++= md.params(1)
-     ot ++= "\""
-    }
-   ot ++= "/>"
+
+    ot ++= "/>"
+
+    logger.attributeRangeWarning(md, 1, 2)
   }
 
 }//HTML
@@ -219,27 +244,13 @@ class HTML(val ot: OutputTarget)
 
 
 object HTML
-extends ParserCompanion[HTML]
+    extends ParserCompanion[HTML]
 {
 
   // val i = tml.InputIterator("/home/rob/Code/scala/TML/text/SPEC")
   // tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC""")
   // tml.HTML(tml.FileReader.stream("""/home/rob/Code/scala/TML/text/SPEC"""))
 
-/*
-  def apply(it: InputIterator)
-  {
-    println("running apply")
-    val p = new HTML()
-    p(it)
-    p.blockBalance(fix = false)
-    println
-    println(p.logger.toText())
-    println("out:")
-    println(s"'${p.result()}'")
-    println(p)
-  }
-*/
 
   def builder(ot: OutputTarget)
       : HTML =

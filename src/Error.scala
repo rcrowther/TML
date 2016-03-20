@@ -94,6 +94,9 @@ object Error {
   }
 
   /** Sets the primary position from a mark, not an iterator.
+    *
+    * This will record the initial position of the mark, not the
+    * error itself.
     */
   def positionByMarkdata(
     markData: MarkData,
@@ -103,9 +106,9 @@ object Error {
       : Error =
   {
     new Error(
-      markData.pos,
       markData.lineNum,
       markData.linePos,
+      markData.pos,
       None,
       message,
       advice

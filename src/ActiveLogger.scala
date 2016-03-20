@@ -16,8 +16,6 @@ final class ActiveLogger
 
 
 
-
-
   //-----------------
   // Utility render
   //-----------------
@@ -83,44 +81,108 @@ final class ActiveLogger
 
 
   //-----------------
-  // General errors
+  // Renderer errors
   //-----------------
 
-  /** Log a warning from a renderer.
-    */
+
   def rendererWarning(
-    it: InputIterator,
+    md: MarkData,
     message: String,
     advice: String
   )
   {
-    warnings += Error(
-      it,
-      message,
+    warnings += Error.positionByMarkdata(
+      md,
+      "(renderer) " + message,
       advice
     )
   }
 
-  /** Log an error from a renderer.
-    */
+
+  def rendererWarning(
+    md: MarkData,
+    message: String
+  )
+  {
+    warnings += Error.positionByMarkdata(
+      md,
+      "(renderer) " + message,
+      ""
+    )
+  }
+
+
   def rendererError(
-    it: InputIterator,
+    md: MarkData,
     message: String,
     advice: String
   )
   {
-    errors += Error(
-      it,
-      message,
+    errors += Error.positionByMarkdata(
+      md,
+      "(renderer) " + message,
       advice
     )
   }
 
 
+  def attributeRangeWarning(
+    md: MarkData,
+    from: Int,
+    to: Int
+  )
+  {
+    if(md.params.size < from || md.params.size > to) {
+val markStr = s"mark: '${md.control}${md.tagName}'"
 
-  //-----------------
-  // Specific errors
-  //-----------------
+      if(md.params.size < from){
+        val sz = md.params.size
+        sz match {
+          case 0 => {
+            rendererWarning(
+              md,
+              s"No attributes?: $markStr"
+            )
+          }
+          case 1 => {
+            rendererWarning(
+              md,
+              s"Only 1 attribute?: $markStr"
+            )
+          }
+          case _ => {
+            rendererWarning(
+              md,
+              s"Only $sz attributes?: $markStr"
+            )
+          }
+        }
+      }
+      else {
+        val surplus = md.params.size - to
+        if (surplus == 1) {
+          rendererWarning(
+            md,
+            s"1 unused attribute: $markStr"
+          )
+        }
+        else {
+          rendererWarning(
+            md,
+            s"$surplus unused attributes: $markStr"
+          )
+        }
+      }
+    }
+  }
+
+
+
+
+
+  //---------------
+  // Parser errors
+  //---------------
 
   // too close to bother with mark data
   def bracketAttributeClosedByNewline(
@@ -246,56 +308,58 @@ final class ActiveLogger
   {
     val b = new StringBuilder()
 
+    if(isEmpty) b ++= "ok"
+    else {
+      if (!errors.isEmpty) {
+        errors.foreach { e =>
+          e.addPosString(b)
+          b ++= " error: "
+          b ++= e.message
+          b ++= "\n"
+          if (addAdviceString(b, e) ||  addOpeningBlockString(b, e))  b ++= "\n"
+        }
 
-    if (!errors.isEmpty) {
-      errors.foreach { e =>
-        e.addPosString(b)
-        b ++= " error: "
-        b ++= e.message
-        b ++= "\n"
-        if (addAdviceString(b, e) ||  addOpeningBlockString(b, e))  b ++= "\n"
+        b += '\n'
       }
 
-      b += '\n'
-    }
+      if (!warnings.isEmpty) {
+        warnings.foreach { e =>
+          e.addPosString(b)
+          b ++= " warning: "
+          b ++= e.message
+          b ++= "\n"
+          if (addAdviceString(b, e) ||  addOpeningBlockString(b, e))  b ++= "\n"
 
-    if (!warnings.isEmpty) {
-      warnings.foreach { e =>
-        e.addPosString(b)
-        b ++= " warning: "
-        b ++= e.message
-        b ++= "\n"
-        if (addAdviceString(b, e) ||  addOpeningBlockString(b, e))  b ++= "\n"
+        }
 
+        b += '\n'
       }
 
-      b += '\n'
-    }
+      if (!tailErrors.isEmpty) {
+        tailErrors.foreach { e =>
+          e.addPosString(b)
+          b ++= " tail error: "
+          b ++= e.message
+          b ++= "\n"
+          // No opening blocks on tail errors, they ARE the opening block.
+          if (addAdviceString(b, e))  b ++= "\n"
+        }
 
-    if (!tailErrors.isEmpty) {
-      tailErrors.foreach { e =>
-        e.addPosString(b)
-        b ++= " tail error: "
-        b ++= e.message
-        b ++= "\n"
-        // No opening blocks on tail errors, they ARE the opening block.
-        if (addAdviceString(b, e))  b ++= "\n"
+        b += '\n'
       }
 
-      b += '\n'
-    }
-
-    if (!errors.isEmpty) {
-      b append errors.size
-      b ++= " error(s) found\n"
-    }
-    if (!warnings.isEmpty) {
-      b append warnings.size
-      b ++= " warning(s) found\n"
-    }
-    if (!tailErrors.isEmpty) {
-      b ++= "balance errors found!\n"
-      b += '\n'
+      if (!errors.isEmpty) {
+        b append errors.size
+        b ++= " error(s) found\n"
+      }
+      if (!warnings.isEmpty) {
+        b append warnings.size
+        b ++= " warning(s) found\n"
+      }
+      if (!tailErrors.isEmpty) {
+        b ++= "balance errors found!\n"
+        b += '\n'
+      }
     }
 
     b.result

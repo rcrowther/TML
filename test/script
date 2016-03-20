@@ -159,8 +159,9 @@ tml.HTML("\ntricky\n[? bell\ncup")
 tml.HTML("\n##  \n far")
 
 
-
-
+== Renderer Errors
+tml.HTML.errorReport(" *{title}{alternative text}{go-no-place.com}  ")
+tml.HTML.errorReport(" [a{title}{alternative text}{go-no-place.com}  ]")
 
 ============================
 tml.HTML("")

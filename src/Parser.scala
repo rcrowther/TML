@@ -41,7 +41,7 @@ abstract class Parser
 //etc.
   var logger : Logger = Logger.inactive()
 
-  private var it = tml.InputIterator.empty
+  protected var it = tml.InputIterator.empty
   private var currentChar = '\u0000'
 
 
@@ -881,7 +881,7 @@ abstract class Parser
   private def parseInlineSelfClose()
   {
     //val controlPos = it.pos
-    val md = MarkData(InlineBracketOpenMark, it)
+    val md = MarkData(InlineSelfClosingMark, it)
     forward()
     parseAttributes(md)
 

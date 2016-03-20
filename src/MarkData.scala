@@ -122,11 +122,11 @@ final class MarkData(
     b append params
     b ++= ", resolvedTagname:"
     b append resolvedTagname
-    b ++= "pos:"
+    b ++= " pos:"
     b append pos
-    b ++= "lineNum:"
+    b ++= " lineNum:"
     b append lineNum
-    b ++= "linePos:"
+    b ++= " linePos:"
     b append linePos
     b += ')'
     b.result
