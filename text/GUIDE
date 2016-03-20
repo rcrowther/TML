@@ -468,12 +468,11 @@ val uData = tml.Util.mapWhenNot('?', "", eData, tml.UML.apply _)
 val it = tml.InputIterator(uData)
 
 // Parse to HTML
-//(the HTMLCodeblock parser has a special renderer to make code W3 compatible)
-val p = tml.HTMLCodeblock()
-p(it)
+//(the HTMLCodeblock parser has a special tagname renderer for computer code)
+val p = tml.HTMLCodeblock.errorReport(it)
 
-// Use the utility webpage method to wrap in webpage tags.
-val r = tml.HTMLUtils.toWebpage("Guide", "<path to...>TML/text/lib/doc.css", p.result())
+// Use the utility method to wrap in webpage tags.
+val r = tml.HTMLUtils.toWebpage("Guide", "<path to...>TML/text/lib/doc.css", p)
 
 // ...to see results in a repl,
 println(r)

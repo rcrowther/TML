@@ -7,14 +7,17 @@ The parser has these characteristics,
 -- It is slow
 Stepping along arrays (String = array of codepoints) in Java is slow. 
 -  
--- The code is plain and open
+-- The code is plain and open.
 As a result of the above (Regex and/or non-linebased algorithms are more complex)
 -
--- It handles Unicode
+-- It handles Unicode.
 Java Regex can handle Unicode, but I kept this parser plain.
 -
--- It should show even performance to length/complexity
+-- It should show even performance to length/complexity.
 In some people's terminology, is 'scalable'.
+-
+-- It handles masses of inputs and outputs, often implicitly.
+-
 +
 
 == Stepping
@@ -22,14 +25,14 @@ This Scala parser uses simple character stepping. Indexing arrays in Java is slo
 
 However, I wanted a simple implementation (first). The stepping algorithm also allows a vast number of input options.
 
-The Scala parser is very flexible. It may be rewritten to work in different ways.
+The parser is extensible code, calling renders through callbacks. It may be rewritten to work in different ways.
  
 
 == Unicode
 This parser handles Unicode, but only the Basic Multilingual Plane (BMP), i.e. the original Java implementation of 16 bits (inside, the code is typed as Char, not Int). 
 
-== Inputs
-One advantage of the stepping parser is that it handles a large number of input types. To do this, it wraps in InputIterator.
+== Inputs/Outputs
+One advantage of the stepping parser is that it handles a large number of i/o types. To do this, it wraps in InputIterator and OutputTarget.
 
 InputIterator can take strings, multiple strings, strings replacing newlines (from a file, say), or an InputStreamReader.
 
@@ -37,19 +40,18 @@ InputIterator can take strings, multiple strings, strings replacing newlines (fr
 Provides concise access to files. This is not provided as a final solution, but for assesssment and testing.
 
 == Errors and reports
-TML parsers always use a stack or recursion. 
-This means that TML, though slower than possible, is robust and can give some human-useful error reports.
+TML parsers always use a stack or recursion. This means that TML, though slower than possible, is robust and can give some human-useful error reports.
 
-This TML parser maintains a stack with error reporting.
+This TML parser maintains a stack with extensive error reporting.
 
-Error reporting can not be turned off. 
+Error reporting can be turned off, but only to a small performance advantage. 
 
 == documentation
 tml.HTMLCodeblock(tml.InputIterator.line(tml.UML(tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC"""))))
 
 
 == State of project
-The original was written on a Windows 10 laptop computer using Eclipse. This setup was horribly slow, sometimes stalled, and the intermittent power supply caused unrequested shutdowns. The Eclipse Scala pluging remains, for my purposes, an unhappy experience. After I lost 2 hours work on yet another shutdown, I finished off on a proper computer.
+The original was written on a Windows 10 laptop computer using Eclipse. This setup was horribly slow, sometimes stalled, and the intermittent power supply caused unrequested shutdowns. The Eclipse Scala plugin remains, for my purposes, an unhappy experience. After I lost 2 hours work on yet another shutdown, I finished off on a proper computer.
 
 One result, no automated tests have been written.   
 

@@ -19,7 +19,7 @@ package tml
   */
 // TODO: Escapes, liss, blockquote, headline
 //TODO: Perhaps should override HTML
-class Markdown
+class Markdown(val ot: OutputTarget)
     extends Parser
 {
 
@@ -74,19 +74,19 @@ class Markdown
  {
 
     if (md.klass != "") {
-      b ++= " class=\""
-      b ++= md.klass
-      b ++= "\""
+      ot ++= " class=\""
+      ot ++= md.klass
+      ot ++= "\""
     }
     if (md.params.isDefinedAt(0) && md.params(0) != "") {
-      b ++= " alt=\""
-      b ++= md.params(0)
-      b ++= "\""
+      ot ++= " alt=\""
+      ot ++= md.params(0)
+      ot ++= "\""
     }
     if (md.params.isDefinedAt(1) && md.params(1) != "") {
-      b ++= " src=\""
-      b ++= md.params(1)
-      b ++= "\""
+      ot ++= " src=\""
+      ot ++= md.params(1)
+      ot ++= "\""
     }
   }
 
@@ -95,19 +95,19 @@ class Markdown
   // li, dd, dt, blockquote
   def renderBlockOpen(md: MarkData)
  {
-    b += '<'
-    b ++= md.resolvedTagname
+    ot += '<'
+    ot ++= md.resolvedTagname
     attributesStockRender(md)
-    b += '>'
+    ot += '>'
   }
 
   def renderBlockClose(
     md: MarkData
   )
   {
-    b ++= "<\\"
-    b ++= md.resolvedTagname
-    b += '>'
+    ot ++= "<\\"
+    ot ++= md.resolvedTagname
+    ot += '>'
   }
 
   // used for h?, pre
@@ -126,34 +126,34 @@ class Markdown
         else "h" + (ctrls.size + 1)
     }
 
-    b += '<'
-    b ++= md.resolvedTagname
+    ot += '<'
+    ot ++= md.resolvedTagname
 
     if (md.klass != "") {
-      b ++= " class=\""
-      b ++= md.klass
-      b ++= "\""
+      ot ++= " class=\""
+      ot ++= md.klass
+      ot ++= "\""
     }
     if (md.params.isDefinedAt(0) && md.params(0) != "") {
-      b ++= " title=\""
-      b ++= md.params(0)
-      b ++= "\""
+      ot ++= " title=\""
+      ot ++= md.params(0)
+      ot ++= "\""
     }
     if (md.params.isDefinedAt(1) && md.params(1) != "") {
-      b ++= " href=\""
-      b ++= md.params(1)
-      b ++= "\""
+      ot ++= " href=\""
+      ot ++= md.params(1)
+      ot ++= "\""
     }
-    b += '>'
+    ot += '>'
 
     //println(s"renderOpen... '${b.result}'")
   }
 
   def renderParagraphClose(md: MarkData)
  {
-    b ++= "<\\"
-    b ++= md.resolvedTagname
-    b += '>'
+    ot ++= "<\\"
+    ot ++= md.resolvedTagname
+    ot += '>'
   }
 
   // used for a, i, b, span
@@ -163,19 +163,19 @@ class Markdown
     // Markdown link
     // link = [an example](http://example.com/ "Title")
     if (md.resolvedTagname == "a") {
-      b += '['
+      ot += '['
     }
     else {
       if (md.resolvedTagname == "em") {
-        b += '*'
+        ot += '*'
       }
       else {
         // catch literal, ignore
         if (md.resolvedTagname != InlineLiteralTagname) {
-          b += '<'
-          b ++= md.resolvedTagname
+          ot += '<'
+          ot ++= md.resolvedTagname
           attributesStockRender(md)
-          b += '>'
+          ot += '>'
         }
       }
     }
@@ -193,28 +193,28 @@ class Markdown
     // Markdown link
     // link = [an example](http://example.com/ "Title")
     if (name == "a") {
-      b ++= "]("
+      ot ++= "]("
     if (md.params.isDefinedAt(1) && md.params(1) != "") {
-        b ++= md.params(1)
+        ot ++= md.params(1)
       }
 
     if (md.params.isDefinedAt(0) && md.params(0) != "") {
-        b += '\"'
-      b ++= md.params(0)
-        b += '\"'
+        ot += '\"'
+      ot ++= md.params(0)
+        ot += '\"'
       }
-      b += ')'
+      ot += ')'
     }
     else {
       if (md.resolvedTagname == "em") {
-        b += '*'
+        ot += '*'
       }
       else {
         // catch literal, ignore
         if (name != InlineLiteralTagname) {
-          b ++= "<\\"
-          b ++= name
-          b += '>'
+          ot ++= "<\\"
+          ot ++= name
+          ot += '>'
         }
       }
     }
@@ -226,17 +226,17 @@ class Markdown
 
     // Markdown img
     //img = ![Alt text](/path/to/img.jpg "Optional title")
-    b += '!'
+    ot += '!'
 
     if (md.params.isDefinedAt(0) && md.params(0) != "") {
-      b += '['
-      b ++= md.params(0)
-      b += ']'
+      ot += '['
+      ot ++= md.params(0)
+      ot += ']'
     }
     if (md.params.isDefinedAt(1) && md.params(1) != "") {
-      b += '('
-      b ++= md.params(1)
-      b += ')'
+      ot += '('
+      ot ++= md.params(1)
+      ot += ')'
     }
     //println(s"render... '${b.result}'")
   }
@@ -245,19 +245,19 @@ class Markdown
   def renderBlockSelfClosingMark(md: MarkData) 
 {
     // Markdown hr
-    b ++= "* * *"
+    ot ++= "* * *"
   }
 
   def renderTextParagraphOpen() 
 {
     // put the newline back
-    b += '\n'
+    ot += '\n'
   }
 
   def renderTextParagraphClose() 
 {
     // put the newline back
-    b += '\n'
+    ot += '\n'
   }
 
 }//Markdown

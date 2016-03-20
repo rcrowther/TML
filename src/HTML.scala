@@ -6,7 +6,7 @@ package tml
 *
 * Only additions to TML are some tagname definitions, rendering,  and tagname aliases.
   */
-class HTML
+class HTML(val ot: OutputTarget)
     extends Parser
 {
 
@@ -63,19 +63,19 @@ class HTML
   protected def attributesStockRender(md: MarkData)
 {
     if (md.klass != "") {
-      b ++= " class=\""
-      b ++= md.klass
-      b ++= "\""
+     ot ++= " class=\""
+     ot ++= md.klass
+     ot ++= "\""
     }
     if (md.params.isDefinedAt(0) && md.params(0) != "") {
-      b ++= " title=\""
-      b ++= md.params(0)
-      b ++= "\""
+     ot ++= " title=\""
+     ot ++= md.params(0)
+     ot ++= "\""
     }
     if (md.params.isDefinedAt(1) && md.params(1) != "") {
-      b ++= " href=\""
-      b ++= md.params(1)
-      b ++= "\""
+     ot ++= " href=\""
+     ot ++= md.params(1)
+     ot ++= "\""
     }
   }
 
@@ -84,28 +84,28 @@ class HTML
   // li, dd, dt, blockquote
   def renderBlockOpen(md: MarkData)
  {
-    b += '<'
-    b ++= md.resolvedTagname
+   ot += '<'
+   ot ++= md.resolvedTagname
     attributesStockRender(md)
-    b += '>'
+   ot += '>'
   }
 
   def renderBlockClose(
     md: MarkData
   )
   {
-    b ++= "</"
-    b ++= md.resolvedTagname
-    b += '>'
+   ot ++= "</"
+   ot ++= md.resolvedTagname
+   ot += '>'
   }
 
   // used for hr
   def renderBlockSelfClosingMark(md: MarkData)
  {
-    b += '<'
-    b ++= md.resolvedTagname
+   ot += '<'
+   ot ++= md.resolvedTagname
     attributesStockRender(md)
-    b ++= "/>"
+   ot ++= "/>"
   }
 
   // used for h?, pre
@@ -124,43 +124,43 @@ class HTML
         else "h" + (ctrls.size + 1)
     }
 
-    b += '<'
-    b ++= md.resolvedTagname
+   ot += '<'
+   ot ++= md.resolvedTagname
 
     if (md.klass != "") {
-      b ++= " class=\""
-      b ++= md.klass
-      b ++= "\""
+     ot ++= " class=\""
+     ot ++= md.klass
+     ot ++= "\""
     }
     if (md.params.isDefinedAt(0) && md.params(0) != "") {
-      b ++= " title=\""
-      b ++= md.params(0)
-      b ++= "\""
+     ot ++= " title=\""
+     ot ++= md.params(0)
+     ot ++= "\""
     }
     if (md.params.isDefinedAt(1) && md.params(1) != "") {
-      b ++= " href=\""
-      b ++= md.params(1)
-      b ++= "\""
+     ot ++= " href=\""
+     ot ++= md.params(1)
+     ot ++= "\""
     }
-    b += '>'
+   ot += '>'
   }
 
   def renderParagraphClose(md: MarkData)
 {
-    b ++= "</"
-    b ++= md.resolvedTagname
-    b += '>'
+   ot ++= "</"
+   ot ++= md.resolvedTagname
+   ot += '>'
   }
 
 
   def renderTextParagraphOpen()
  {
-    b ++= "<p>"
+   ot ++= "<p>"
   }
 
   def renderTextParagraphClose()
  {
-    b ++= "</p>"
+   ot ++= "</p>"
   }
 
 
@@ -169,10 +169,10 @@ class HTML
 {
     // catch literal, ignore
     if (md.resolvedTagname != InlineLiteralTagname) {
-      b += '<'
-      b ++= md.resolvedTagname
+     ot += '<'
+     ot ++= md.resolvedTagname
       attributesStockRender(md)
-      b += '>'
+     ot += '>'
     }
   }
 
@@ -185,33 +185,33 @@ class HTML
 
     // catch literal, ignore
     if (name != InlineLiteralTagname) {
-      b ++= "</"
-      b ++= name
-      b += '>'
+     ot ++= "</"
+     ot ++= name
+     ot += '>'
     }
   }
 
   // Used for img
   def renderInlineSelfClosingMark(md: MarkData) 
 {
-    b += '<'
-    b ++= md.resolvedTagname
+   ot += '<'
+   ot ++= md.resolvedTagname
     if (md.klass != "") {
-      b ++= " class=\""
-      b ++= md.klass
-      b ++= "\""
+     ot ++= " class=\""
+     ot ++= md.klass
+     ot ++= "\""
     }
     if (md.params.isDefinedAt(0) && md.params(0) != "") {
-      b ++= " alt=\""
-      b ++= md.params(0)
-      b ++= "\""
+     ot ++= " alt=\""
+     ot ++= md.params(0)
+     ot ++= "\""
     }
     if (md.params.isDefinedAt(1) && md.params(1) != "") {
-      b ++= " src=\""
-      b ++= md.params(1)
-      b ++= "\""
+     ot ++= " src=\""
+     ot ++= md.params(1)
+     ot ++= "\""
     }
-    b ++= "/>"
+   ot ++= "/>"
   }
 
 }//HTML
@@ -241,10 +241,10 @@ extends ParserCompanion[HTML]
   }
 */
 
-  def builder()
+  def builder(ot: OutputTarget)
       : HTML =
   {
-    new HTML()
+    new HTML(ot)
   }
 
 }//HTML

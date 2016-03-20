@@ -30,8 +30,8 @@ package tml
   * highlighting, copy this class and substitute the new attribute
   * name.
   */
-class HTMLCodeblock
-    extends HTML
+class HTMLCodeblock(ot: OutputTarget)
+    extends HTML(ot)
 {
 
   override val blockBracketedTagnameAliases = Map(
@@ -48,9 +48,9 @@ class HTMLCodeblock
   override def renderBlockOpen(md: MarkData)
 {
     if(md.resolvedTagname == "codeblock") {
-      b ++= "<pre" 
+      ot ++= "<pre" 
       attributesStockRender(md)
-      b ++= "><code>"
+      ot ++= "><code>"
     }
     else {
       super.renderBlockOpen(md)
@@ -62,7 +62,7 @@ class HTMLCodeblock
   )
   {
     if(md.resolvedTagname == "codeblock") {
-      b ++= "</code></pre>"
+      ot ++= "</code></pre>"
     }
     else {
       super.renderBlockClose(md)
@@ -74,12 +74,14 @@ class HTMLCodeblock
 
 
 
-object HTMLCodeblock {
+object HTMLCodeblock
+extends ParserCompanion[HTMLCodeblock]
+ {
 
 
   // tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC""")
   // tml.HTMLCodeblock(tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC"""))
-
+/*
   def apply(it: InputIterator)
   {
     println("running apply")
@@ -93,11 +95,11 @@ object HTMLCodeblock {
     println
     println(p)
   }
-
-  def apply()
+*/
+  def builder(ot: OutputTarget)
       : HTMLCodeblock =
   {
-    new HTMLCodeblock()
+    new HTMLCodeblock(ot)
   }
 
 }//HTMLCodeblock

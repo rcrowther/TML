@@ -14,7 +14,7 @@ import java.io.InputStreamReader
   * extending to provide methods for rendering.
   */
 //TODO: Text position is broken. Needs paragraph detection.
-trait Parser
+abstract class Parser
     extends Definitions
 {
 
@@ -30,7 +30,9 @@ trait Parser
 
   /** Stringbuilder for output.
     */
-  protected val b = new StringBuilder()
+  //protected val b = new StringBuilder()
+
+  protected val ot: OutputTarget
 
   /** The error log for this parser.
     */
@@ -473,7 +475,7 @@ trait Parser
         it,
         controlMark
       )
-      b += controlMark
+     ot+= controlMark
 
       false
     }
@@ -488,7 +490,7 @@ trait Parser
           stackTextMark,
           controlMark
         )
-        b += controlMark
+       ot+= controlMark
 
         false
       }
@@ -562,7 +564,7 @@ trait Parser
         it
       )
 
-      b += currentChar
+     ot+= currentChar
     }
     else {
       // Is ok, render and dispose of the markdata
@@ -722,7 +724,7 @@ trait Parser
     )
     {
       // print through
-      b += prevChar
+     ot+= prevChar
       prevChar = currentChar
       
       // update linecount
@@ -864,7 +866,7 @@ trait Parser
     while (currentChar != InlineBracketCloseMark
       && currentChar != LineFeed) {
       // output
-      b += currentChar
+     ot+= currentChar
       forward()
     }
     
@@ -916,7 +918,7 @@ trait Parser
         // Skip the space. If newlines present, quit the paragraphing,
         // else replace with a space.
         skipSpace()
-        if (currentChar != LineFeed) b += ' '
+        if (currentChar != LineFeed)ot+= ' '
       }
       else {
 
@@ -929,7 +931,7 @@ trait Parser
           // is a free-text char
           // output
           case _ => {
-            b += currentChar
+           ot+= currentChar
             forward()
           }
         }
@@ -1143,14 +1145,11 @@ trait Parser
   def clear()
   {
     currentChar = '\u0000'
-    //currentPos = 0
     blockStack.clear()
     paragraphMark = MarkData.textParagraph()
     inlineStack.clear()
-    b.clear()
+    ot.clear()
     logger.clear()
-    //lineCount = 0
-    //currentLinePos = 0
   }
 
   /** Returns a string representating this parser.
@@ -1172,7 +1171,7 @@ trait Parser
     b.result
   }
 
-  def result() : String = b.result()
+  //def result() : String = b.result()
 
 }//Parser
 

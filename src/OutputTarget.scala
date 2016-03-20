@@ -26,6 +26,12 @@ trait OutputTarget
     */
   def ++=(s: String)
 
+  /** Empties the output.
+    *
+    * May discard or flush results. Will leavve the output ready to be used again.
+    */
+  def clear()
+
 }//OutputTarget
 
 
@@ -34,6 +40,9 @@ trait OutputTarget
   * Some output needs care with encoding. Output from TML is UTF-16.
   * This is ok for general Java methods, but may produce mangled
   * output if converted to bytes, or pushed to the outside world.
+  *
+  * Note that any handlin of the supplied object, such as sttream closing or 
+  * results from StringBuilders, must be handled externall to the parser. 
   */
 object OutputTarget {
 
@@ -42,91 +51,76 @@ object OutputTarget {
   val empty: OutputTarget = new OutputTarget {
     def +=(c: Char) {}
     def ++=(s: String) {}
+    def clear() {}
   }
 
   /** Creates an output target to stdout.
     */
-  def printer(): OutputTarget = new OutputTarget{
+  def apply(): OutputTarget = new OutputTarget{
     def +=(c: Char) = print(c)
     def ++=(s: String) = print(s)
+    def clear() { println }
   }
 
   /** Creates an output target using a string builder.
     *
     * The builder is available without results.
     */
-  def stringBuilder(): OutputTarget = new OutputTarget{
-    private val b = new StringBuilder()
+  def apply(b: StringBuilder): OutputTarget = new OutputTarget{
+    //private val b = new StringBuilder()
     def +=(c: Char) = { b += c }
     def ++=(s: String) = { b ++= s }
-    def result() : String = b.result()
-    def builder : StringBuilder = b
+    def clear() { b.clear() }
   }
 
   /*
-   /** Creates an output target from a stream.
-   */
-   def outputStream(os: OutputStream, cs: Charset): OutputTarget = new OutputTarget{
-   val osw = new OutputStreamWriter(os, cs)
-   def +=(c: Char) = { osw.write(c) }
-   def ++=(s: String) = { osw.write(s, 0, s.size) }
-
    def close(): Option[Exception] = {
    try {
-   osw.close()
+   os.close()
    None
    }
    catch {
    case e: Exception => Some(e)
    }
    }
-   }
+   */
 
-   /** Creates an output target from a stream, encoded as utf8.
-   */
-   def outputStream(os: OutputStream): OutputTarget = outputStream(os: OutputStream, StandardCharsets.UTF_8)
-   */
 
   /** Creates an output target from a stream.
     *
     * Note that output from TML is UTF-16.
     */
-  //NB: currentky, not our business to state encoung, etc. R.C.
-  def outputStream(os: OutputStream): OutputTarget = new OutputTarget{
+  def apply(os: OutputStream): OutputTarget = new OutputTarget{
     def +=(c: Char) = { os.write(c) }
     def ++=(s: String) = { os.write(s.getBytes(), 0, s.size) }
-
-    def close(): Option[Exception] = {
-      try {
-        os.close()
-        None
-      }
-      catch {
-        case e: Exception => Some(e)
-      }
-    }
+    def clear() = os.flush()
   }
 
-  /** Creates an output target from a stream.
+
+  /** Creates an output target from a stream, in a specified encoding.
     *
-    * Wraps in an [[java.io.OutputStreamWriter]] to convert.
+    * For the conversion, wraps in an [[java.io.OutputStreamWriter]].
     */
-  def toUF8Stream(os: OutputStream): OutputTarget = new OutputTarget{
-    val osw = new OutputStreamWriter(os, StandardCharsets.UTF_8)
+  def apply(os: OutputStream, cs: Charset): OutputTarget = new OutputTarget{
+    val osw = new OutputStreamWriter(os, cs)
     def +=(c: Char) = { osw.write(c) }
     def ++=(s: String) = { osw.write(s, 0, s.size) }
-
-    def close(): Option[Exception] = {
-      try {
-        osw.close()
-        None
-      }
-      catch {
-        case e: Exception => Some(e)
-      }
-    }
+    def clear() = osw.flush()
   }
 
-  implicit def outputTargetFromStream(os: OutputStream): OutputTarget = outputStream(os)
+  /** Creates an output target from a stream, encoded as utf8.
+    *
+    * The stream of data is converted to UTF-8.
+    *
+    * For the conversion, wraps in an [[java.io.OutputStreamWriter]].
+    */
+  def toUF8Stream(os: OutputStream)
+      : OutputTarget =
+  {
+    apply(os: OutputStream, StandardCharsets.UTF_8)
+  }
+
+  implicit def outputTargetFromStringBuilder(b: StringBuilder): OutputTarget = apply(b)
+  implicit def outputTargetFromStream(os: OutputStream): OutputTarget = apply(os)
 
 }//OutputTarget
