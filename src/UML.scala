@@ -7,7 +7,7 @@ import java.util.regex.Pattern
 import scala.language.implicitConversions
 
 
-/** Markup for creating unicode entities.
+/** Markup for creating inaccessible unicode codepoints.
   *
   * 30 years on we still do not have keyboards or text processors
   * which handle extended character sets in any easy manner. Most
@@ -26,15 +26,14 @@ import scala.language.implicitConversions
   * single-character codes.
   *
   * These are raw methods, which do not defend against much. For
-  * example, they should not be used round pre-formed HTML pages where
+  * example, the code may damage pre-formed HTML pages where
   * &lt;script> or &lt;head> tags exist.
   *
-  * HTML character entity references exist, but are unlikely to be as
-  * compatible as Unicode, which usage stretches far beyond
-  * browsers. Hexadecimal numeric character references are used in
-  * official documentation, but rarely in practice. Greater
-  * compatibility, and most currrent sources, recommend decimal
-  * references. This markup parser uses decimal references.
+  * Java strings are encoded as UTF-16, and string handling mostly
+  * works in UTF-16. Thus this Scala implementation of UML does not
+  * use entities, but punches in the necessary codepoints. Please bear
+  * in mind that the results of a parse, even if correct, may display,
+  * in display code not handling UTF-16, as distorted.
   *
   * [[http://alistapart.com/article/emen]]
   *
@@ -87,27 +86,27 @@ object UML {
       case '-' => {
         //println(s"dash match $m")
         // hyphen else dash
-        if (m.size == 1) "&#8208;"
+        if (m.size == 1) "\u2010"
         else {
           // em/dict else en
           if (m.size == 2) {
             // 'dictionary hyphen' else 'en'
-            if (m(1) == '.')"&#8231;"
-            else "&#8211;"
+            if (m(1) == '.')"\u2027"
+            else "\u2013"
           }
-          else "&#8212;"
+          else "\u2014"
         }
       }
 
       // ellipsis
-      case '.' => "&#8230;"
+      case '.' => "\u2026"
 
       // legal marks
       case '(' => {
         m(1) match {
-          case 'c' => "&#169;"
-          case 't' => "&#8482;"
-          case 'r' => "&#174;"
+          case 'c' => "\u00A9"
+          case 't' => "\u2122"
+          case 'r' => "\u00AE"
         }
       }
 
@@ -151,83 +150,83 @@ object UML {
       // single quotes
       case '\'' => {
         // two quotes is open, one is close
-        if( m.size == 2) "&#8216"
-        else "&#8217"
+        if( m.size == 2) "\u2018"
+        else "\u2019"
       }
 
       // double quotes
       case '"' => {
         // two quotes is open, one is close
-        if( m.size == 2) "&#8220;"
-        else  "&#8221;"
+        if( m.size == 2) "\u201C"
+        else  "\u201D"
       }
 
       // guillemet open
-      case '<' => "&#171;"
+      case '<' => "\u00AB"
 
       // guillemet close
-      case '>' => "&#187;"
+      case '>' => "\u00BB"
 
       case ':' => {
         m match {
-          case """:\A""" => "&#128;"
-          case """:/A""" => "&#129;"
-          case """:^A""" => "&#130;"
-          case """::A""" => "&#132;"
-          case """:oA""" => "&#133;"
-          case """:cC""" => "&#199;"
-          case """:\E""" => "&#200;"
-          case """:/E""" => "&#201;"
-          case """:^E""" => "&#202;"
-          case """::E""" => "&#203;"
-          case """:\I""" => "&#204;"
-          case """:/I""" => "&#205;"
-          case """:^I""" => "&#206;"
-          case """::I""" => "&#207;"
-          case """:\O""" => "&#210;"
-          case """:/O""" => "&#211;"
-          case """:^O""" => "&#212;"
-          case """::O""" => "&#214;"
-          case """:\U""" => "&#217;"
-          case """:/U""" => "&#218;"
-          case """:^U""" => "&#219;"
-          case """::U""" => "&#220;"
-          case """:\a""" => "&#224;"
-          case """:/a""" => "&#225;"
-          case """:^a""" => "&#226;"
-          case """::a""" => "&#228;"
-          case """:oa""" => "&#229;"
-          case """:cc""" => "&#231;"
-          case """:\e""" => "&#232;"
-          case """:/e""" => "&#233;"
-          case """:^e""" => "&#234;"
-          case """::e""" => "&#235;"
-          case """:\i""" => "&#236;"
-          case """:/i""" => "&#237;"
-          case """:^i""" => "&#238;"
-          case """::i""" => "&#239;"
-          case """:\o""" => "&#242;"
-          case """:/o""" => "&#243;"
-          case """:^o""" => "&#244;"
-          case """::o""" => "&#246;"
-          case """:\\u""" => "&#249;"
-          case """:/u""" => "&#250;"
-          case """:^u""" => "&#251;"
-          case """::u""" => "&#252;"
-          case """:/y""" => "&#253;"
-          case """::y""" => "&#255;"
-          case ":va" => "&#259;"
+          case """:\A""" => "\u00C0"
+          case """:/A""" => "\u00C1"
+          case """:^A""" => "\u00C2"
+          case """::A""" => "\u00C4"
+          case """:oA""" => "\u00C5"
+          case """:cC""" => "\u00C7"
+          case """:\E""" => "\u00C8"
+          case """:/E""" => "\u00C9"
+          case """:^E""" => "\u00CA"
+          case """::E""" => "\u00CB"
+          case """:\I""" => "\u00CC"
+          case """:/I""" => "\u00CD"
+          case """:^I""" => "\u00CE"
+          case """::I""" => "\u00CF"
+          case """:\O""" => "\u00D2"
+          case """:/O""" => "\u00D3"
+          case """:^O""" => "\u00D4"
+          case """::O""" => "\u00D6"
+          case """:\U""" => "\u00D9"
+          case """:/U""" => "\u00DA"
+          case """:^U""" => "\u00DB"
+          case """::U""" => "\u00DC"
+          case """:\a""" => "\u00E0"
+          case """:/a""" => "\u00E1"
+          case """:^a""" => "\u00E2"
+          case """::a""" => "\u00E4"
+          case """:oa""" => "\u00E5"
+          case """:cc""" => "\u00E7"
+          case """:\e""" => "\u00E8"
+          case """:/e""" => "\u00E9"
+          case """:^e""" => "\u00EA"
+          case """::e""" => "\u00EB"
+          case """:\i""" => "\u00EC"
+          case """:/i""" => "\u00ED"
+          case """:^i""" => "\u00EE"
+          case """::i""" => "\u00EF"
+          case """:\o""" => "\u00F2"
+          case """:/o""" => "\u00F3"
+          case """:^o""" => "\u00F4"
+          case """::o""" => "\u00F6"
+          case ":\\u" => "\u00F9"
+          case """:/u""" => "\u00FA"
+          case """:^u""" => "\u00FB"
+          case """::u""" => "\u00FC"
+          case """:/y""" => "\u00FD"
+          case """::y""" => "\u00FF"
+          case ":va" => "\u0103"
 
           case _ => {
             m(1) match {
-              case '^' => m(2) + "&#770;"
-              case 'u' => m(2) + "&#774;"
-              case ':' => m(2) + "&#776;"
-              case 'o' => m(2) + "&#778;"
-              case 'v' => m(2) + "&#780;"
-              case '\\' => m(2) + "&#768;"
-              case '/' => m(2) + "&#769;"
-              case 'c' => m(2) + "&#807;"
+              case '^' => m(2) + "\u0302"
+              case 'u' => m(2) + "\u0306"
+              case ':' => m(2) + "\u0308"
+              case 'o' => m(2) + "\u030A"
+              case 'v' => m(2) + "\u030C"
+              case '\\' => m(2) + "\u0300"
+              case '/' => m(2) + "\u0301"
+              case 'c' => m(2) + "\u0327"
               case _ => m
             }
           }
@@ -263,11 +262,11 @@ object UML {
     if(m(0) == ':') {
       m(2) match {
         // multiply, or dimensions
-        case 'x' => "&#215;"
+        case 'x' => "\u00D7"
         // minus
-        case '-' => "&#8722;"
+        case '-' => "\u2212"
         // degree
-        case 'o' => "&#176;"
+        case 'o' => "\u00B0"
         case _ => m
       }
 
@@ -276,21 +275,21 @@ object UML {
       if(Character.isDigit(m(0))) {
         // fraction
         m match {
-          case "1/2" => "&#189;"
-          case "1/3" => "&#8531;"
-          case "2/3" => "&#8532;"
-          case "1/4" => "&#188;"
-          case "3/4" => "&#190;"
-          case "1/5" => "&#8533"
-          case "2/5" => "&#8354"
-          case "3/5" => "&#8535"
-          case "4/5" => "&#8536"
-          case "1/6" => "&#8537"
-          case "5/6" => "&#8538"
-          case "1/8" => "&#8539"
-          case "3/8" => "&#8540;"
-          case "5/8" => "&#8541;"
-          case "7/8" => "&#8542;"
+          case "1/2" => "\u00BD"
+          case "1/3" => "\u2153"
+          case "2/3" => "\u2154"
+          case "1/4" => "\u00BC"
+          case "3/4" => "\u00BE"
+          case "1/5" => "\u2155"
+          case "2/5" => "\u2156"
+          case "3/5" => "\u2157"
+          case "4/5" => "\u2158"
+          case "1/6" => "\u2159"
+          case "5/6" => "\u215A"
+          case "1/8" => "\u215B"
+          case "3/8" => "\u215C"
+          case "5/8" => "\u215D"
+          case "7/8" => "\u215E"
           case _ => m
         }
       }
@@ -324,8 +323,8 @@ object UML {
     b.toString()
   }
 
-/** Replaces matches, on group 1, in a string by applying a function. 
-*/
+  /** Replaces matches, on group 1, in a string by applying a function.
+    */
   private def stringReplace(
     p: Pattern,
     repCallback: (String) => String,

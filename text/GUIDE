@@ -474,7 +474,9 @@ val p = tml.HTMLCodeblock.errorReport(it)
 // Use the utility method to wrap in webpage tags.
 val r = tml.HTMLUtils.toWebpage("Guide", "<path to...>TML/text/lib/doc.css", p)
 
-// ...to see results in a repl,
+// ...to see results in a repl...
+// Note that some implementations of UML translate as Unicode (not entities)
+// so some terminals may struggle with output.
 println(r)
 ?
  

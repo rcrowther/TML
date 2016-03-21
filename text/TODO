@@ -1,8 +1,7 @@
 = General
 Get some tests, someday
-Webpage/markup defence code?
+
 Update docs on HTML parser examples --- add FileReader
-abstract output for streams also?
 
 test Unicode
 Convert to unicode method
@@ -15,8 +14,9 @@ Finish Markdown extension
 Fully abstract the char definitions
 Tidy
 
-protect methods in Utils?
-Enhance the logger
+Test protect methods in Utils?
+more protection needeed, or ok?
+
 
 = UML
 check spec

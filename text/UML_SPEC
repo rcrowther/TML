@@ -13,7 +13,16 @@ Input is text. The form of input and output; stream, file, etc. is not defined.
 === Unicode
 UML input would usually be Latin/ASCII/UTF-8. UML should, if writing to solid format, encode and output as Unicode.
 
-In circumstances where the output is not solid, or specifically designed to handle Unicode, UML can output Latin/ASCII. For example, this may include HTML entity coding. However, even in this situation, a stream of Unicode codepoints is preferred.
+In circumstances where the codebase can not handle Unicode, UML can output Latin/ASCII with escapes. For example, some implementations of UML may translate to XML entity coding. If XML entity encodings are implemented, please implement decimal entities first.
+
+Unicode codepoints, in whatever format, are preferred. If translation is to entity, then this should be clearly indicated (e.g. in method or class names)
+
+~ Rationale
+: XML entity encoding may be widespread in use, but is still a subset of potential usage. Moreover, entity-encoded material is difficult to scan, so has little further use. Unicode encoding may not be implemented in many older codebases, but is now widely used. In particular, TML is likely to be used for material destined for the web---most browsers handle Unicode in several encodings. Moreover, UTF-8 degrades respectfully in older software.
+
+~ Rationale
+: HTML character entity references exist, but are unlikely to be as compatible as XML Unicode entities, which usage stretches far beyond browsers. Hexadecimal numeric character references are used in official documentation, but rarely in practice. Greater compatibility, and most current sources, recommend decimal-encoded entities.
+
 
 == Parsing generalities
 Each group in the character references should be available as a separate call. 
@@ -67,6 +76,26 @@ Second, it would be foolish to ignore that much TML code will be embedded with m
 === Typography
 Should include ''basic' methods in the previous section, and the following,
 
+==== Quotes
+
+?codeblock
+"''"  single quotes open
+"'" single quote close and apostrophe
+"\"\""  double quote open 
+"\"" double quote close
+"<<" guillemot open
+">>" guillemot close
+?
+
+~ Rationale
+: UML has an unusual quote system. However, TML convention suggests an open mark should be distinguished from a close mark, and that characters should, where possible, be repeated.
+
+This system allows (as do some other systems) single quote close to be an apostrophe (Unicode approved usage).
+
+~ Rationale
+: The UML setup denies the user the ability to use the straight apostrophe for foot and inch marks. However, Unicode has separate characters for these---the keyboard mappings are wrong anyway (maybe sometime provide a solution?). 
+
+
 ==== Combining marks
 
 ?codeblock
@@ -88,36 +117,11 @@ If character tables fail, the code should fall back to using Unicode combining c
 
 Java advice: ""never build your own tables".
 
-==== Quotes
-
-?codeblock
-"''"  single quotes open
-"'" single quote close and apostrophe
-"\"\""  double quote open 
-"\"" double quote close
-"<<" guillemet open
-">>" guillemet close
-?
-
-~ Rationale
-: UML has an unusual quote system. However, TML convention suggests an open mark should be distinguished from a close mark, and that characters should, where possible, be repeated.
-
-This system allows (as do some other systems) single quote close to be an apostrophe (Unicode approved usage).
-
-~ Rationale
-: The UML setup denies the user the ability to use the straight apostrophe for foot and inch marks. However, Unicode has separate characters for these---the keyboard mappings are wrong anyway (maybe sometime provide a solution?). 
 
 === Math
 Fractions, math symbols (inc. mathematical multiply/minus, and degree).
 
-==== Fractions
-?codeblock
-anyOf(1235678) ~ "/" ~ anyOf(234568)
-?
-
-All non-reducible fractions with factorial 2,3,4,5,7,8. Non-reducible means 3/4 exists, but not 2/4 (reduces to 1/2).
-
-==== Maths symbols
+==== Math symbols
 ?codeblock
 ":mx" multiply
 ":m-" minus
@@ -129,6 +133,15 @@ All non-reducible fractions with factorial 2,3,4,5,7,8. Non-reducible means 3/4 
 
 ~ Rationale
 : Multiply also has use for volume dimensions. It can still be regarded as ''math'.
+
+
+==== Fractions
+?codeblock
+anyOf(1235678) ~ "/" ~ anyOf(234568)
+?
+
+All non-reducible fractions with factorial 2,3,4,5,7,8. Non-reducible means 3/4 exists, but not 2/4 (reduces to 1/2).
+
 
 
 == Notes
