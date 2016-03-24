@@ -79,6 +79,7 @@ final class MarkData(
     * Used to count multiple control repetitions e.g. for headline
     * controls.
     */
+/*
   def tagControlPrefixCount
       : Int =
   {
@@ -90,7 +91,7 @@ final class MarkData(
     }
     i
   }
-
+*/
   /** Split the tagname between controls and text.
     *
     * This method separates controls at the start of the tagname from
@@ -98,13 +99,34 @@ final class MarkData(
     * 
     * Either side may return empty.
     */
+/*
   def splitTagControls()
       : (String, String) =
   {
     tagName.splitAt(tagControlPrefixCount)
   }
+*/
 
 
+  /** Appends a represention of the original mark from markData.
+    */
+ def addMarkString(b: StringBuilder)
+: StringBuilder =
+{
+      b += '\''
+      b append control
+      b append tagName
+      b += '\''
+b
+}
+
+  /** Creates a represention of the original mark from markData.
+    */
+ def toMarkString()
+: String =
+{
+addMarkString(new StringBuilder()).result()
+}
 
 
   override def toString()

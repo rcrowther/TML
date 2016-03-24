@@ -49,6 +49,10 @@ Error reporting can be turned off, but only to a small performance advantage.
 == documentation
 tml.HTMLCodeblock(tml.InputIterator.line(tml.UML(tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC"""))))
 
+== Markdown extension
+Convert TML markup to the lightweight markup language Markdown.
+ 
+Don't expect the parser to understand Markdown finessess such as the break idom. And don't expect Markdown to handle TML's block-level accuracy or systemic nesting. But, given the kind of material Markdown is used for, the parser usually returns correct results. 
 
 == State of project
 The original was written on a Windows 10 laptop computer using Eclipse. This setup was horribly slow, sometimes stalled, and the intermittent power supply caused unrequested shutdowns. The Eclipse Scala plugin remains, for my purposes, an unhappy experience. After I lost 2 hours work on yet another shutdown, I finished off on a proper computer.

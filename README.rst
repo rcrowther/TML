@@ -51,4 +51,13 @@ TML includes Unicode character markup method(s), called UML, ::
 
 Converts simple markup code to curly brackets, trademark symbols, fractions, accented characters etc. See the documentation for details.
 
+
+Markdown extension
+------------------
+Convert TML markup to the lightweight markup language `Markdown`_.
+ 
+Don't expect the parser to understand ``Markdown`` tricks such as the break idiom. And don't expect ``Markdown`` to handle ``TML``'s block-level accuracy or systemic mark nesting. But, given the kind of material ``Markdown`` is used for, the parser usually returns correct results. 
+
 ok.
+
+.. _Markdown: https://daringfireball.net/projects/markdown/

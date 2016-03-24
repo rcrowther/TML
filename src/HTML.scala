@@ -144,11 +144,8 @@ class HTML(val ot: OutputTarget)
     // then the tag name was given or defaulted, so do nothing.
     // If prefixes exist, they are counted to form the
     // resolvedTagname.
-    if (md.control == '=') {
-      val (ctrls, tag) = md.splitTagControls
-      md.resolvedTagname =
-        if (tag.size > 0) tag
-        else "h" + (ctrls.size + 1)
+    if (BlockParagraphNoDefaultMarks.contains(md.control)) {
+      md.resolvedTagname = "h" + (md.tagName + 1)
     }
 
     ot += '<'

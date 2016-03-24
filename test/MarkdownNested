@@ -1,0 +1,42 @@
+=== Block-level nested
+
+==== blockquote nested
+
+#blockquote 
+Cum noluisse quaerendum ut.
+
+Te nulla eleifend accusamus nec. 
+
+==== Inner discussion
+What goes on, in your heart?
+
+    +ul
+    --  Ex per ullum cetero.
+        Et nemore dissentias quo. 
+        -
+    -- Illum albucius ad ius, ei duis percipit pri.
+        -
+    +
+#
+
+==== list nested
+
+++
+@ Cum noluisse quaerendum ut.
+
+@ Te nulla eleifend accusamus nec. 
+
+--
+==== Inner discussion
+What goes on, in your heart?
+
+    +ul
+    --  Ex per ullum cetero.
+        Et nemore dissentias quo. 
+        -
+    -- Illum albucius ad ius, ei duis percipit pri.
+        -
+    +
+-
++
+

@@ -20,6 +20,7 @@ final class ActiveLogger
   // Utility render
   //-----------------
 
+
   /** Represents a control char as a string.
     *
     * Converts whitespace into something human-readable.
@@ -42,6 +43,8 @@ final class ActiveLogger
       }
     }
   }
+
+
 
   /** Appends a represention of the original position and display of a mark.
     */
@@ -133,7 +136,7 @@ final class ActiveLogger
   )
   {
     if(md.params.size < from || md.params.size > to) {
-val markStr = s"mark: '${md.control}${md.tagName}'"
+val markStr = s"mark: ${md.toMarkString()}"
 
       if(md.params.size < from){
         val sz = md.params.size

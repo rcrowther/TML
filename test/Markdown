@@ -1,0 +1,61 @@
+= Markdown test
+
+== Block-level
+
+#blockquote Te nulla eleifend accusamus nec. 
+#
+
+long quote,
+
+#blockquote 
+Cum noluisse quaerendum ut.
+
+Te nulla eleifend accusamus nec. 
+
+Euismod ocurreret ea has, quis verear senserit sed ad.
+#
+
+ordered list, paragraph items,
++ol
+@ Cum noluisse quaerendum ut. 
+@ Vim at doctus explicari appellantur.
+@ Vim at doctus explicari appellantur.
++
+
+unordered list, block listitems,
+
++ul
+--  Ex per ullum cetero.
+Et nemore dissentias quo. 
+-
+-- Illum albucius ad ius, ei duis percipit pri.
+-
++
+
+codeblock,
+
+#codeblock
+val (aX, aY) = pos(x + 1, y + 1)
+reset(aX, aY)
+#
+
+
+=== Block self-closing
+_
+
+== Inline-level
+
+I was thinking of [a{cypruss.com} someplace...].
+
+my [codeblock x += 1] of code
+
+a big [em shock!] to the system
+
+=== Inline self-closing
+
+*{image of dolphin}{dolphin.com}
+
+== Anonymous paragraphs
+Vis an velit feugait philosophia. 
+Mea facilis dignissim in. 
+Sea possim accommodare ex, iusto vituperata ne eam, ad nobis accusata cum.
