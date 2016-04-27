@@ -5,22 +5,21 @@ package tml
 /** Translation of TML to Markdown.
   *
   * One way to do this is to convert to HTML then pass in. Markdown
-  * should pass HTML through, untouched.
+  * should pass HTML untouched.
   *
   * This class will attempt to make `Markdown` marks from
-  * TML. `Markdown` is a more idiomatic solution than HTML, and easier
+  * TML. `Markdown` is more idiomatic than HTML, and easier
   * to edit. `Markdown` is more expressive than TML, so the results
   * will be limited.
   *
-  * *Warnings*:
+  * *Warnings*
   *  - Don't use literals for block-level codeblocks (the Parser will
   *  fail to indent correctly).
   *  - Images require two attributes `alt text` then `link/anchor`
   *  - TML handles unlimited nesting.
   * 
   * The parser will not, 
-  *  - handle ordered lists, the attribute 'title' in links,
-  * or reference links.
+  *  - handle the attribute 'title' in links, or reference links.
   *  - escape codeblock contents, an automatic Markdown effect. Use a
   *  preprocessing stage,
   *
@@ -42,14 +41,14 @@ package tml
   *  - defend consecutive blocklevel items such as lists and
   *  blockquotes, which in `Markdown` blend together. 
   * 
-  * It is best to restrain markup to common TML idoms. Markdown has
-  * little of the flexibility of TML, and TML guesses what is intended
+  * It is best to restrain source markup to common TML idoms. Markdown has
+  * little of the flexibility of TML, and TML guesses the intention
   * from tagnames (except for headlines, where the detection is by the
   * control mark `=`). Override tagnames, and the result may be
   * caotic.
   *
   * If a mark is unrecognised (many marks can be valid TML, but not
-  * recognised as `Markdown`) the parser reports an
+  * `Markdown`) the parser reports an
   * `unrecognisedMarkWarning`.
   *
   * [[https://daringfireball.net/projects/markdown]]

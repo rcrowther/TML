@@ -42,7 +42,7 @@ abstract class Parser
   var logger : Logger = Logger.inactive()
 
   protected var it = tml.InputIterator.empty
-  private var currentChar = '\u0000'
+  protected var currentChar = '\u0000'
 
 
 

@@ -40,12 +40,12 @@ Use the mini-filereader, built-in to preserve your sanity, ::
 
     tml.HTML(tml.FileReader("""/home/<some filepath>/TML/text/SPEC"""))
 
-Wait until it goes wrong. Lightweight markup parsers always do...
+Wait until it goes wrong. Lightweight markup parsers always do.
 
 
 UML
 ---
-TML includes Unicode character markup method(s), called UML, ::
+TML includes character-based Unicode markup method(s), called UML, ::
 
     val res = tml.UML(<string with UML markup>)
 

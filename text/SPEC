@@ -302,7 +302,7 @@ An implication of this is that, since paragraphs finish on newlines, all inline 
 
 
 == Grammar
-A PEG-like grammar for TML
+A PEG-like grammar,
 
 ?codeblock
 BlockParagraphMark = AnyOf('?', ...)

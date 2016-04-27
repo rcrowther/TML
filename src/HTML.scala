@@ -10,17 +10,33 @@ package tml
   *
   * The only attributes available are,
   *
-  * 'class' shortcut attribute renders as 'class="..."'
+  * ==='class' shortcut===
+  * On any tagname, the attribute renders as 'class="..."'
   *
-  * For inline tagname 'a'
+  * ===inline tagname 'a'===
   * attribute1 = 'href="..."'
   *
-  * For inline self-closing (tagname 'img')
+  * tagname 'a' deviates from standard TML behaviour. A tag with empty
+  * contents copies 'href' attribute as inner text i.e.
+  *
+  * {{{
+  *   [a{voila.com}]
+  * }}}
+  *
+  * renders as,
+  *
+  * {{{
+  *   <a href="voila.com">voila.com</a>
+  * }}}
+  *
+  * ===inline self-closing (tagname 'img')===
   *  attribute1 'src="..."'
+  *
   * or...
+  *
   *  attribute1 = 'alt="..."', attribute2 'src="..."'
   *
-  * NB: title attribute = "Relying on the title attribute is currently
+  * NB: no title attributes: "Relying on the title attribute is currently
   * discouraged" W3C HTML 5.1
   */
 class HTML(val ot: OutputTarget)
@@ -187,12 +203,19 @@ class HTML(val ot: OutputTarget)
       if (md.resolvedTagname == "a") {
         if (md.params.size > 0) {
           renderAttribute(ot, "href", md.params(0))
+          ot += '>'
+
+          // If this anchor is followed directly by a close
+          // move the href into the builder
+          // (parser state is undisturbed, the inline close will be parsed as usual)
+          if(currentChar == ']') ot ++= md.params(0)
         }
         logger.attributeRangeWarning(md, 1)
       }
-      else logger.attributeRangeWarning(md, 0)
-
-      ot += '>'
+      else {
+        ot += '>'
+        logger.attributeRangeWarning(md, 0)
+      }
     }
   }
 

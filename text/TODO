@@ -1,11 +1,28 @@
 = General
 Get some tests, someday
 
+Install
+
 Update docs on HTML parser examples --- add FileReader
 
 test Unicode
 
 Abstracted ParserCompanion
+
+TEX/Mallard?
+
+Move definitions to package
+Make FileReader return InputIterator
+
+== Parser
+Definitions should be protected
+
+== HTML
+Maybe add optional title attributes to HTML?
+HTML  gives empty anchors the link as text
+
+= Logger
+attribute range warning could be thunked?
 
 = TML
 Macroformat extension
