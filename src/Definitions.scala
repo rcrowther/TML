@@ -8,8 +8,8 @@ trait Definitions
   //---------------------
 
   // ASCII control code - ETX (end of text)
-  val EOF: Char = 3
-  val LineFeed: Char = 10
+  protected val EOF: Char = 3
+  protected val LineFeed: Char = 10
 
 
   //val CarriageReturn: Char = 13

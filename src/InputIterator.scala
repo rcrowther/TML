@@ -174,7 +174,7 @@ object InputIterator {
     * ends. This iterator replaces linends (which are significant in
     * TML). If parsing string lines with linends appended, the
     * iterator will generate output correctly from TML markup (at a
-    * small cost of an extra char parse per line).
+    * cost of an extra char parse per line).
     *
     * The iterater, in common with other iterators here, iterates the
     * chars contained in the strings (not across the strings).
@@ -184,11 +184,13 @@ object InputIterator {
     */
   // Pos will represent stripped linends, 
   // so updates on iterator additions.
+  // Works by initializing to zero, then triggering it's own 
+  // nextString() method
   def apply(ts: TraversableOnce[String]): InputIterator = new InputIterator {
     private var currPos = 0
     private var currString = ""
     private var currSize = 0
-    private var deliveredLF = false
+    private var deliveredLF = true
     private val strSeq = ts.toSeq
     private var i = 0
     private val strCount = strSeq.size
