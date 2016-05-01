@@ -322,7 +322,8 @@ object InputIterator {
 
   /** Creates an iterator from an input stream.
     *
-    * When the stream is created, codings may be specified.
+    * Codings may be specified by specifying on the supplied
+    * InputStreamReader.
     */
   def apply(s: InputStreamReader): InputIterator = new InputIterator {
 
@@ -353,8 +354,50 @@ object InputIterator {
       if (frwd != -1) frwd.toChar else LineFeed
   }
 
+  /** Creates an iterator from an input stream.
+    *
+    * Codings may be specified by specifying on the supplied
+    * InputStreamReader.
+*
+* This version grinds all newlines to the TML recongised 'NL/10' character.
+* This action can help cope with encoding issues. 
+    */
+  def newlineGrind(s: InputStreamReader): InputIterator = new InputIterator {
+
+    private var frwd: Int = s.read()
+    private var deliveredLF = false
+
+    def next() : Char =
+      if (frwd != -1) {
+        val p = frwd
+        frwd = s.read()
+
+      // defense detecting all common newline chars 
+      // (TML parsers only accepts 10 for newlines)
+        if (frwd > 9 && frwd < 15) frwd = 10
+
+        pos += 1
+        val r = p.toChar
+        if (r == LineFeed) {
+          lastNewlinePos = pos
+          lineCount += 1
+        }
+        r
+      }
+      else {
+        if (!deliveredLF) {
+          deliveredLF = true
+          LineFeed
+        }
+        else EOF
+      }
+
+    def lookForward : Char =
+      if (frwd != -1) frwd.toChar else LineFeed
+  }
   def printout(it: InputIterator) {
     var c: Char = '\u0000'
+    // 3 is EOF
     do {
       c = it.next()
       print(c)

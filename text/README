@@ -16,14 +16,14 @@ Java Regex can handle Unicode, but I kept this parser plain.
 -- It should show even performance to length/complexity.
 In some people's terminology, is 'scalable'.
 -
--- It handles masses of inputs and outputs, often implicitly.
+-- It handles many inputs and outputs, often implicitly.
 -
 +
 
 == Stepping
 This Scala parser uses simple character stepping. Indexing arrays in Java is slow. The parser will be slow.
 
-However, I wanted a simple implementation (first). The stepping algorithm also allows a vast number of input options.
+However, I wanted a simple implementation (first). The stepping algorithm also allows many input options.
 
 The parser is extensible code, calling renders through callbacks. It may be rewritten to work in different ways.
  

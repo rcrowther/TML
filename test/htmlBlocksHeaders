@@ -4,10 +4,6 @@
 // but good for detecting
 // sequential issues.
 
-val p = Parser()
-
-p("""
-
 #main
 
 === Lorem ipsum dolor sit amet
@@ -52,4 +48,3 @@ Te nulla eleifend accusamus nec. Te quo equidem omittam vituperata, nec ut nonum
 #footer
 Te quo equidem omittam vituperata, nec ut nonumes constituam. 
 #
-""")

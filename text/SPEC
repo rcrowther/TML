@@ -68,7 +68,33 @@ It is worth noting that TML can be parsed as single chars, with no lookabout at 
 === Extended input recognition
 The base definition of TML does not cover many implementations of space and line ends.
 
-TML implementations may add, or notate as, a "Universal Support" method. This should admit all Unicode newlines --- which include carriage return (CR), CR + LF and other. It should also convert/handle the full range of Unicode whitespace (which includes tabs, etc.) The method of handling can be in the parsing code itself, or in a pre-scanning conversion.
+TML implementations may add, or notate as, a "Universal Support" method. This should admit all ASCII newlines --- which include,
+
++dl
+~ line feed 
+: (LF), 10, 000A
+~ vertical tab
+: (VT), 11, 000B
+~ form feed
+: (FF), 13, 000C
+~ carriage return 
+: (CR), 14, 000D
++
+
+Since TML attaches no significance to multiple newlines, these are accommodated by code such as ''char c; (c>9 || c<15)'.
+
+It could also include all Unicode newlines which, in addition to the above, include,
+
++dl
+~ Next line
+: (NEL), 133, 85
+~ Line separator
+: (LS), 8232, 2028
+~ Paragraph Separator
+: (PS), 8233, 2029
++
+
+It should also convert/handle the full range of Unicode whitespace (which includes tabs, etc.) The method of handling can be in the parsing code itself, or in a pre-scanning conversion.
 
 ~ Rationale
 : It is more important that a user knows what a parser can or cannot do, as opposed to the parser erratically handling many cases.

@@ -974,9 +974,9 @@ abstract class Parser
 
 
   
-  /** Parse a paragrah with no opening side-significant mark.
+  /** Parse a paragraph with no opening side-significant mark.
     * 
-    * Brackets the contents  in paragraph marks.
+    * Brackets the contents in paragraph marks.
     * 
     * Asssumes currentPos on content. Compresses spacing, and handles
     * inline marks.  Stops on a linefeed.

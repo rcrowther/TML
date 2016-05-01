@@ -157,7 +157,8 @@ Converts TML marked files to other markups
   }
 
 
-
+ //BufferedReader in
+   //= new BufferedReader(new InputStreamReader(System.in));
   // execute
   def executeOne(
     grammar: String,
@@ -174,7 +175,7 @@ Converts TML marked files to other markups
     else {
       val is = new FileInputStream(src)
       val isr = new InputStreamReader(is)
-      val it = InputIterator(isr)
+      val it = InputIterator.newlineGrind(isr)
       val sFileName = src.getName()
       val fn = filenameSplit(sFileName)._1
       val dst = dstRoot.resolve(fn + '.' + extension)
