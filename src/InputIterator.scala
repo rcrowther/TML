@@ -18,7 +18,7 @@ import scala.language.implicitConversions
   * `EOF`
   */
 trait InputIterator
-extends Definitions
+    extends Definitions
 {
 
   /** Count of the characters iterated.
@@ -118,8 +118,8 @@ object InputIterator {
   }
 
   /** Creates an iterator from a char array.
-*
-* Note that the array must be UTF-16.
+    *
+    * Note that the array must be UTF-16.
     */
   def apply(a: Array[Char]): InputIterator = new InputIterator {
     private val sz = a.size
@@ -142,8 +142,8 @@ object InputIterator {
       else LineFeed
   }
 
-// TODO: probably need...
-// def utf8(a: Array[Char]): InputIterator =  ...
+  // TODO: probably need...
+  // def utf8(a: Array[Char]): InputIterator =  ...
 
 
   /** Creates an iterator from a string builder.
@@ -182,9 +182,9 @@ object InputIterator {
     * If lineends should not be appended to the given strings, see the
     * multi-string `concat` method.
     */
-  // Pos will represent stripped linends, 
+  // Pos will represent stripped linends,
   // so updates on iterator additions.
-  // Works by initializing to zero, then triggering it's own 
+  // Works by initializing to zero, then triggering it's own
   // nextString() method
   def apply(ts: TraversableOnce[String]): InputIterator = new InputIterator {
     private var currPos = 0
@@ -358,9 +358,9 @@ object InputIterator {
     *
     * Codings may be specified by specifying on the supplied
     * InputStreamReader.
-*
-* This version grinds all newlines to the TML recongised 'NL/10' character.
-* This action can help cope with encoding issues. 
+    *
+    * This version grinds all newlines to the TML recongised 'NL/10' character.
+    * This action can help cope with encoding issues. 
     */
   def newlineGrind(s: InputStreamReader): InputIterator = new InputIterator {
 
@@ -372,8 +372,8 @@ object InputIterator {
         val p = frwd
         frwd = s.read()
 
-      // defense detecting all common newline chars 
-      // (TML parsers only accepts 10 for newlines)
+        // defense detecting all common newline chars
+        // (TML parsers only accepts 10 for newlines)
         if (frwd > 9 && frwd < 15) frwd = 10
 
         pos += 1

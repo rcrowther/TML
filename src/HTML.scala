@@ -161,7 +161,7 @@ class HTML(val ot: OutputTarget)
     // If prefixes exist, they are counted to form the
     // resolvedTagname.
     if (BlockParagraphNoDefaultMarks.contains(md.control)) {
-      md.resolvedTagname = "h" + (md.tagName + 1)
+      md.resolvedTagname = "h" + (md.tagName.length + 1)
     }
 
     ot += '<'
