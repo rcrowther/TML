@@ -5,6 +5,6 @@ Tests inline markup features of the HTML converter.
 
 Goto [a{voila.com} Voila]
 
-[a{voila.com}]goo
+[a{voila.com}] goo
 
 

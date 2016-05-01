@@ -20,6 +20,7 @@ trait ParserCompanion[PARSER <: Parser]
     p.blockBalance(fix = true)
     //println("out:")
     //println(s"'${p.result()}'")
+    ot.clear()
   }
 
   /** Apply input, fixes errors, no error reporting.
@@ -45,6 +46,7 @@ trait ParserCompanion[PARSER <: Parser]
     p(it)
     p.blockBalance(fix = true)
     println(p.logger.toText())
+    ot.clear()
   }
 
   /** Apply input, fixes errors, with error reporting.

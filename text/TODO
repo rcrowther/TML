@@ -13,6 +13,9 @@ TEX/Mallard?
 
 Make FileReader return InputIterator
 
+== InputIterator
+Stream adding trailing paragraphs, and internal paragraphs on space
+
 == Parser
 Definitions should be protected
 

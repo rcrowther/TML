@@ -49,7 +49,7 @@ class HTMLCodeblock(ot: OutputTarget)
 {
     if(md.resolvedTagname == "codeblock") {
       ot ++= "<pre" 
-      attributesStockRender(md)
+      classAttributeRender(md)
       ot ++= "><code>"
     }
     else {

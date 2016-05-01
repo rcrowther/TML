@@ -28,7 +28,7 @@ trait OutputTarget
 
   /** Empties the output.
     *
-    * May discard or flush results. Will leavve the output ready to be used again.
+    * May discard or flush results. Will leave the output ready to be used again.
     */
   def clear()
 
