@@ -22,6 +22,7 @@ import java.io.IOException
 //tml.Runner.main(Array("-version"))
 
 // TODO need startup script to run without Scala
+// TODO: Ignore hidden files
 object Runner
 {
 
@@ -66,7 +67,15 @@ object Runner
         val filenameStr = p.getFileName().toString
         var (filename, extension) = filenameSplit(filenameStr)
         
-        if(extension != grammarExt && Files.isRegularFile(p))
+        // ignore hidden files (prefix '.' suffix '~')
+        // and extensions that match the grammar (already converted)
+        // and directories/symlinks.
+        if(
+          filenameStr(0) != '.'
+            && filenameStr.last != '~'
+            && extension != grammarExt
+            && Files.isRegularFile(p)
+        )
         {
           b += p.toFile
         }
@@ -157,8 +166,8 @@ Converts TML marked files to other markups
   }
 
 
- //BufferedReader in
-   //= new BufferedReader(new InputStreamReader(System.in));
+  //BufferedReader in
+  //= new BufferedReader(new InputStreamReader(System.in));
   // execute
   def executeOne(
     grammar: String,
@@ -248,26 +257,24 @@ Converts TML marked files to other markups
       else {
 
         // split the switches from the files
+        // (painful)
         var allowArg = false
         val splitPos =
           inputArgs.indexWhere((a) => {
-            if (a(0) == '-' || allowArg) {
+            if (a(0) == '-') {
               allowArg = (a == "-g" || a == "-grammar")
-
               false
             }
             else {
-              if(a.contains('/')) {
-                if (allowArg) {
+              if(allowArg) {
+                if(a.contains('/')) {
                   errorThenExit(s"path argument in switch parameter position arg:$a")
-                  false
                 }
-                else true
-              }
-              else {
+
                 allowArg = false
                 false
               }
+              else true
             }
           })
 

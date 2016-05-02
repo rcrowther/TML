@@ -1,7 +1,7 @@
 = General
 Get some tests, someday
 
-Install
+
 
 Update docs on HTML parser examples --- add FileReader
 
@@ -12,6 +12,15 @@ Abstracted ParserCompanion
 TEX/Mallard?
 
 Make FileReader return InputIterator
+
+== Install
+'-r' on file sources
+
+UML option?
+
+To webpage option?
+
+Options parse must be for *known* switches
 
 == InputIterator
 Stream adding trailing paragraphs, and internal paragraphs on space
