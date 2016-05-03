@@ -75,303 +75,373 @@ object UMLInputIterator {
       )
     }
 
+
+    def cacheShiftLeft(off: Int)
+    {
+      off match {
+        case 0 => {}
+
+        case 1 => {
+          cache(0) = cache(1)
+          cache(1) = cache(2)
+          cache(2) = it.next()
+        }
+        case 2 => {
+          cache(0) = cache(2)
+          cache(1) = it.next()
+          cache(2) = it.next()
+        }
+
+        case _ => throw new Exception(s"Offset out of range:$off")
+      }
+    }
+
+
+    def cacheReplace3(newChar: Char)
+        : Boolean =
+    {
+      cache(0) = newChar
+      cache(1) = it.next()
+      cache(2) = it.next()
+      true
+    }
+
+    def cacheReplace1(newChar: Char)
+        : Boolean =
+    {
+      cache(0) = newChar
+      true
+    }
+
+    def cacheReplace2(newChar: Char)
+        : Boolean =
+    {
+      cache(0) = newChar
+      cache(1) = cache(2)
+      cache(2) = it.next()
+      true
+    }
+
+    def cacheInsert2For3(newChar: Char)
+        : Boolean =
+    {
+      cache(0) = cache(2)
+      cache(1) = newChar
+      cache(2) = it.next()
+      true
+    }
+
+
     /**
       @return cache read limit
       */
     def cacheToUML()
-        : Int =
+        : Boolean =
     {
-      // lookahead saw the first point as a possible UML
-      var point1 = it.next()
-      var point2 = it.next()
-      var point3 = it.next()
+      var point1 = cache(0)
+      var point2 = cache(1)
+      var point3 = cache(2)
 
-      val readLimit =
-        // elipsis
-        point1 match {
-          case '.' => {
-            if (point2 == '.' && point3 == '.') {point1 = '\u2026'; 1}
-            else 3
-          }
-
-          case '(' => {
-            if (
-              (point2 == 'c' || point2 == 't' || point2 == 'r')
-                && point3 == ')'
-            )
-            {
-              point2 match {
-                case 'c' => {point1 = '\u00A9'; 1}
-                case 't' => {point1 = '\u2122'; 1}
-                case 'r' => {point1 = '\u00AE'; 1}
-              }
-            }
-            else 3
-          }
-
-          case '-' => {
-            // em
-            if (point2 == '-' && point3 == '-') {
-              {point1 = '\u2014'; 1}
-            }
-            else {
-              // en
-              if (point2 == '-') {
-                {point1 = '\u2013'; 1}
-              }
-              else {
-                // em/dict
-                if (point2 == '.') {
-                  {point1 = '\u2027'; 1}
-                }
-                else {point1 = '\u2010'; 1}
-              }
-            }
-          }
-          case  '\'' => {
-            if (point2 == '\'') {point1 = '\u2018'; 1}
-            else {point1 = '\u2019'; 1}
-          }
-          case  '"' => {
-            // double quotes
-            if (point2 == '"') {point1 = '\u201C'; 1}
-            else {point1 = '\u201D'; 1}
-          }
-          case  '<' => {
-            // guillemet open
-            if (point2 == '<') {point1 = '\u00AB'; 1}
-            else 3
-          }
-          case  '>' => {
-            // guillemet close
-            if (point2 == '>') {point1 = '\u00BB'; 1}
-            else 3
-          }
-          case ':' => {
-            if (point2 == 'm') {
-              // Math
-              point3 match {
-                // multiply, or dimensions
-                case 'x' =>  {point1 = '\u00D7'; 1}
-                // minus
-                case '-' =>  {point1 = '\u2212'; 1}
-                // degree
-                case 'o' =>  {point1 = '\u00B0'; 1}
-                case _ => 3
-              }
-            }
-            else {
-              //fractions
-              if (point2 > '0' && point2 < '8') {
-                point2 match {
-                  case '1' => {
-                    point3 match {
-                      case '2' => {point1 = '\u00BD'; 1}
-                      case '3' => {point1 = '\u2153'; 1}
-                      case '4' => {point1 = '\u00BC'; 1}
-                      case '5' => {point1 = '\u2155'; 1}
-                      case '6' => {point1 = '\u2159'; 1}
-                      case '8' => {point1 = '\u215B'; 1}
-                      case _ => 3
-                    }
-                  }
-
-                  case '2' => {
-                    point3 match {
-                      case '3' => {point1 = '\u2154'; 1}
-                      case '5' => {point1 = '\u2156'; 1}
-                      case _ => 3
-                    }
-                  }
-
-                  case '3' => {
-                    point3 match {
-                      case '4' => {point1 = '\u00BE'; 1}
-                      case '5' => {point1 = '\u2157'; 1}
-                      case '8' => {point1 = '\u215C'; 1}
-                      case _ => 3
-                    }
-                  }
-
-                  case '4' => {
-                    point3 match {
-                      case '5' => {point1 = '\u2158'; 1}
-                      case _ => 3
-                    }
-                  }
-
-                  case '5' => {
-                    point3 match {
-                      case '6' => {point1 = '\u215A'; 1}
-                      case '8' => {point1 = '\u215D'; 1}
-                      case _ => 3
-                    }
-                  }
-
-                  case '7' => {
-                    point3 match {
-                      case '8' => {point1 = '\u215E'; 1}
-                      case _ => 3
-                    }
-                  }
-                  case _ => 3
-                }
-              }
-              else {
-                // accents
-                if (
-                  point2 == '\\'
-                    || point2 == '/'
-                    || point2 == '^'
-                    || point2 == 'u'
-                    || point2 == ':'
-                    || point2 == 'o'
-                    || point2 == 'v'
-                    || point2 == 'c'
-                )
-                {
-                  point2 match {
-		    case '\\' => {
-                      point3 match {
-                        case 'A' => {point1 = '\u00C0'; 1}
-                        case 'E' => {point1 = '\u00C8'; 1}
-                        case 'O' => {point1 = '\u00D2'; 1}
-                        case 'I' => {point1 = '\u00CC'; 1}
-                        case 'U' => {point1 = '\u00D9'; 1}
-                        case 'a' => {point1 = '\u00E0'; 1}
-                        case 'e' => {point1 = '\u00E8'; 1}
-                        case 'i' => {point1 = '\u00EC'; 1}
-                        case 'o' => {point1 = '\u00F2'; 1}
-                        case 'u' =>  {point1 = '\u00F9'; 1}
-                        case _ => {point1 = point3; point2 = '\u0300'; 2}
-                      }
-                    }
-
-		    case '/' => {
-                      point3 match {
-                        case 'A' => {point1 = '\u00C1'; 1}
-                        case 'E' => {point1 = '\u00C9'; 1}
-                        case 'I' => {point1 = '\u00CD'; 1}
-                        case 'O' => {point1 = '\u00D3'; 1}
-                        case 'U' => {point1 = '\u00DA'; 1}
-                        case 'a' => {point1 = '\u00E1'; 1}
-                        case 'e' => {point1 = '\u00E9'; 1}
-                        case 'i' => {point1 = '\u00ED'; 1}
-                        case 'o' => {point1 = '\u00F3'; 1}
-                        case 'u' => {point1 = '\u00FA'; 1}
-                        case 'y' => {point1 = '\u00FD'; 1}
-                        case _ => {point1 = point3; point2 = '\u0301'; 2}
-                      }
-                    }
-
-		    case '^' => {
-                      point3 match {
-                        case 'A' => {point1 = '\u00C2'; 1}
-                        case 'E' => {point1 = '\u00CA'; 1}
-                        case 'I' => {point1 = '\u00CE'; 1}
-                        case 'O' => {point1 = '\u00D4'; 1}
-                        case 'U' => {point1 = '\u00DB'; 1}
-                        case 'a' => {point1 = '\u00E2'; 1}
-                        case 'e' => {point1 = '\u00EA'; 1}
-                        case 'i' => {point1 = '\u00EE'; 1}
-                        case 'o' => {point1 = '\u00F4'; 1}
-                        case 'u' => {point1 = '\u00FB'; 1}
-                        case _ => {point1 = point3; point2 = '\u0302'; 2}
-                      }
-                    }
-
-		    case 'u' => {
-                      point1 = point3
-                      point2 = '\u0306'
-                      2
-                    }
-
-		    case ':' => {
-                      point3 match {
-                        case 'A' => {point1 = '\u00C4'; 1}
-                        case 'E' => {point1 = '\u00CB'; 1}
-                        case 'I' => {point1 = '\u00CF'; 1}
-                        case 'O' => {point1 = '\u00D6'; 1}
-                        case 'U' => {point1 = '\u00DC'; 1}
-                        case 'a' => {point1 = '\u00E4'; 1}
-                        case 'e' => {point1 = '\u00EB'; 1}
-                        case 'i' => {point1 = '\u00EF'; 1}
-                        case 'o' => {point1 = '\u00F6'; 1}
-                        case 'u' => {point1 = '\u00FC'; 1}
-                        case 'y' => {point1 = '\u00FF'; 1}
-                        case _ => {point1 = point3; point2 = '\u0308'; 2}
-                      }
-                    }
-
-		    case 'o' => {
-                      point3 match {
-                        case 'A' => {point1 = '\u00C5'; 1}
-                        case 'a' => {point1 = '\u00E5'; 1}
-                        case _ => {point1 = point3; point2 = '\u030A'; 2}
-                      }
-                    }
-		    case 'v' => {
-                      point1 = point3
-                      point2 = '\u030C'
-                      2
-                    }
-		    case 'c' => {
-                      point3 match {
-                        case 'c' => {point1 = '\u00E7'; 1}
-                        case 'C' => {point1 = '\u00C7'; 1}
-                        case _ => {point1 = point3; point2 = '\u0327'; 2}
-                      }
-                    }
-
-                    case _ => 3
-                  }
-                }
-                else 3
-              }
-            }
-          }
-
-          case _ => 3
+      // elipsis
+      point1 match {
+        case '.' => {
+          if (point2 == '.' && point3 == '.') cacheReplace3('\u2026')
+          else false
         }
 
-      cache(0) = point1
-      cache(1) = point2
-      cache(2) = point3
-      readLimit
+        case '(' => {
+          if (
+            (point2 == 'c' || point2 == 't' || point2 == 'r')
+              && point3 == ')'
+          )
+          {
+            point2 match {
+              case 'c' => cacheReplace3('\u00A9')
+              case 't' => cacheReplace3('\u2122')
+              case 'r' => cacheReplace3('\u00AE')
+            }
+          }
+          else false
+        }
+
+        case '-' => {
+          // em
+          if (point2 == '-' && point3 == '-') {
+            cacheReplace3('\u2014')
+          }
+          else {
+            // en
+            if (point2 == '-') {
+              cacheReplace2('\u2013')
+            }
+            else {
+              // dict/hyphen
+              if (point2 == '.') {
+                cacheReplace2('\u2027')
+              }
+              else cacheReplace1('\u2010')
+            }
+          }
+        }
+        case  '\'' => {
+          if (point2 == '\'') cacheReplace2('\u2018')
+          else cacheReplace1('\u2019')
+        }
+        case  '"' => {
+          // double quotes
+          if (point2 == '"') cacheReplace2('\u201C')
+          else cacheReplace1('\u201D')
+        }
+        case  '<' => {
+          // guillemet open
+          if (point2 == '<') cacheReplace2('\u00AB')
+          else false
+        }
+        case  '>' => {
+          // guillemet close
+          if (point2 == '>') cacheReplace2('\u00BB')
+          else false
+        }
+        case ':' => {
+          if (point2 == 'm') {
+            // Math
+            point3 match {
+              // multiply, or dimensions
+              case 'x' =>  cacheReplace3('\u00D7')
+              // minus
+              case '-' =>  cacheReplace3('\u2212')
+              // degree
+              case 'o' =>  cacheReplace3('\u00B0')
+              case _ => false
+            }
+          }
+          else {
+            //fractions
+            if (point2 > '0' && point2 < '8') {
+              point2 match {
+                case '1' => {
+                  point3 match {
+                    case '2' => cacheReplace3('\u00BD')
+                    case '3' => cacheReplace3('\u2153')
+                    case '4' => cacheReplace3('\u00BC')
+                    case '5' => cacheReplace3('\u2155')
+                    case '6' => cacheReplace3('\u2159')
+                    case '8' => cacheReplace3('\u215B')
+                    case _ => false
+                  }
+                }
+
+                case '2' => {
+                  point3 match {
+                    case '3' => cacheReplace3('\u2154')
+                    case '5' => cacheReplace3('\u2156')
+                    case _ => false
+                  }
+                }
+
+                case '3' => {
+                  point3 match {
+                    case '4' => cacheReplace3('\u00BE')
+                    case '5' => cacheReplace3('\u2157')
+                    case '8' => cacheReplace3('\u215C')
+                    case _ => false
+                  }
+                }
+
+                case '4' => {
+                  point3 match {
+                    case '5' => cacheReplace3('\u2158')
+                    case _ => false
+                  }
+                }
+
+                case '5' => {
+                  point3 match {
+                    case '6' => cacheReplace3('\u215A')
+                    case '8' => cacheReplace3('\u215D')
+                    case _ => false
+                  }
+                }
+
+                case '7' => {
+                  point3 match {
+                    case '8' => cacheReplace3('\u215E')
+                    case _ => false
+                  }
+                }
+                case _ => false
+              }
+            }
+            else {
+              // accents
+              if (
+                point2 == '\\'
+                  || point2 == '/'
+                  || point2 == '^'
+                  || point2 == 'u'
+                  || point2 == ':'
+                  || point2 == 'o'
+                  || point2 == 'v'
+                  || point2 == 'c'
+              )
+              {
+                point2 match {
+		  case '\\' => {
+                    point3 match {
+                      case 'A' => cacheReplace3('\u00C0')
+                      case 'E' => cacheReplace3('\u00C8')
+                      case 'O' => cacheReplace3('\u00D2')
+                      case 'I' => cacheReplace3('\u00CC')
+                      case 'U' => cacheReplace3('\u00D9')
+                      case 'a' => cacheReplace3('\u00E0')
+                      case 'e' => cacheReplace3('\u00E8')
+                      case 'i' => cacheReplace3('\u00EC')
+                      case 'o' => cacheReplace3('\u00F2')
+                      case 'u' =>  cacheReplace3('\u00F9')
+                      case _ => cacheInsert2For3('\u0300')
+                    }
+                  }
+
+		  case '/' => {
+                    point3 match {
+                      case 'A' => cacheReplace3('\u00C1')
+                      case 'E' => cacheReplace3('\u00C9')
+                      case 'I' => cacheReplace3('\u00CD')
+                      case 'O' => cacheReplace3('\u00D3')
+                      case 'U' => cacheReplace3('\u00DA')
+                      case 'a' => cacheReplace3('\u00E1')
+                      case 'e' => cacheReplace3('\u00E9')
+                      case 'i' => cacheReplace3('\u00ED')
+                      case 'o' => cacheReplace3('\u00F3')
+                      case 'u' => cacheReplace3('\u00FA')
+                      case 'y' => cacheReplace3('\u00FD')
+                      case _ => cacheInsert2For3('\u0301')
+                    }
+                  }
+
+		  case '^' => {
+                    point3 match {
+                      case 'A' => cacheReplace3('\u00C2')
+                      case 'E' => cacheReplace3('\u00CA')
+                      case 'I' => cacheReplace3('\u00CE')
+                      case 'O' => cacheReplace3('\u00D4')
+                      case 'U' => cacheReplace3('\u00DB')
+                      case 'a' => cacheReplace3('\u00E2')
+                      case 'e' => cacheReplace3('\u00EA')
+                      case 'i' => cacheReplace3('\u00EE')
+                      case 'o' => cacheReplace3('\u00F4')
+                      case 'u' => cacheReplace3('\u00FB')
+                      case _ => cacheInsert2For3('\u0302')
+                    }
+                  }
+
+		  case 'u' => {
+                    cacheInsert2For3('\u0306')
+                  }
+
+		  case ':' => {
+                    point3 match {
+                      case 'A' => cacheReplace3('\u00C4')
+                      case 'E' => cacheReplace3('\u00CB')
+                      case 'I' => cacheReplace3('\u00CF')
+                      case 'O' => cacheReplace3('\u00D6')
+                      case 'U' => cacheReplace3('\u00DC')
+                      case 'a' => cacheReplace3('\u00E4')
+                      case 'e' => cacheReplace3('\u00EB')
+                      case 'i' => cacheReplace3('\u00EF')
+                      case 'o' => cacheReplace3('\u00F6')
+                      case 'u' => cacheReplace3('\u00FC')
+                      case 'y' => cacheReplace3('\u00FF')
+                      case _ => cacheInsert2For3('\u0308')
+                    }
+                  }
+
+		  case 'o' => {
+                    point3 match {
+                      case 'A' => cacheReplace3('\u00C5')
+                      case 'a' => cacheReplace3('\u00E5')
+                      case _ => cacheInsert2For3('\u030A')
+                    }
+                  }
+		  case 'v' => {
+                    cacheInsert2For3('\u030C')
+                  }
+		  case 'c' => {
+                    point3 match {
+                      case 'c' => cacheReplace3('\u00E7')
+                      case 'C' => cacheReplace3('\u00C7')
+                      case _ => cacheInsert2For3('\u0327')
+                    }
+                  }
+
+                  case _ => false
+                }
+              }
+              else false
+            }
+          }
+        }
+
+        case _ => false
+      }
+
+      //cache(0) = point1
+      //cache(1) = point2
+      //cache(2) = point3
+      //readLimit
+
     }
 
 
     // Stores points tested for UML, maybe substituted
-    private var cache = new Array[Int](3)
+    private var cache = new Array[Char](3)
 
     // Current cache item for next()
     // -1 = cache not in action, or an index to cache
     private var cacheI = -1
-    private var limit = 0
+    private val limit = 3
 
     def next() : Char =
     {
       val ret =
         if (cacheI < 0) {
-          val r = it.next()
+          val rp = it.next()
 
-          // test if nextchar is maybe UML, if so,
-          // walk ahead and cache
-          if (isUMLStart(it.lookForward)) {
-            cacheI = 0
-            limit = cacheToUML()
-          }
+          // test if point is maybe UML, if so, cache
+          val r =
+            if (isUMLStart(rp)) {
+              // point is possible UML
+              // load cache, process, set cacheI
+              cacheReplace3(rp)
+              cacheToUML()
+              cacheI = 1
+              cache(0)
+            }
+            else rp
           r
         }
         else {
           // empty the cache
-          val r = cache(cacheI)
-          cacheI += 1
-          if (cacheI == limit) cacheI = -1
-          r
-        }
 
-      ret.toChar
+          // test if the point is maybe UML, if so,
+          // cache shift left, process, set cacheI
+          val rc =
+            if (isUMLStart(cache(cacheI))) {
+              cacheShiftLeft(cacheI)
+              cacheToUML()
+              cacheI = 1
+              cache(0)
+            }
+            else {
+              // not UML. Advance.
+              val r = cache(cacheI)
+              cacheI += 1
+              if (cacheI >= limit) cacheI = -1
+              r
+            }
+          rc
+        }
+      ret
     }
 
     def lookForward : Char = it.lookForward

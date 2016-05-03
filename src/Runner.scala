@@ -125,12 +125,13 @@ object Runner
     */
   def printHelpShort()
   {
-    val help = """Usage: tml <options> <source files> <destination>
+    val help = """Usage: tml <options> <source file> <destination>
+   or: tml <options> <source file>
    or: tml -help
-   (<source files> can either be a file or directory. Ignores files starting
+   (<source file> can either be a file or directory. Ignores files starting
    with '.' or ending in '~'. <destination> must be a
    directory. If either option is omitted, the current working directory is
-   used)
+   used. Output encoding is forced to UTF-8)
 Converts TML marked files to other markups
 """
     print(help)
@@ -144,6 +145,7 @@ Converts TML marked files to other markups
     val helpOptions = """
  -g, --grammar    one of {html, htmlCB, markdown} 
  -e, --errors     explain what is being done (reports errors)
+ --uml            apply UML transformations to input
  -v, --verbose    explain what is being done (reports files)
  -h, -help        display help and exit
  -version         output version information and exit
@@ -176,6 +178,7 @@ Converts TML marked files to other markups
     dstRoot: Path,
     extension: String,
     errors: Boolean,
+    uml: Boolean,
     verbose: Boolean
   )
   {
@@ -185,7 +188,12 @@ Converts TML marked files to other markups
     else {
       val is = new FileInputStream(src)
       val isr = new InputStreamReader(is)
-      val it = InputIterator.newlineGrind(isr)
+      val baseIt = InputIterator.newlineGrind(isr)
+
+      val it =
+        if (uml) UMLInputIterator(baseIt)
+        else baseIt
+
       val sFileName = src.getName()
       val fn = filenameSplit(sFileName)._1
       val dst = dstRoot.resolve(fn + '.' + extension)
@@ -308,6 +316,7 @@ Converts TML marked files to other markups
           else "html"
         }
 
+        val uml = switches.contains("-uml")
         val verbose = {switches.find((s) => {s == "-verbose" || s == "-v"}) != None}
         val errors = {switches.find((s) => {s == "-errors" || s == "-e"}) != None}
 
@@ -343,7 +352,7 @@ Converts TML marked files to other markups
         val ext = grammarListExt(grammar)
 
         srcs.foreach{
-          executeOne(grammar, _, dst, ext, errors, verbose)
+          executeOne(grammar, _, dst, ext, errors, uml, verbose)
         }
       }
     }
