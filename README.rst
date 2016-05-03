@@ -58,6 +58,15 @@ Convert TML markup to the lightweight markup language `Markdown`_.
  
 Don't expect the parser to understand ``Markdown`` tricks such as the break idiom. And don't expect ``Markdown`` to handle ``TML``'s block-level accuracy or systemic mark nesting. But, given the kind of material ``Markdown`` is used for, the parser often returns correct results. 
 
+
+Installation
+------------
+Linux only. TML includes installation code. Once installed, to convert all documentation to webpages,
+
+    tml -uml -wp "<some filepath>/TML/text/lib/doc.css" <some filepath>/TML/text <some filepath>/TML/text
+
+(this is fast, it may make some interpretation errors. See the GUIDE for more info)
+
 ok.
 
 .. _Markdown: https://daringfireball.net/projects/markdown/

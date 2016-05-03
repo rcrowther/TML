@@ -146,6 +146,8 @@ Converts TML marked files to other markups
  -g, --grammar    one of {html, htmlCB, markdown} 
  -e, --errors     explain what is being done (reports errors)
  --uml            apply UML transformations to input
+ -wp, --webpage   wrap in basic web markup: HTML5, 'title' attribute is
+                  capitalized filename, parameter is a stylesheet href
  -v, --verbose    explain what is being done (reports files)
  -h, -help        display help and exit
  -version         output version information and exit
@@ -169,6 +171,25 @@ Converts TML marked files to other markups
   }
 
 
+  def webpagePrefix(ot: OutputTarget, styleSheet: String, title: String)
+  {
+    val t = if(title.length > 2) {
+      Character.toUpperCase(title(0)) + title.substring(1)
+    }
+    else title
+
+    ot ++= """<!DOCTYPE html><html><head><title>"""
+    ot ++= t
+    ot ++= """</title><meta http-equiv="content-type" content="text/html; charset=UTF-8" /><link rel="stylesheet" type="text/css" media="screen" href=""""
+    ot ++= styleSheet
+    ot ++= """"/></head><body><article>"""
+  }
+
+  def webpageSuffix(ot: OutputTarget)
+  {
+    ot ++= """</article></body></html>"""
+  }
+
   //BufferedReader in
   //= new BufferedReader(new InputStreamReader(System.in));
   // execute
@@ -178,8 +199,9 @@ Converts TML marked files to other markups
     dstRoot: Path,
     extension: String,
     errors: Boolean,
+    verbose: Boolean,
     uml: Boolean,
-    verbose: Boolean
+    webpage: Option[String]
   )
   {
     if (!src.exists()) {
@@ -202,6 +224,8 @@ Converts TML marked files to other markups
 
       if (verbose) println(src.getPath)
 
+      if (webpage != None) webpagePrefix(ot, webpage.get, fn)
+
       grammar match {
         case "html" => {
           if (!errors) HTML(ot, it)
@@ -216,6 +240,11 @@ Converts TML marked files to other markups
           else HTMLCodeblock.errorReport(ot, it)
         }
       }
+
+      if (webpage != None) webpageSuffix(ot)
+      // Finalize the output
+      ot.clear()
+
     }
   }
 
@@ -270,15 +299,20 @@ Converts TML marked files to other markups
         var allowArg = false
         val splitPos =
           inputArgs.indexWhere((a) => {
-            if (a(0) == '-') {
-              allowArg = (a == "-g" || a == "-grammar")
+            if (a.length > 0 && a(0) == '-') {
+              allowArg = (
+                a == "-g"
+                  || a == "--grammar"
+                  || a == "-wp"
+                  || a == "--webpage"
+              )
               false
             }
             else {
               if(allowArg) {
-                if(a.contains('/')) {
-                  errorThenExit(s"path argument in switch parameter position arg:$a")
-                }
+                //if(a.contains('/')) {
+                //errorThenExit(s"path argument in switch parameter position arg:$a")
+                //}
 
                 allowArg = false
                 false
@@ -299,7 +333,7 @@ Converts TML marked files to other markups
 
         // treat the options
         val grammar = {
-          val x = switches.indexWhere((s) => {s == "-grammar" || s == "-g"})
+          val x = switches.indexWhere((s) => {s == "--grammar" || s == "-g"})
           //println(s"grammar at $x")
           if(x != -1) {
             if(x > switches.length - 2) {
@@ -314,6 +348,24 @@ Converts TML marked files to other markups
             g
           }
           else "html"
+        }
+
+        val webpage = {
+          val x = switches.indexWhere((s) => {s == "--webpage" || s == "-wp"})
+          //println(s"grammar at $x")
+          if(x != -1) {
+            if(x > switches.length - 2) {
+              errorThenExit("webpage switch must be followed by a stylesheet route")
+            }
+
+            val ss = switches(x + 1)
+            if (ss.length > 0 && ss(0) == '-') {
+              errorThenExit(s"webpage switch must be followed by a stylesheet route switch:$ss")
+            }
+
+            Some(ss)
+          }
+          else None
         }
 
         val uml = switches.contains("-uml")
@@ -352,7 +404,16 @@ Converts TML marked files to other markups
         val ext = grammarListExt(grammar)
 
         srcs.foreach{
-          executeOne(grammar, _, dst, ext, errors, uml, verbose)
+          executeOne(
+            grammar,
+            _,
+            dst,
+            ext,
+            errors,
+            verbose,
+            uml,
+            webpage
+          )
         }
       }
     }

@@ -12,6 +12,10 @@ trait ParserCompanion[PARSER <: Parser]
   /** Apply input, fixes errors, no error reporting.
     *
     * Default behaviour in Spec.
+    *
+    * The output target is not cleared, to allow for building.
+    * Clearing may be necessary for results, especially when using
+    * streams.
     */
   def apply(ot: OutputTarget, it: InputIterator)
   {
@@ -20,7 +24,7 @@ trait ParserCompanion[PARSER <: Parser]
     p.blockBalance(fix = true)
     //println("out:")
     //println(s"'${p.result()}'")
-    ot.clear()
+    //ot.clear()
   }
 
   /** Apply input, fixes errors, no error reporting.
@@ -28,9 +32,9 @@ trait ParserCompanion[PARSER <: Parser]
     * Shortcut to return a string from any `InputIterator`.
     */
   def apply(it: InputIterator)
-: String =
+      : String =
   {
-   val b = new StringBuilder()
+    val b = new StringBuilder()
     val p = builder(b)
     p(it)
     p.blockBalance(fix = true)
@@ -38,6 +42,10 @@ trait ParserCompanion[PARSER <: Parser]
   }
 
   /** Apply input, fixing errors, with error reporting.
+    *
+    * The output target is not cleared, to allow for building.
+    * Clearing may be necessary for results, especially when using
+    * streams.
     */
   def errorReport(ot: OutputTarget, it: InputIterator)
   {
@@ -46,7 +54,7 @@ trait ParserCompanion[PARSER <: Parser]
     p(it)
     p.blockBalance(fix = true)
     println(p.logger.toText())
-    ot.clear()
+    //ot.clear()
   }
 
   /** Apply input, fixes errors, with error reporting.
@@ -54,9 +62,9 @@ trait ParserCompanion[PARSER <: Parser]
     * Shortcut to return a string from any `InputIterator`.
     */
   def errorReport(it: InputIterator)
-: String =
+      : String =
   {
-   val b = new StringBuilder()
+    val b = new StringBuilder()
     val p = builder(b)
     p.logger = new ActiveLogger()
     p(it)
