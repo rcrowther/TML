@@ -15,7 +15,7 @@ import scala.language.implicitConversions
   * how to write them into a document.
   *
   * This set of methods is not designed to be the answer to the
-  * problem. It is an easy-to-understand way of creating some common
+  * problem. It is an easy-to-understand way of creating common
   * codepoints, mostly using keyboard-available characters.
   *
   * Like any conversion methods for typography, these methods will
@@ -215,7 +215,7 @@ object UML {
           case """::u""" => "\u00FC"
           case """:/y""" => "\u00FD"
           case """::y""" => "\u00FF"
-          case ":va" => "\u0103"
+            //case ":ua" => "\u0103"
 
           case _ => {
             m(1) match {
@@ -246,55 +246,86 @@ object UML {
   // Math
   //------
 
-
-  private val mathSymbolSP = nc(""":m[xo-]""")
-  private val fractionSP = nc("""[1235678]/[234568]""")
+  private val mathSymbolSP = nc(""":(?:(m[xo-])|([12345678][234568]))""")
 
   private val mathP = Pattern.compile('(' + (
     mathSymbolSP
-      | fractionSP
   ) + ')')
 
   private def maths(m: String)
       : String =
   {
-    // also defined by m(1) == 'm'
-    if(m(0) == ':') {
-      m(2) match {
-        // multiply, or dimensions
-        case 'x' => "\u00D7"
-        // minus
-        case '-' => "\u2212"
-        // degree
-        case 'o' => "\u00B0"
-        case _ => m
-      }
-
-    }
-    else {
-      if(Character.isDigit(m(0))) {
-        // fraction
-        m match {
-          case "1/2" => "\u00BD"
-          case "1/3" => "\u2153"
-          case "2/3" => "\u2154"
-          case "1/4" => "\u00BC"
-          case "3/4" => "\u00BE"
-          case "1/5" => "\u2155"
-          case "2/5" => "\u2156"
-          case "3/5" => "\u2157"
-          case "4/5" => "\u2158"
-          case "1/6" => "\u2159"
-          case "5/6" => "\u215A"
-          case "1/8" => "\u215B"
-          case "3/8" => "\u215C"
-          case "5/8" => "\u215D"
-          case "7/8" => "\u215E"
+    m(1) match {
+      case 'm' => {
+        m(2) match {
+          // multiply, or dimensions
+          case 'x' => "\u00D7"
+          // minus
+          case '-' => "\u2212"
+          // degree
+          case 'o' => "\u00B0"
           case _ => m
         }
       }
-      else m
+      case _ => {
+        // fractions
+        m(1) match {
+          case '1' => {
+            m(2) match {
+              case '2' => "\u00BD"
+              case '3' => "\u2153"
+              case '4' => "\u00BC"
+              case '5' => "\u2155"
+              case '6' => "\u2159"
+              case '8' => "\u215B"
+              case _ => m
+            }
+          }
+
+          case '2' => {
+            m(2) match {
+              case '3' => "\u2154"
+              case '5' => "\u2156"
+              case _ => m
+            }
+          }
+
+          case '3' => {
+            m(2) match {
+              case '4' => "\u00BE"
+              case '5' => "\u2157"
+              case '8' => "\u215C"
+              case _ => m
+            }
+          }
+
+          case '4' => {
+            m(2) match {
+              case '5' => "\u2158"
+              case _ => m
+            }
+          }
+
+          case '5' => {
+            m(2) match {
+              case '6' => "\u215A"
+              case '8' => "\u215D"
+              case _ => m
+            }
+          }
+
+          case '7' => {
+            m(2) match {
+              case '8' => "\u215E"
+              case _ => m
+            }
+          }
+          case _ => m
+        }
+
+      }
     }
+
   }
 
 

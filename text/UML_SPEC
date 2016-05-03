@@ -111,9 +111,9 @@ This system allows (as do some other systems) single quote close to be an apostr
 ) ~ LETTER
 ?
 
-The tables may match a character first. If character matching is attempted, they should first implement ''Latin-1 Supplement' Letters, meaning vowels (vowels includes ''y') for accents, not including BREVE and CARRON.
+The tables may match a character first. If character matching is attempted, they should first implement ''Latin-1 Supplement' Letters, meaning vowels (vowels includes ''y') for accents, not including BREVE and CARRON (i.e. BREVE and CARRON can be implemented, but also omitted).
 
-If character tables fail, the code should fall back to using Unicode combining characters.
+If character tables fail, the code should fall back to using Unicode combining characters. Combing character results should include all of the marks in the table above, including BREVE and CARRON.
 
 Java advice: ""never build your own tables".
 
@@ -137,11 +137,13 @@ Fractions, math symbols (inc. mathematical multiply/minus, and degree).
 
 ==== Fractions
 ?codeblock
-anyOf(1235678) ~ "/" ~ anyOf(234568)
+": ~ anyOf(1235678) ~ anyOf(234568)
 ?
 
 All non-reducible fractions with factorial 2,3,4,5,7,8. Non-reducible means 3/4 exists, but not 2/4 (reduces to 1/2).
 
+~ Rationale
+: Fraction marks are unintuitive (i.e. matches no common system, and also visually difficult to read). But the prefix '':' is easy to parse (compare to the common [cb DIGIT ~ / ~ DIGIT] representation). The lack of slashes means the notation is less likely to interfere with literals containing computer and mathematical code. And the character '':' is consistent with other marks in UML. 
 
 
 == Notes
@@ -149,4 +151,4 @@ All non-reducible fractions with factorial 2,3,4,5,7,8. Non-reducible means 3/4 
 Unicode regards ligatures as a feature of presentation. They have an effect on semantic parsing, so Unicode discourages their use. Consequently, they are not enabled.
 
 === Math before typography
-If used together, ''math' should be parsed before ''typography'. The ''math' definition of ''minus' is unlikly to be ambiguous, but the typographical hyphen will replace it if typography is used first.   
+If used together, ''math' should be parsed before ''typography'. The ''math' definition of ''minus' is unlikely to be ambiguous, but the typographical hyphen will replace it if typography is used first.   

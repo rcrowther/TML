@@ -22,7 +22,7 @@ import java.io.IOException
 //tml.Runner.main(Array("-version"))
 
 // TODO need startup script to run without Scala
-// TODO: Ignore hidden files
+// TODO: Set '.' to cwd
 object Runner
 {
 
@@ -127,7 +127,8 @@ object Runner
   {
     val help = """Usage: tml <options> <source files> <destination>
    or: tml -help
-   (<source files> can either be a file or directory. <destination> must be a
+   (<source files> can either be a file or directory. Ignores files starting
+   with '.' or ending in '~'. <destination> must be a
    directory. If either option is omitted, the current working directory is
    used)
 Converts TML marked files to other markups

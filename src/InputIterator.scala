@@ -6,7 +6,7 @@ import java.io.InputStreamReader
 import scala.language.implicitConversions
 
 
-//tml.HTML2(InputIterator(FileReader("/home/rob/Code/scala/TML/text/SPEC")))
+//tml.HTML2(InputIterator(tml.FileReader("/home/rob/Code/scala/TML/text/SPEC")))
 
 
 /** Iterator for input
@@ -395,6 +395,7 @@ object InputIterator {
     def lookForward : Char =
       if (frwd != -1) frwd.toChar else LineFeed
   }
+
   def printout(it: InputIterator) {
     var c: Char = '\u0000'
     // 3 is EOF
