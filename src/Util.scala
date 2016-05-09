@@ -241,7 +241,7 @@ object Util
     }
   }
 
-  /** Builds new strings, applying a function to the contents of a block mark.
+  /** Builds new strings, applying a function when not the contents of a block mark.
     *
     * The function is applied to everything outside the block mark. It
     * will not map the target marks, but other TML is mapped.

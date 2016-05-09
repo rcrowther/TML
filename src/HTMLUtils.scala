@@ -231,7 +231,9 @@ object HTMLUtils
     * some efforts to,
     *  - avoid encoding existing entity ampersands
     *  - detect HTML tag angle brackets (so, not all angle brackets)
-    * As the method is for trusted data, it will not encode quotation marks. They are unlikely to appear in attribute form, and encoding is likely to clash with tpographic content.
+    * As the method is for trusted data, it will not encode quotation
+    * marks. They are unlikely to appear in attribute form, and
+    * encoding is likely to clash with tpographic content.
     *
     * Many entities exist above &#160. This method only translates
     * markup-significant, low numeric, entities.
@@ -265,7 +267,9 @@ object HTMLUtils
     * some efforts to,
     *  - avoid encoding existing entity ampersands
     *  - detect HTML tag angle brackets (so, not all angle brackets)
-    * As the method is for trusted data, it will not encode quotation marks. They are unlikely to appear in attribute form, and encoding is likely to clash with tpographic content.
+    * As the method is for trusted data, it will not encode quotation
+    * marks. They are unlikely to appear in attribute form, and
+    * encoding is likely to clash with tpographic content.
     *
     * Many entities exist above &#160. This method only translates
     * markup-significant, low numeric, entities.
@@ -311,13 +315,13 @@ object HTMLUtils
     * Many entities exist above &#160. This method only translates
     * markup-significant, low numeric, entities.
     *
-    * For WC3 entities
+    * For WC3 entities,
     * [[https://www.w3.org/TR/REC-html40/sgml/entities.html]]
     *
-    * For insecure data
+    * For insecure data,
     * [[https://www.owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet]]
     *
-    * Also try
+    * Also try,
     * [[https://code.google.com/p/owasp-esapi-java/source/browse/trunk/src/main/java/org/owasp/esapi/codecs/HTMLEntityCodec.java]]
     */
   def toDisplay(str: String)

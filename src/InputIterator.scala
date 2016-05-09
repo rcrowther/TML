@@ -369,6 +369,7 @@ object InputIterator {
 
     def next() : Char =
       if (frwd != -1) {
+
         val p = frwd
         frwd = s.read()
 
@@ -400,7 +401,7 @@ object InputIterator {
     var c: Char = '\u0000'
     // 3 is EOF
     do {
-      c = it.next()
+      it.next()
       print(c)
     } while(c != 3)
       println

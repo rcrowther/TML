@@ -67,7 +67,7 @@ class HTML(val ot: OutputTarget)
   val BlockParagraphNoDefaultMarks: Seq[Char] = Seq('=')
 
   // Could be used for 'a'
-  // but span is generic so intuitive
+  // ...but span is generic so intuitive
   val InlineMarkDefault: String = "span"
 
   val inlineBracketedTagnameAliases = Map(
@@ -209,6 +209,10 @@ class HTML(val ot: OutputTarget)
           // move the href into the builder
           // (parser state is undisturbed, the inline close will be parsed as usual)
           if(currentChar == ']') ot ++= md.params(0)
+        }
+        else  {
+          // else parameterless anchors have incomplete rendering
+          ot += '>'
         }
         logger.attributeRangeWarning(md, 1)
       }

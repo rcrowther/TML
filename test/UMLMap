@@ -1,0 +1,22 @@
+// UML unmap '?' and inline 'a'
+
+hi:/e [b :/e [a :/e]]
+hi:/e  [a :/e  [b :/e ]]
+
+??
+  [a :/e ]
+?
+
+hi:/e 
+
+??
+  [b :/e ]
+?
+
+##
+hi:/e 
+
+  ?b
+   hi:/e 
+  ?
+#

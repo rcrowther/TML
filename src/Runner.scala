@@ -213,7 +213,14 @@ Converts TML marked files to other markups
       val baseIt = InputIterator.newlineGrind(isr)
 
       val it =
-        if (uml) UMLInputIterator(baseIt)
+        if (uml) //UMLInputIterator(baseIt)
+UMLInputIterator.mapWhenNot(
+    baseIt,
+'?',
+    '[',
+    ']',
+    'a'
+  )
         else baseIt
 
       val sFileName = src.getName()

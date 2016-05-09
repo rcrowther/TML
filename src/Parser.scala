@@ -1054,7 +1054,7 @@ abstract class Parser
   {
 
     // Ensure the parser ends in the following seq of 2 chars.
-    // NB: This parser makes no attempt to take the size of it's input,
+    // NB: This parser makes no attempt to test the size of it's input,
     //  it defines limits by setting control characters to the
     // end of input. In Java this can be expensive, as it is an
     // immutable string copy.
@@ -1073,7 +1073,8 @@ abstract class Parser
 
 
     while (currentChar != EOF) {
-
+//println(s"currentChar: ${currentChar.toInt}$currentChar")
+//println ( (currentChar == EOF) )
       // Jump whitespace for something useful
       // must allow to go to loop test again here, see if
       // limit reached, or spurious paragraph markup
@@ -1096,6 +1097,8 @@ abstract class Parser
         // handle block marks, else treat as paragraph.
         //println(s"skipped whitespace lastMarkWasNewline:$lastMarkWasNewline now: $currentChar")
         //println(s"main block loop: $currentChar")
+
+
         if (SideSignificantMarks.contains(currentChar)) {
           parseSideSignificant()
         }
@@ -1106,6 +1109,7 @@ abstract class Parser
 
       }
     }
+//println("EOP")
   }
 
 

@@ -2,22 +2,24 @@
 -webkit-box-sizing: border-box;
 -moz-box-sizing: border-box;
 box-sizing: border-box;
-font-size: 14px;
-line-height: 21px;
-font-weight: normal;
-letter-spacing: 0.20px;
+
 margin: 0;
 padding: 0;
 list-style-position: inside;
 }
 
 body{
+font-size: 14px;
+line-height: 21px;
+font-weight: normal;
+letter-spacing: 0.20px;
+font-family: georgia,serif;    
 }
 
 article {
 /*width: 600px;*/
 width: 500px;
-margin: 0 auto 0 auto;
+margin: 0 auto 21px auto;
 }
 
 h1 {
@@ -75,6 +77,11 @@ font-style: italic;
 
 code {
 font-family: monospace;
+}
+
+blockquote {
+margin-top: 21px;
+padding: 0px 42px 7px 42px;
 }
 
 .action{

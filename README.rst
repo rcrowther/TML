@@ -61,7 +61,7 @@ Don't expect the parser to understand ``Markdown`` tricks such as the break idio
 
 Installation
 ------------
-Linux only. TML includes installation code. Once installed, to convert all documentation to webpages,
+Linux only. TML includes installation code. Once installed, to convert all documentation to webpages, ::
 
     tml -uml -wp "<some filepath>/TML/text/lib/doc.css" <some filepath>/TML/text <some filepath>/TML/text
 
