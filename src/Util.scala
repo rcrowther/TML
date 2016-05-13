@@ -256,6 +256,7 @@ object Util
     */
   // tml.Util.mapWhenNot('?', "", tml.FileReader("/home/rob/Code/scala/TML/text/SPEC"), (s) => {print(s); "lit!"})
   // TODO: skip *all* controls --- No, ok for this...
+  // TODO: The newer stream mapper in UMLInputIterator has better controls?
   def mapWhenNot(
     control: Char,
     klass: String,

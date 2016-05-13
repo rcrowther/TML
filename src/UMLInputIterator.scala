@@ -477,6 +477,8 @@ object UMLInputIterator {
   //val i = tml.InputIterator(tml.FileReader("/home/rob/Code/scala/TML/test/UMLShort"))
   //val it = tml.InputIterator.mapWhenNot(i, '[', ']', '?')
   //TODO: Ought to detect full inline tagnames, not initial char?
+//TODO: A mess of f..then cold be tidied?
+//NB: Newest mapper. See Util.mapWhenNot
   def mapWhenNot(
     it: InputIterator,
     blockControl: Char,

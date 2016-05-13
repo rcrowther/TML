@@ -105,7 +105,7 @@ object Runner
   private val grammarListExt = Map(
     "html" -> "htm",
     "htmlCB" -> "htm",
-    "markdown" -> "mk"
+    "markdown" -> "md"
   )
 
   private val grammarList = grammarListExt.keys.toSeq
@@ -214,13 +214,13 @@ Converts TML marked files to other markups
 
       val it =
         if (uml) //UMLInputIterator(baseIt)
-UMLInputIterator.mapWhenNot(
-    baseIt,
-'?',
-    '[',
-    ']',
-    'a'
-  )
+          UMLInputIterator.mapWhenNot(
+            baseIt,
+            '?',
+            '[',
+            ']',
+            'a'
+          )
         else baseIt
 
       val sFileName = src.getName()
