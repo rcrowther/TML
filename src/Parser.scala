@@ -51,6 +51,23 @@ abstract class Parser
   // Mark definitions
   //---------------------
 
+/** An arbitary string to open a parse.
+*
+* Probably best not used on markup which can stand alone e.g. webpages.
+* howeveer, it wwould be useful for texts with closing stanzas e.g. XML, JSON.
+*
+*/
+def open: String
+
+
+
+/** An arbitary string to close a parse.
+*
+* Probably best not used on markup which can stand alone e.g. webpages.
+* howeveer, it wwould be useful for texts with closing stanzas e.g. JSON.
+*/
+def close: String
+
   /** Marks for block-based markup.
     *
     * The char key is the control character, recognised after
@@ -67,6 +84,24 @@ abstract class Parser
     * See also
     */
   def BlockBracketedMarks: Map[Char, String]
+
+  /** Marks for block-based markup with titles.
+    *
+    * The difference between these and `BlockBracketedMarks` is
+    * that these parse the first line and send it to the
+    * renderer.
+    *
+    * Block marks in TML are pairs. They start with the mark, then
+    * close on a repetition of the mark. They detect open and close by the
+    * presence of a title i.e. not an empty following line. 
+*
+* They do not respond to duplicated marks (no defaults) or attributes. They do not parse post-mark text. They are rendered through `renderBlockOpen` and `renderBlockClose`, carrying a single attribute
+of the title line.
+    *
+    * See also
+    */
+  def BlockBracketedTitledMarks: Seq[Char]
+
 
   /** Modify block bracket tag names automatically.
     *
@@ -191,6 +226,7 @@ abstract class Parser
     val b = Seq.newBuilder[Char]
     b += BlockSelfClosingMark
     b ++= BlockBracketedMarks.map(_._1)
+    b ++= BlockBracketedTitledMarks
     b ++= BlockParagraphMarks
     b.result()
   }
@@ -243,7 +279,8 @@ abstract class Parser
     * implemented parsers.  The test is not necessary, but is little
     * overload, as the tests may be elided on compilation.
     */
-  def verifyControlDefinitions()
+//TODO: extend for BlockBracketedTitledMark
+  @elidable(FINEST) def verifyControlDefinitions()
   {
     val bbc = BlockBracketedMarks.map(_._1).toSeq
     val bpc = BlockParagraphMarks
@@ -348,6 +385,24 @@ abstract class Parser
     b.result()
   }
 
+  /** Read a line.
+    *
+    * Reads until `currentChar` is a LineFeed.
+    *
+    * @return the line as a string.
+    */
+  private def readLine()
+      : String =
+  {
+    val b = new StringBuilder()
+
+    while (currentChar != LineFeed) {
+      b += currentChar
+      forward()
+    }
+    b.result()
+  }
+
 
 
   //----------------
@@ -423,21 +478,23 @@ abstract class Parser
   private def parseAttributes(md: MarkData)
   {
     //val t = System.nanoTime()
+    val attsB = Seq.newBuilder[String]
 
     // Get tagname
     md.tagName = getUntil(
       (c: Char) => { c == '.' || c == '{' || Character.isWhitespace(c) }
     )
 
-    if (currentChar == '.') {
+    while (currentChar == '.') {
       forward()
-      md.klass = getUntil(
-        (c: Char) => { c == '{' ||  Character.isWhitespace(c) }
+      attsB += getUntil(
+        (c: Char) => {  c == '.' || c == '{' ||  Character.isWhitespace(c) }
       )
     }
 
+    md.klass = attsB.result()
 
-    var attsB = Seq.newBuilder[String]
+    attsB.clear()
 
     while (currentChar == '{') {
       forward()
@@ -464,10 +521,10 @@ abstract class Parser
     * @param charPos index of the control char.
     * @return true if the close was accepted and given markup, else false
     */
-  private def handleBlockClose()
+  private def handleBlockClose(controlMark: Char)
       : Boolean =
   {
-    val controlMark = currentChar
+    //val controlMark = currentChar
 
     if (blockStack.isEmpty) {
       // Too many closes. Ignore.
@@ -519,6 +576,20 @@ abstract class Parser
 
     renderBlockOpen(md)
   }
+
+  /** Stack, and render an unresolved block open mark.
+*
+* Used for 
+    */
+  private def handleUnresolvedBlockOpen(md: MarkData)
+  {
+
+    blockStack.push(
+      md
+    )
+//println(s"handleUnresolvedBlockOpen $blockStack")
+    renderBlockOpen(md)
+  }
   
   /** Unstack and render a paragraph close.
     */
@@ -533,9 +604,9 @@ abstract class Parser
     */
   private def handleParagraphOpen(md: MarkData)
   {
-    //println(s"  paragraph open cmark:$controlMark md:$md")
+    //println(s"  paragraph open md:$md")
 
-    // first, defend the no-default marks
+    // defend the no-default marks
     if (!BlockParagraphNoDefaultMarks.contains(md.control)) {
       md.tagNameResolve(BlockParagraphDefaultedMarks)
     }
@@ -667,7 +738,7 @@ abstract class Parser
   {
     // if suceed, move off and skip space,
     // else treat control as start of unmarked paragraph
-    if(handleBlockClose()) {
+    if(handleBlockClose(currentChar)) {
       forward()
       
       // Now on whitspace
@@ -680,7 +751,26 @@ abstract class Parser
   }
 
 
-
+  def parseBlockBracketedTitledMark(controlMark: Char) {
+val controlChar = controlMark
+//println(s"parseBlockBracketedTitledMark $controlMark")
+    // Step on and read the line...
+    forward()
+val line = readLine().trim()
+if (!line.isEmpty) {
+// open
+    val md = MarkData(controlChar, it)
+md.params = Seq(line)
+    handleUnresolvedBlockOpen(md)
+// leave cursor on the linefeed
+}
+else {
+// close
+handleBlockClose(controlChar)
+// leave cursor on the linefeed
+//forward()
+}
+}
 
   /** Parse a block without parsing the contents.
     *
@@ -786,6 +876,7 @@ abstract class Parser
     */
   private def parseBlockParagraph(controlMark: Char)
   {
+    //println(s"  parseBlockParagraph controlMark:$controlMark")
     // Stash for errors
     val md = MarkData(controlMark, it)
 
@@ -918,7 +1009,7 @@ abstract class Parser
         // Skip the space. If newlines present, quit the paragraphing,
         // else replace with a space.
         skipSpace()
-        if (currentChar != LineFeed)ot+= ' '
+        if (currentChar != LineFeed) ot+= ' '
       }
       else {
 
@@ -1006,6 +1097,7 @@ abstract class Parser
 
   private def parseSideSignificant()
   {
+   // println(s"  parseSideSignificant currentChar:$currentChar")
     // in rough order of liklyhood?
     if (BlockBracketedMarks.contains(currentChar)) {
       //println(s"peek: ${it.lookForward}")
@@ -1025,6 +1117,10 @@ abstract class Parser
         // handles the open mark, and following paragraph
         parseBlockParagraph(currentChar)
       }
+else {
+if (BlockBracketedTitledMarks.contains(currentChar)) {
+            parseBlockBracketedTitledMark(currentChar)
+}
       else {
         currentChar match {
           // literal block
@@ -1039,9 +1135,10 @@ abstract class Parser
             parseBlockSelfClose()
           }
           case _ => {
-            
+            // should be unreachable
           }
         }
+}
       }
     }
   }
@@ -1052,6 +1149,9 @@ abstract class Parser
     */
   def apply(itIn: InputIterator)
   {
+// add immediately
+// not on construction, class initialises too early.
+ot ++= open
 
     // Ensure the parser ends in the following seq of 2 chars.
     // NB: This parser makes no attempt to test the size of it's input,
@@ -1075,6 +1175,7 @@ abstract class Parser
     while (currentChar != EOF) {
 //println(s"currentChar: ${currentChar.toInt}$currentChar")
 //println ( (currentChar == EOF) )
+//println(s"SideSignificantMarks $SideSignificantMarks")
       // Jump whitespace for something useful
       // must allow to go to loop test again here, see if
       // limit reached, or spurious paragraph markup
@@ -1096,7 +1197,7 @@ abstract class Parser
 
         // handle block marks, else treat as paragraph.
         //println(s"skipped whitespace lastMarkWasNewline:$lastMarkWasNewline now: $currentChar")
-        //println(s"main block loop: $currentChar")
+        //println(s"main block loop: '$currentChar'")
 
 
         if (SideSignificantMarks.contains(currentChar)) {
@@ -1110,6 +1211,7 @@ abstract class Parser
       }
     }
 //println("EOP")
+ot ++= close
   }
 
 

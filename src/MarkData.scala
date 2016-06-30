@@ -6,9 +6,8 @@ package tml
   *
   * @param control the char used to identify a mark.
   * @param tagName attribute representing the name/type of the mark.
-  * @param klass attribute representing the class of the mark.
-  * @param url attribute representing a url attached to the mark.
-  * @param text attribute representing text attached to the mark.
+  * @param klass attributes representing the class of the mark.
+  * @param params attributes attached to the mark.
   * @param pos where the mark starts, for blocks on the whitespace.
   * @param lineNum count of lines where the mark is positioned.
   * @param linePos position of the start of the line where the mark is positioned.
@@ -16,7 +15,7 @@ package tml
 final class MarkData(
   val control: Char,
   var tagName: String,
-  var klass: String,
+  var klass: Seq[String],
   var params: Seq[String],
   val pos: Int,
   val lineNum: Int,
@@ -173,7 +172,7 @@ object MarkData {
     new MarkData(
       control,
       "",
-      "",
+      Seq.empty[String],
       Seq.empty[String],
       it.pos,
       it.lineCount,
@@ -185,13 +184,13 @@ object MarkData {
   def apply()
       : MarkData =
   {
-    new MarkData('\u0000', "", "", Seq.empty[String], 0, 0, 0)
+    new MarkData('\u0000', "", Seq.empty[String], Seq.empty[String], 0, 0, 0)
   }
 
   def apply(
     control: Char,
     tagName: String,
-    klass: String,
+    klass: Seq[String],
     params: Seq[String],
     pos: Int,
     lineNum: Int,

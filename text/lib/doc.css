@@ -84,6 +84,15 @@ margin-top: 21px;
 padding: 0px 42px 7px 42px;
 }
 
+.page_img{
+width:450px;
+padding: 0 0 28px 0;
+}
+
+.text_right{
+text-align:right;
+}
+
 .action{
 margin: 21px 0;
 padding: 7px 21px;

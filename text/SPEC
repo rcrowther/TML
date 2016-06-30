@@ -183,9 +183,13 @@ Bracket opening and self-closing marks can be followed by an attributes set,
 #{attribute 1}{attribute 2}...
 ?
 
-Attributes can be multiple. All attributes are optional. Whitespace, either newline or space, finishes the attribute set.</p><p>Attributes supplied with zero contents may render as an attribute with no content, or not at all, depending on the target markup.
+Attributes can be multiple. All attributes are optional. Whitespace, either newline or space, finishes the attribute set.
 
-Attributes have no meaning attached to them, or their order. There is however, a vague convention---attributes supplying URLs should be the last attribute in the list.</p><p>The bracketed attributes can, exceptionally, be closed by a newline. See [a{}{} ''Inline close by newline']
+Attributes supplied with zero contents may render as an attribute with no content, or not at all, depending on the target markup.
+
+Attributes have no meaning attached to them, or their order. There is however, a vague convention---attributes supplying URLs should be the last attribute in the list.
+
+The bracketed attributes can, exceptionally, be closed by a newline. See [a{}{} ''Inline close by newline']
 
 ~ Note
 : A newline will close an open attribute. See ''Inline close by newline'.

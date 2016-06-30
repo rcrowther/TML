@@ -5,6 +5,9 @@ trait HTMLDefinitions
 
 this : Parser =>
 
+  def close: String = ""
+  def open: String = ""
+
   val blockBracketedTagnameAliases = Map(
     "d" -> "div",
     "c" -> "code",
@@ -17,6 +20,8 @@ this : Parser =>
     '-' -> "li",
     '?' -> "pre"
   )
+
+  val BlockBracketedTitledMarks = Seq.empty[Char]
 
   val BlockParagraphDefaultedMarks: Map[Char, String] = Map(
     '~' -> "dd",

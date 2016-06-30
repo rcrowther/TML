@@ -10,7 +10,7 @@ trait Definitions
   // ASCII control code - ETX (end of text)
   protected val EOF: Char = 3
   protected val LineFeed: Char = 10
-
+  protected val Space: Char = 32
 
   //val CarriageReturn: Char = 13
 

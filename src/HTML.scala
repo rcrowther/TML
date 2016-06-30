@@ -43,6 +43,9 @@ class HTML(val ot: OutputTarget)
     extends Parser
 {
 
+  val close: String = ""
+  val open: String = ""
+
   val blockBracketedTagnameAliases = Map(
     "d" -> "div",
     "c" -> "code",
@@ -55,6 +58,8 @@ class HTML(val ot: OutputTarget)
     '-' -> "li",
     '?' -> "pre"
   )
+
+  val BlockBracketedTitledMarks = Seq.empty[Char]
 
   val BlockParagraphDefaultedMarks: Map[Char, String] = Map(
     '~' -> "dd",
@@ -86,6 +91,8 @@ class HTML(val ot: OutputTarget)
   val InlineSelfClosingMarkDefault: String = "img"
 
   /** Test on construction that all marks are different.
+    *
+    * Is elidable
     */
   verifyControlDefinitions()
 
@@ -96,12 +103,16 @@ class HTML(val ot: OutputTarget)
     */
   protected def classAttributeRender(md: MarkData)
   {
-    if (md.klass != "") {
+    if (!md.klass.isEmpty) {
       ot ++= " class=\""
-      ot ++= md.klass
+      var first = true
+      md.klass.foreach{ k =>
+        if (first) first = false
+        else ot += ' '
+        ot ++= k
+      }
       ot ++= "\""
     }
-
   }
 
   protected def renderAttribute(
@@ -274,7 +285,7 @@ object HTML
   // val i = tml.InputIterator("/home/rob/Code/scala/TML/text/SPEC")
   // tml.FileReader("""/home/rob/Code/scala/TML/text/SPEC""")
   // tml.HTML(tml.FileReader.stream("""/home/rob/Code/scala/TML/text/SPEC"""))
-
+  // tml.HTML(tml.InputIterator(tml.FileReader("""/home/rob/Code/scala/TML/test/htmlBlocks""")))
 
   def builder(ot: OutputTarget)
       : HTML =

@@ -105,7 +105,8 @@ object Runner
   private val grammarListExt = Map(
     "html" -> "htm",
     "htmlCB" -> "htm",
-    "markdown" -> "md"
+    "markdown" -> "md",
+    "filmscript" -> "htm"
   )
 
   private val grammarList = grammarListExt.keys.toSeq
@@ -143,7 +144,7 @@ Converts TML marked files to other markups
     printHelpShort()
 
     val helpOptions = """
- -g, --grammar    one of {html, htmlCB, markdown} 
+ -g, --grammar    one of {html, htmlCB, markdown, filmscript} 
  -e, --errors     explain what is being done (reports errors)
  --uml            apply UML transformations to input
  -wp, --webpage   wrap in basic web markup: HTML5, 'title' attribute is
@@ -245,6 +246,10 @@ Converts TML marked files to other markups
         case "htmlCB" => {
           if (!errors) HTMLCodeblock(ot, it)
           else HTMLCodeblock.errorReport(ot, it)
+        }
+        case "filmscript" => {
+          if (!errors) filmscript.HTML(ot, it)
+          else filmscript.HTML.errorReport(ot, it)
         }
       }
 

@@ -41,7 +41,7 @@ trait ParserCompanion[PARSER <: Parser]
     b.result()
   }
 
-  /** Apply input, fixing errors, with error reporting.
+  /** Apply input, ignoring errors, with error reporting.
     *
     * The output target is not cleared, to allow for building.
     * Clearing may be necessary for results, especially when using
@@ -52,12 +52,12 @@ trait ParserCompanion[PARSER <: Parser]
     val p = builder(ot)
     p.logger = new ActiveLogger()
     p(it)
-    p.blockBalance(fix = true)
+    p.blockBalance(fix = false)
     println(p.logger.toText())
     //ot.clear()
   }
 
-  /** Apply input, fixes errors, with error reporting.
+  /** Apply input, ignoring errors, with error reporting.
     *
     * Shortcut to return a string from any `InputIterator`.
     */
@@ -68,7 +68,7 @@ trait ParserCompanion[PARSER <: Parser]
     val p = builder(b)
     p.logger = new ActiveLogger()
     p(it)
-    p.blockBalance(fix = true)
+    p.blockBalance(fix = false)
     println(p.logger.toText())
     b.result()
   }
@@ -80,7 +80,7 @@ trait ParserCompanion[PARSER <: Parser]
    {
    val p = builder()
    p(it)
-   p.blockBalance(fix = true)
+   p.blockBalance(fix = false)
    println("out:")
    println(s"'${p.result()}'")
    println

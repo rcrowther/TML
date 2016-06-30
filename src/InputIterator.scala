@@ -55,6 +55,20 @@ trait InputIterator
     */
   def lookForward: Char
 
+  /** Prints the entire input iterator.
+    *
+    * *WARNING* exhausts the iterator. Only intended for
+    * development and debugging.
+    */
+  def printOut() {
+    var c: Char = '\u0000'
+    do {
+      print(c)
+      c = next()
+    } while(c != EOF)
+      println
+  }
+
   /** Returns a string representating this input iterator.
     *
     * The string shows details of the state - not threadsafe.
@@ -190,7 +204,7 @@ object InputIterator {
     private var currPos = 0
     private var currString = ""
     private var currSize = 0
-    private var deliveredLF = true
+    private var deliveredLF = false
     private val strSeq = ts.toSeq
     private var i = 0
     private val strCount = strSeq.size
@@ -395,16 +409,6 @@ object InputIterator {
 
     def lookForward : Char =
       if (frwd != -1) frwd.toChar else LineFeed
-  }
-
-  def printout(it: InputIterator) {
-    var c: Char = '\u0000'
-    // 3 is EOF
-    do {
-      it.next()
-      print(c)
-    } while(c != 3)
-      println
   }
 
   implicit def string2InputIterator(s: String) = InputIterator(s)
