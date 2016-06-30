@@ -1,0 +1,50 @@
+// Test many features of TML, 
+// This test set up with HTML features.
+// Doesn't cover possible errors
+// but good for detecting
+// sequential issues.
+
+#main
+
+=== Lorem ipsum dolor sit amet
+
+++
+@ cu utinam euismod constituam his
+@ vis an amet alii tempor
+@ Vis an velit feugait philosophia
+@ Mea facilis dignissim in
++
+[a{sea_possim_accommodare.ex} iusto vituperata ne eam, ad nobis accusata cum]
+
+Offendit necessitatibus an quo,
+*.small.border{image of pro in illud convenire quaerendum}{dolphin.mars}
+cu ius idque mediocrem.
+
+_.dashed
+
+#section
+
+Cum noluisse quaerendum ut [italic Civibus inimicus id eos], noluisse epicurei in eam.
+
+
+ ??
+  Vim at doctus explicari appellantur.
+  Admodum posidonium contentiones at quo.
+  Eu odio solet percipit sit,
+      his ex civibus probatus,
+      cu affert copiosae vituperata usu.
+  Et copiosae explicari per,
+      ius ut omnis augue dicant.
+ ?
+#
+
+// code
+#pre
+?code
+Te nulla eleifend accusamus nec. Te quo equidem omittam vituperata, nec ut nonumes constituam. Possim alienum perfecto pro ex, ex nam possit hendrerit argumentum. Ex per ullum cetero. Id eos lorem fierent quaerendum, sea diam solet putant te.
+?
+#
+#
+#footer
+Te quo equidem omittam vituperata, nec ut nonumes constituam. 
+#
