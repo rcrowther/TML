@@ -58,6 +58,14 @@ Convert TML markup to the lightweight markup language `Markdown`_.
  
 Don't expect the parser to understand ``Markdown`` tricks such as the break idiom. And don't expect ``Markdown`` to handle ``TML``'s block-level accuracy or systemic mark nesting. But, given the kind of material ``Markdown`` is used for, the parser often returns correct results. 
 
+Filmscript
+----------
+(ignoring my own TODO list...) TML has a specialised input language for filmscripts. This is as concise as possible while allowing good flexibility.
+
+The output is semantic, HTML only, and relies on custom CSS.
+
+For instructions, see `text/filmscript/README`.
+
 
 Installation
 ------------
@@ -68,5 +76,7 @@ Linux only. TML includes installation code. Once installed, to convert all docum
 (this is fast, it may make some interpretation errors. See the GUIDE for more info)
 
 ok.
+
+
 
 .. _Markdown: https://daringfireball.net/projects/markdown/

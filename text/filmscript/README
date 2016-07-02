@@ -1,0 +1,140 @@
+= Filmscript
+
+A sub-language of TML for generating filmscripts. 
+
+
+== Implementation
+The sub-language is limited, to make the typing involved far less than would be expected. The output is also specialised markup, a subset of the output language, designed for filmsripts.
+
+To be flexible, the implementation ought to pre-parse, and produce full TML, leading to 
+
+Input language -> TML -> output language
+
+but lacking compiler phases, and to avoid two-stage compilation, I targeted HTML with some definitions,
+
+Input language -> HTML
+
+
+
+== Usage without installation
+From a file,
+
+?cb
+ tml.filmscript.HTML.errorReport(tml.InputIterator(tml.FileReader("""/home/rob/Code/scala/TML/test/filmscript/test.tml""")))
+?
+
+
+== CSS
+CSS for the HTML output is a seperate project, available elsewhere. Or you can make your own.
+
+
+
+== The language
+This can be deduced from test/filmscript/test.tml. However,
+
+=== Main structure
+
+==== Optional title
+? Jarring Bones
+   By Tenker
+?
+
+
+==== A scene
+= EXT. LOCATION #1 - DAY
+---
+=
+
+==== A Character
+# CHARACTER #1
+---
+# 
+
+=== Inserts
+
+==== Instruction
+An instruction. 
+
+
+* (pause)
+
+Works at scene level, where it is upper-case to the left,
+
+THE CORNER OF THE ROOM
+
+or at character level, where it is indented,
+
+??
+... break text.
+(beat)
+However, ...
+?
+
+==== Transition
+Works at scene-level,
+
+~ dissolve to:
+
+Where it is upper-cased to the right,
+
+DISSOLVE TO: 
+
+
+==== Simultaneous dialoge
+Places scene action (character dialoge, on-screen text etc.) side by side,
+
+||
+...
+|
+
+e.g.
+
+||
+# CHARACTER #1
+Show your first character speaking on the left.
+#
+
+# CHARACTER #2
+While the character on the right tries to get a word in edgeways.
+#
+|
+
+==== On-screen text
+Like this,
+
+>>
+...
+>
+
+e.g.
+
+>>
+"On-screen text can contain characters or formatting available from a keyboard. This is limiting, but scripts are for reading."
+>
+
+==== Series of shots/montage
+Like this,
+
++ SERIES OF SHOTS:
+@ ...
+@ ...
++
+
+or,
+
++ MONTAGE:
+@ ...
+@ ...
++
+
+== Formal end of script
+A script should end with this transition, inside the last scene block,
+
+...
+~ FADE OUT.
+=
+
+The parser handles other aspects of script starting and ending.
+
+== The end
+That's it.
